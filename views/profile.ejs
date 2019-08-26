@@ -1,0 +1,47 @@
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
+    integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="../main.css" />
+</head>
+
+<body>
+  <div class="page-wrapper">
+    <div class="nav-wrapper">
+      <div class="grad-bar"></div>
+      <nav class="navbar">
+        <img src="../LightningHosted.png" alt="Company Logo">
+        <div class="menu-toggle" id="mobile-menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+        <ul class="nav no-search">
+          <li class="nav-item"><a href="#">Home</a></li>
+          <li class="nav-item"><a href="#">Posts</a></li>
+          <li class="nav-item"><a href="#">About</a></li>
+          <li class="nav-item"><a href="#">Contact</a></li>
+          <li class="nav-item"><a href="/noauth/logout">Logout</a></li>
+
+        </ul>
+      </nav>
+    </div>
+    <section class="headline">
+      <h1>LightningHosted</h1>
+      <p>Share Images And Stack Sats</p>
+    </section>
+    <form ref='uploadForm' id='uploadForm' action='/auth/upload' method='post' encType="multipart/form-data">
+      <input type="file" name="sampleFile" />
+      <input type='submit' value='Upload!' />
+    </form>
+    <div id="deposit"></div>
+    <div class="grid">
+    </div>
+
+</body>
+<footer>
+  <!-- <script src="../script.js"></script> -->
+</footer>
