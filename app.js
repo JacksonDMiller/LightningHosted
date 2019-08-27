@@ -31,7 +31,7 @@ app.use('/noauth', noauthRoutes);
 app.use('/auth', authRoutes);
 
 app.set('view engine', 'ejs');
-app.listen(3000, () => console.log(`App listening on port 3000!`));
+app.listen(3000, () => console.log(`Yipyip the app listening on port 3000!`));
 
 
 app.get('/', function (req, res) {
@@ -41,7 +41,7 @@ app.get('/', function (req, res) {
 mongoose.connect(keys.mongodb.dbURI);
 
 mongoose.connection.once('open', function(){
-    console.log('yipyip the database has connected');
+    console.log('yipyip the database has connected!');
   }).on('error', function(error){
     console.log(error);
   });

@@ -26,12 +26,12 @@ router.post('/upload', function (req, res) {
     }
 
     // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-    let sampleFile = req.files.sampleFile;
+    let sampleFile = req.files.filepond;
     console.log(sampleFile);
 
     fileName = crypto.randomBytes(20).toString('hex')
     // use the mv() method to place the file somewhere on your server
-    sampleFile.mv('./uploads/' + fileName + '.jpg', function (err) {
+    sampleFile.mv( './uploads/' + fileName + '.jpg', function (err) {
         if (err) { return res.status(500).send(err) };
         console.log(req.user)
 
