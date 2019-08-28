@@ -389,3 +389,8 @@ input {
 .filepond--root{
   margin-bottom: 0 !important;
 }
+
+#filepond-container{
+  position: relative;
+  z-index: -1;
+}
