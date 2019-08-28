@@ -81,6 +81,7 @@ h2 {
   font-weight: 400;
   text-decoration: none;
   transition: color 0.3s ease-out;
+  margin: 10px;
 }
 
 .nav-item a:hover {
