@@ -17,7 +17,7 @@ FilePond.setOptions(
 
 
 function showMessage(message, image){
+    $('#message-image').html('<img id="message-image" src="'+image+'" />')
     $('#message').text(message)
-    $('#message-container').prepend('<img id="theImg" src="'+image+'" />')
     $('#message-container').slideToggle('fast');
 }
