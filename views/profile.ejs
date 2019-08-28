@@ -18,7 +18,6 @@
 
 <body>
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
-  <div class="page-wrapper">
     <div class="nav-wrapper">
       <div class="grad-bar"></div>
       <nav class="navbar">
@@ -44,8 +43,14 @@
     </section>
     <div id="deposit"></div>
     <div class="grid">
+        <button onclick="showMessage('please pay','./LightningHosted.png')"></button>
     </div>
     <input type="file">
+    <div id='message-container'>
+      <p id='message'>This is a message</p>
+      <div id='message-image'></div>
+    </div>
+    
 </body>
 <footer>
   <script src="../auth-script.js"></script>

@@ -377,3 +377,15 @@ input {
  }
   
 }
+
+#message-container{
+  background: #23A6D5;
+  margin-top: 0;
+  border-radius: 0em 0em 0.5em 0.5em;
+  padding-top: 0;
+  display: none;
+}
+
+.filepond--root{
+  margin-bottom: 0 !important;
+}
