@@ -393,7 +393,6 @@ input {
 
 #filepond-container{
   position: relative;
-  z-index: -1;
 }
 
 #message-image{
