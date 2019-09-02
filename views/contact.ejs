@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0">
   <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
@@ -7,10 +8,7 @@
     integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
     crossorigin="anonymous"></script>
-  <link rel="stylesheet" type="text/css" href="main.css" />
-  <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
-  <script src="https://unpkg.com/infinite-scroll@3/dist/infinite-scroll.pkgd.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/main.css" />
 </head>
 
 <body>
@@ -18,7 +16,7 @@
     <div class="nav-wrapper">
       <div class="grad-bar"></div>
       <nav class="navbar">
-          <a href="/"><img src="/LightningHosted.png" alt="Company Logo"></a>
+        <a href="/"><img src="/LightningHosted.png" alt="Company Logo"></a>
         <div class="menu-toggle" id="mobile-menu">
           <span class="bar"></span>
           <span class="bar"></span>
@@ -37,10 +35,33 @@
       <h1>LightningHosted</h1>
       <p>Share Images And Stack Sats</p>
     </section>
-    <div class="grid">
+    <div>
+      <h1 class='heading'>Contact Us</h1>
+      <div id="form-messages"></div>
+      <form id="ajax-contact" method="post" action="./contact/submit">
+      
+          <div class="field">
+              <label for="email">Email:</label>
+              <input type="email" id="email" name="email" required>
+          </div>
+
+          <div class="field">
+              <label for="subject">Subject:</label>
+              <input type="text" id="subject" name="subject" required>
+          </div>
+      
+          <div class="field">
+              <label for="message">Message:</label>
+              <textarea id="message" name="message" required></textarea>
+          </div>
+      
+          <div class="field">
+              <button type="submit">Send</button>
+          </div>
+      </form>
     </div>
 </body>
 <footer>
-  <script src="script.js"></script>
-  <script src="noauth-script.js"></script>
+  <script src="/script.js"></script>
+  <script src="/contact-script.js"></script>
 </footer>

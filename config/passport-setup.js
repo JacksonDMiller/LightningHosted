@@ -26,7 +26,6 @@ passport.use(
         User.findOne({ thirdPartyId: profile.id }).then((currentUser) => {
             if (currentUser) {
                 //already have the user
-                console.log('user found')
                 done(null, currentUser);
 
             } else {
@@ -37,9 +36,9 @@ passport.use(
                     earnedSats: 0,
                     paidSats: 0,
                     views: 0,
-                    userName: profile.displayName
+                    userName: profile.displayName,
+                    upVotes: 0,
                 }).save().then((newUser) => {
-                    console.log(newUser);
                     done(null, newUser);
                 });
             }

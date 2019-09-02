@@ -10,9 +10,7 @@ var infScroll = new InfiniteScroll('.grid', {
 });
 
 infScroll.on('load', function (response) {
-
    var data = JSON.parse(response);
-   x = 0;
    data.forEach(element => {
       $(".grid").append('<div id="photoCard' + x + '" class="item photo"> <div class="content"> <div class="title"> <h3>' + element.title + '</h3> </div> <img class="photothumb" src="/noauth/image/' + element.fileName + '"> <div class="desc"> <p>Views: ' + element.views + '</p> </div> </div> </div>')
 

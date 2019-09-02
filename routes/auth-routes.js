@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const authCheck = (req, res, next) => {
     if (!req.user) {
         // if user is not logged in
-        res.redirect('../')
+        res.redirect('../noauth/google')
     }
     else {
         // if logged in
@@ -27,13 +27,11 @@ router.post('/upload', function (req, res) {
 
     // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
     let sampleFile = req.files.filepond;
-    console.log(sampleFile);
 
     fileName = crypto.randomBytes(20).toString('hex')
     // use the mv() method to place the file somewhere on your server
     sampleFile.mv( './uploads/' + fileName + '.jpg', function (err) {
         if (err) { return res.status(500).send(err) };
-        console.log(req.user)
 
         User.findOne({ _id: req.user.id }).then((currentUser) => {
             currentUser.images.push({
@@ -49,14 +47,20 @@ router.post('/upload', function (req, res) {
                 date: new(Date),
                 title: 'ss',
                 caption: 'String',
-                paymentRequest: 'String'
+                paymentRequest: 'String',
+                upVotes: 0
             })
-            console.log(currentUser);
             currentUser.save();
         });
 
         res.send('File uploaded!');
     });
+});
+
+router.get('/user', authCheck, (req, res) => {
+    User.findOne({ _id: req.user.id }).then((currentUser) => {
+    res.send(currentUser)
+    })
 });
 
 module.exports = router;

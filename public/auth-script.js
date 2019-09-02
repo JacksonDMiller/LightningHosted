@@ -21,3 +21,16 @@ function showMessage(message, image){
     $('#message').text(message)
     $('#message-container').slideToggle('fast');
 }
+
+$.get("./user/", function (data, status) {
+    // var data = JSON.parse(data);
+    
+    data.images.forEach(element => {
+       $(".grid").append('<div id="photoCard' + x + '" class="item photo"> <div class="content"> <div class="title"> <h3>' + element.title + '</h3> </div> <img class="photothumb" src="/noauth/image/' + element.fileName + '"> <div class="desc"> <p>Views: ' + element.views + '</p> </div> </div> </div>')
+ 
+       allItems = document.getElementsByClassName("item");
+       for (x = 0; x < allItems.length; x++) {
+          imagesLoaded(allItems[x], resizeInstance);
+       }
+    });
+});

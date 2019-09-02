@@ -15,7 +15,8 @@ const imageSchema = new Schema({
     date: Date,
     title: String,
     caption: String,
-    paymentRequest: String
+    paymentRequest: String,
+    upVotes: Number
 }, { strict: false });
 
 const accountSchema = new Schema({
@@ -25,6 +26,7 @@ const accountSchema = new Schema({
     paidSats: Number,
     views: Number,
     userName: String,
+    upVotes: Number,
     images: [imageSchema]
 });
 
