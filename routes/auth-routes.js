@@ -63,12 +63,12 @@ const authCheck = (req, res, next) => {
 router.get('/', authCheck, (req, res) => {
     res.render('profile', { user: req.user });
 });
-
+var invoice = '';
 router.post('/upload', function (req, res) {
     if (Object.keys(req.files).length == 0) {
         return res.status(400).send('No files were uploaded.');
     }
-    var invoice = '';
+    
     lightning.addInvoice({ value: 250, memo: 'LightningHosted Captcha' }, function (err, response) {
         invoice = response.payment_request;
     }
@@ -100,8 +100,7 @@ router.post('/upload', function (req, res) {
             })
             currentUser.save();
         });
-
-        res.send('File uploaded!');
+        res.status(200).send(invoice);
     });
 });
 
