@@ -81,7 +81,7 @@ router.post('/contact/submit', function (req, res) {
       
       var mailOptions = {
         from: req.body.email,
-        to: 'Jackson.sbe@gmail.com',
+        to: keys.email.email,
         subject: req.body.subject +' '+ req.body.email,
         text: req.body.message,
       };
