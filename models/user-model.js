@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const imageSchema = new Schema({
     imageId: String,
     reviewStatus: Boolean,
+    payStatus: Boolean,
     deleted: Boolean,
     views: Number,
     reports: Number,

@@ -34,9 +34,18 @@ lightning = new lnrpc.Lightning('localhost:10009', credentials);
 var call = lightning.subscribeInvoices({});
 
 call.on('data', function (invoice) {
-    // searches pending for incoming invoices
     if (invoice.settled === true) {
-        pending[invoice.payment_request] = true;
+        User.findOne({ 'images.paymentRequest': invoice.payment_request}).then(function (record) {
+            console.log('record',record)
+            record.images.forEach(element => {
+                if (element.paymentRequest === invoice.payment_request) {
+                    console.log(element,'elment')
+                    element.payStatus = true;
+                }
+            })
+            record.save();
+        });
+
     }
 })
     .on('end', function () {
@@ -63,45 +72,42 @@ const authCheck = (req, res, next) => {
 router.get('/', authCheck, (req, res) => {
     res.render('profile', { user: req.user });
 });
-var invoice = '';
+
+// REORGONZINGING THIS MOVING THE DATBASE CALL INSIDE THE LIGHTNING CALLBACK 
 router.post('/upload', function (req, res) {
     if (Object.keys(req.files).length == 0) {
         return res.status(400).send('No files were uploaded.');
     }
-    
     lightning.addInvoice({ value: 250, memo: 'LightningHosted Captcha' }, function (err, response) {
-        invoice = response.payment_request;
+        fileName = crypto.randomBytes(20).toString('hex')
+        req.files.filepond.mv('./uploads/' + fileName + '.jpg', function (err) {
+            if (err) { return res.status(500).send(err) };
+
+            User.findOne({ _id: req.user.id }).then((currentUser) => {
+                currentUser.images.push({
+                    imageId: fileName,
+                    reviewStatus: false,
+                    payStatus: false,
+                    deleted: false,
+                    views: 0,
+                    reports: 0,
+                    fileName: fileName + '.jpg',
+                    thumbNail: 'x',
+                    width: 1,
+                    height: 1,
+                    date: new (Date),
+                    title: 'ss',
+                    caption: 'String',
+                    paymentRequest: response.payment_request,
+                    upVotes: 0
+                })
+                currentUser.save().then(() => {
+                    res.status(200).send(response.payment_request); // maybe move this earlier
+                });
+            });
+        });
     }
     );
-
-    let newImage = req.files.filepond;
-
-    fileName = crypto.randomBytes(20).toString('hex')
-    // use the mv() method to place the file somewhere on your server
-    newImage.mv('./uploads/' + fileName + '.jpg', function (err) {
-        if (err) { return res.status(500).send(err) };
-
-        User.findOne({ _id: req.user.id }).then((currentUser) => {
-            currentUser.images.push({
-                imageId: fileName,
-                reviewStatus: false,
-                deleted: false,
-                views: 0,
-                reports: 0,
-                fileName: fileName + '.jpg',
-                thumbNail: 'x',
-                width: 1,
-                height: 1,
-                date: new (Date),
-                title: 'ss',
-                caption: 'String',
-                paymentRequest: invoice,
-                upVotes: 0
-            })
-            currentUser.save();
-        });
-        res.status(200).send(invoice);
-    });
 });
 
 router.get('/user', authCheck, (req, res) => {
