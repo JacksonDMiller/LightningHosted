@@ -3,6 +3,7 @@ const User = require('../models/user-model');
 const crypto = require('crypto');
 const grpc = require('grpc');
 const fs = require('fs');
+const qrCode = require('qrcode')
 
 // setting up LND
 
@@ -35,11 +36,11 @@ var call = lightning.subscribeInvoices({});
 
 call.on('data', function (invoice) {
     if (invoice.settled === true) {
-        User.findOne({ 'images.paymentRequest': invoice.payment_request}).then(function (record) {
-            console.log('record',record)
+        User.findOne({ 'images.paymentRequest': invoice.payment_request }).then(function (record) {
+            console.log('record', record)
             record.images.forEach(element => {
                 if (element.paymentRequest === invoice.payment_request) {
-                    console.log(element,'elment')
+                    console.log(element, 'elment')
                     element.payStatus = true;
                 }
             })
@@ -102,7 +103,11 @@ router.post('/upload', function (req, res) {
                     upVotes: 0
                 })
                 currentUser.save().then(() => {
-                    res.status(200).send(response.payment_request); // maybe move this earlier
+                    qrCode.toDataURL(response.payment_request, function (err, url) {
+                        console.log(url)
+                        res.status(200).send({ invoice: response.payment_request, image: url, fileName: fileName + ".jpg" }); // maybe move this earlier
+                    })
+
                 });
             });
         });

@@ -1,14 +1,21 @@
 $('.menu-toggle').click(function () {
    $(".nav").toggleClass("mobile-nav");
    $(this).toggleClass("is-active");
-   $('#filepond-container').slideToggle('slow');
+   if ($('#filepond-container').hasClass('filepond-container-behind')) {
+      setTimeout(function () {
+         $('#filepond-container').toggleClass('filepond-container-behind')
+      }, 800);
+   }
+   else {
+      $('#filepond-container').toggleClass('filepond-container-behind')
+   }
 });
 
-$("#search-icon").click(function() {
+$("#search-icon").click(function () {
    $(".nav").toggleClass("search");
    $(".nav").toggleClass("no-search");
    $(".search-input").toggleClass("search-active");
- });
+});
 
 function resizeGridItem(item) {
    grid = document.getElementsByClassName("grid")[0];

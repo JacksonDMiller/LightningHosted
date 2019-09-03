@@ -1,7 +1,7 @@
 const inputElement = document.querySelector('input[type="file"]');
 const pondOne = FilePond.create(inputElement);
 const pond = document.querySelector('.filepond--root');
-var lnInvoice = ''
+
 
 FilePond.setOptions(
     {
@@ -13,8 +13,15 @@ FilePond.setOptions(
             url: './upload',
             process: {
                 onload: (res) => {
-                    lnInvoice = res;
-                    showMessage(lnInvoice)
+
+                    res = JSON.parse(res);
+
+
+
+                    showMessage('pay this fool', res.image)
+                    console.log(res)
+
+                    addCard('', res.fileName, 0)
                     // select the right value in the response here and return
                     return res;
                 },
@@ -42,7 +49,7 @@ function showMessage(message, image) {
 $.get("./user/", function (data, status) {
 
     data.images.forEach(element => {
-        $(".grid").append('<div id="photoCard' + x + '" class="item photo"> <div class="content"> <div class="title"> <h3>' + element.title + '</h3> </div> <img class="photothumb" src="/noauth/image/' + element.fileName + '"> <div class="desc"> <p>Views: ' + element.views + '</p> </div> </div> </div>')
+        addCard(element.title, element.fileName, element.views)
 
         allItems = document.getElementsByClassName("item");
         for (x = 0; x < allItems.length; x++) {
@@ -50,3 +57,7 @@ $.get("./user/", function (data, status) {
         }
     });
 });
+
+function addCard(title, fileName, views) {
+    $(".grid").append('<div id="photoCard' + x + '" class="item photo"> <div class="content"> <div class="title"> <h3>' + title + '</h3> </div> <img class="photothumb" src="/noauth/image/' + fileName + '"> <div class="desc"> <p>Views: ' + views + '</p> </div> </div> </div>')
+}

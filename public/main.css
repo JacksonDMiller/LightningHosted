@@ -390,10 +390,16 @@ input {
 
 .filepond--root{
   margin-bottom: 0 !important;
+  
 }
 
 #filepond-container{
   position: relative;
+}
+
+.filepond-container-behind{
+  position: relative;
+  z-index: -1000;
 }
 
 #message-image{
