@@ -15,13 +15,8 @@ FilePond.setOptions(
                 onload: (res) => {
 
                     res = JSON.parse(res);
-
-
-
-                    showMessage('pay this fool', res.image)
-                    console.log(res)
-
-                    addCard('', res.fileName, 0)
+                    showMessage('Please pay the invoice to complete the upload', res.image)
+                    addCard('', res.fileName, 0, res.id)
                     // select the right value in the response here and return
                     return res;
                 },
@@ -36,20 +31,25 @@ pondOne.on('addfile', (error, file) => {
         console.log('Oh no');
         return;
     }
-    console.log('File added', file.serverId);
 });
 
 
 function showMessage(message, image) {
     $('#message-image').html('<img id="message-image" src="' + image + '" />')
     $('#message').text(message)
-    $('#message-container').slideToggle('fast');
+    setTimeout(function () {
+        $('#message-container').slideToggle('slow')
+    }, 1000);
+   
+    
+    
 }
 
 $.get("./user/", function (data, status) {
+    console.log(data);
 
     data.images.forEach(element => {
-        addCard(element.title, element.fileName, element.views)
+        addCard(element.title, element.fileName, element.views, element._id)
 
         allItems = document.getElementsByClassName("item");
         for (x = 0; x < allItems.length; x++) {
@@ -58,6 +58,36 @@ $.get("./user/", function (data, status) {
     });
 });
 
-function addCard(title, fileName, views) {
-    $(".grid").append('<div id="photoCard' + x + '" class="item photo"> <div class="content"> <div class="title"> <h3>' + title + '</h3> </div> <img class="photothumb" src="/noauth/image/' + fileName + '"> <div class="desc"> <p>Views: ' + views + '</p> </div> </div> </div>')
+function addCard(title, fileName, views, id) {
+    if (title != '') {
+        $(".grid").append(
+            `<div id="photoCard` + x + `" class="item photo">
+     <div class="content"> 
+     <div class="title"> <h3>` + title + `</h3> </div> 
+     <img class="photothumb" src="/noauth/image/` + fileName + `"> 
+     <div class="desc"> <p>Views: ` + views + `</p> </div> </div> </div>`)
+    }
+    else {
+        $(".grid").append(
+            `<div id="photoCard` + x + `" class="item photo">
+     <div class="content"> 
+     <div id="title`+id+`" class="centered titleInput title">
+                <div class="group"> 
+                  <input type="text" id="`+id+`" required="required" autocomplete="off">
+                  <label for="name">Title</label>
+                  <div class="bar"></div>
+                </div>
+              </div> 
+     <img class="photothumb" src="/noauth/image/` + fileName + `"> 
+     <div class="desc"> <p>Views: ` + views + `</p> </div> </div> </div>`
+        )
+        $('#'+id).keyup(function (event) {
+            if (event.which == 13) {
+                $.get("./title/"+$(':focus').attr('id')+"/"+$(':focus').val()+'/', function (data, status) {
+                    console.log('#title'+id)
+                 $('#title'+id).html(`<div class="title"> <h3>` + $(':focus').val() + `</h3> </div>`).removeClass('centered').removeClass('titleInput')
+                });
+            }
+        });
+    }
 }

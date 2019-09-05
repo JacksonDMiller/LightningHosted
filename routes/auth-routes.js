@@ -97,15 +97,19 @@ router.post('/upload', function (req, res) {
                     width: 1,
                     height: 1,
                     date: new (Date),
-                    title: 'ss',
+                    title: '',
                     caption: 'String',
                     paymentRequest: response.payment_request,
                     upVotes: 0
                 })
                 currentUser.save().then(() => {
                     qrCode.toDataURL(response.payment_request, function (err, url) {
-                        console.log(url)
-                        res.status(200).send({ invoice: response.payment_request, image: url, fileName: fileName + ".jpg" }); // maybe move this earlier
+                        res.status(200).send({
+                            invoice: response.payment_request,
+                            image: url,
+                            fileName: fileName + ".jpg",
+                            id: currentUser.images[currentUser.images.length - 1].id
+                        });
                     })
 
                 });
@@ -121,6 +125,17 @@ router.get('/user', authCheck, (req, res) => {
     })
 });
 
+router.get('/title/:id/:title', authCheck, (req, res) => {
+    User.findOne({ 'images._id': req.params.id }).then((currentUser) => {
+        currentUser.images.forEach(element => {
+            if (element._id == req.params.id) {
+                element.title = req.params.title;
+            }
+        })
+        currentUser.save();
+        res.send('Title Updated')
+    })
+});
 
 module.exports = router;
 
