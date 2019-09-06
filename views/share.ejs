@@ -1,27 +1,25 @@
-
 <!DOCTYPE html>
 
 <head>
-
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0">
+  <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
     integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="../main.css" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="/main.css" />
   <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
   <script src="https://unpkg.com/infinite-scroll@3/dist/infinite-scroll.pkgd.min.js"></script>
 </head>
 
 <body>
-    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+  <div class="page-wrapper">
     <div class="nav-wrapper">
       <div class="grad-bar"></div>
       <nav class="navbar">
-          <a href="/"><img src="../LightningHosted.png" alt="Company Logo"></a>
+        <a href="/"><img src="/LightningHosted.png" alt="Company Logo"></a>
         <div class="menu-toggle" id="mobile-menu">
           <span class="bar"></span>
           <span class="bar"></span>
@@ -32,8 +30,7 @@
           <li class="nav-item"><a href="/auth/#">Posts</a></li>
           <li class="nav-item"><a href="/noauth/about">About</a></li>
           <li class="nav-item"><a href="/noauth/contact">Contact</a></li>
-          <li class="nav-item"><a href="/noauth/logout">Logout</a></li>
-
+          <%- logInStatus %>
         </ul>
       </nav>
     </div>
@@ -41,23 +38,20 @@
       <h1>LightningHosted</h1>
       <p>Share Images And Stack Sats</p>
     </section>
+    <div id="shareImage" class="item photo" style="grid-row-end: span 11;">
+      <div class="content">
+        <div class="title">
+          <h3>ss</h3>
+        </div> <img class="photothumb" src="/noauth/image/<%- fileName %>">
+        <div class="desc">
+          <p>Views: 0</p>
+        </div>
+      </div>
     </div>
-    <div id ='filepond-container'>
-    <input type="file">
-  </div>
-    <div id='message-container'>
-      <p id='message'></p>
-      <p id='message-link'></p>
-      <div id='message-image'></div>
-    </div>
-  <div class="grid"></div>
+    <div class="grid"></div>
 
-  </div>
-    
 </body>
 <footer>
-  <script src="../auth-script.js"></script>
-  <script src="../script.js"></script>
+  <script src="/script.js"></script>
+  <script src="/noauth-script.js"></script>
 </footer>
-
-</html>

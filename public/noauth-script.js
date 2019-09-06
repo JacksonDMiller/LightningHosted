@@ -1,6 +1,6 @@
 var infScroll = new InfiniteScroll('.grid', {
    path: function () {
-      return './noauth/topPosts/' + this.pageIndex;
+      return '/noauth/topPosts/' + this.pageIndex;
    },
    // load response as flat text
    responseType: 'text',
@@ -11,8 +11,17 @@ var infScroll = new InfiniteScroll('.grid', {
 
 infScroll.on('load', function (response) {
    var data = JSON.parse(response);
+   console.log(data)
    data.forEach(element => {
-      $(".grid").append('<div id="photoCard' + x + '" class="item photo"> <div class="content"> <div class="title"> <h3>' + element.title + '</h3> </div> <img class="photothumb" src="/noauth/image/' + element.fileName + '"> <div class="desc"> <p>Views: ' + element.views + '</p> </div> </div> </div>')
+      $(".grid").append( `<div id="photoCard` + x + `" class="item photo">
+      <div class="content"> 
+      <div class="title"> <h3>` + element.title + `</h3> </div> 
+      <img class="photothumb" src="/noauth/image/` + element.fileName + `"> 
+      <div class="desc"> 
+      <p>Views: ` + element.views + `</p>
+      <p>Upvotes: ` + element.upVotes + `</p>
+      <button class="btn" onclick="upvoteImage('`+ element.id + `')">Upvote</button>
+      </div> </div> </div>`)
 
       allItems = document.getElementsByClassName("item");
       for (x = 0; x < allItems.length; x++) {
@@ -48,4 +57,10 @@ window.addEventListener("resize", resizeAllGridItems);
 allItems = document.getElementsByClassName("item");
 for (x = 0; x < allItems.length; x++) {
    imagesLoaded(allItems[x], resizeInstance);
+}
+
+function upvoteImage (id) {
+   $.get("noauth/upvote/" + id, function (data, status) {
+      console.log(data)
+  });
 }

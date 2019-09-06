@@ -50,13 +50,7 @@ mongoose.connection.once('open', function(){
 
 // home page handler
 app.get('/', function (req, res) {
-  if (!req.user) {
-    res.render('index', { logInStatus: '<li class="nav-item"><a href="/noauth/google">Log in</a></li>' })
-}
-else {
-    res.render('index', { logInStatus: '<li class="nav-item"><a href="/noauth/logout">Logout</a></li>' })
-}
-
+  res.redirect('/noauth')
 });
 
 

@@ -4,6 +4,16 @@ const User = require('../models/user-model');
 const nodemailer = require('nodemailer');
 const keys = require('../config/keys');
 
+router.get('/',(req,res) =>{
+    if (!req.user) {
+        res.render('index', { logInStatus: '<li class="nav-item"><a href="/noauth/google">Log in</a></li>' })
+    }
+    else {
+        res.render('index', { logInStatus: '<li class="nav-item"><a href="/noauth/logout">Logout</a></li>' })
+    }
+})
+
+
 // auth logout
 router.get('/logout', (req, res) => {
     // handle with passport
@@ -27,7 +37,7 @@ router.get('/topPosts/:page', (req, res) => {
         topPostsList = []
         record.forEach(element => {
             for (image in element.images) {
-                if (element.images[image].deleted != true) {
+                if (element.images[image].deleted != true && element.images[image].payStatus === true) {
                     let x = {}
                     x.imageId = element.images[image].imageId
                     x.fileName = element.images[image].fileName
@@ -36,6 +46,8 @@ router.get('/topPosts/:page', (req, res) => {
                     x.caption = element.images[image].caption
                     x.height = element.images[image].height
                     x.width = element.images[image].width
+                    x.upVotes = element.images[image].upVotes
+                    x.id = element.images[image]._id
                     topPostsList.push(x)
                 }
             }
@@ -48,6 +60,18 @@ router.get('/topPosts/:page', (req, res) => {
 });
 
 router.get('/image/:fileName', (req, res) => {
+    // incrment the views
+    User.findOne({ 'images.fileName': req.params.fileName }).then((currentUser) => {
+        console.log('foundrecord')
+        currentUser.images.forEach(element => {
+            if (element.fileName == req.params.fileName) {
+                element.views = element.views +1
+                console.log('found')
+                return
+            }
+        })
+        currentUser.save()
+    })
     res.sendFile('uploads/' + req.params.fileName, { root: './' });
 });
 
@@ -98,9 +122,28 @@ router.post('/contact/submit', function (req, res) {
 });
 
 
+router.get('/share/:fileName', (req, res) => {
+    if (!req.user) {
+        res.render('share', { logInStatus: '<li class="nav-item"><a href="/noauth/google">Log in</a></li>', fileName: req.params.fileName})
+    }
+    else {
+        res.render('share', { logInStatus: '<li class="nav-item"><a href="/noauth/logout">Logout</a></li>', fileName: req.params.fileName})
+    }
+})
+
+router.get('/upvote/:id', (req, res) => {
+    User.findOne({ 'images._id': req.params.id }).then((currentUser) => {
+        console.log(req.params.id)
+        currentUser.images.forEach(element => {
+            if (element._id == req.params.id) {
+                console.log('foundit')
+                element.upVotes = element.upVotes +1;
+            }
+        })
+        currentUser.save();
+        res.send('Upvoted')
+    })
+})
+
 module.exports = router; 
 
-
-
-
-  

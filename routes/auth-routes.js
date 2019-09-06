@@ -137,6 +137,31 @@ router.get('/title/:id/:title', authCheck, (req, res) => {
     })
 });
 
+router.get('/paymentStatus/:invoice', authCheck, (req,res) => {
+    User.findOne({ 'images.paymentRequest': req.params.invoice }).then((currentUser) => {
+        currentUser.images.forEach(element => {
+            if (element.paymentRequest == req.params.invoice) {
+                res.send(element)
+                return
+            }
+        })
+        res.send('not found')
+    })
+})
+
+router.get('/delete/:id/', authCheck, (req, res) => {
+    console.log(req.params.id)
+    User.findOne({ 'images._id': req.params.id }).then((currentUser) => {
+        currentUser.images.forEach(element => {
+            if (element._id == req.params.id) {
+                element.deleted = true;
+            }
+        })
+        currentUser.save();
+        res.send('Image deleted')
+    })
+});
+
 module.exports = router;
 
 
