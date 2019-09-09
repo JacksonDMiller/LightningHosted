@@ -21,7 +21,7 @@ infScroll.on('load', function (response) {
      </a>
       <div class="desc"> 
       <p>Views: ` + element.views + `</p>
-      <p>Upvotes: ` + element.upVotes + `</p>
+      <p>Upvotes: <span id="upvotes`+element.id+`" >` + element.upVotes + `</span></p>
       <button class="btn" onclick="upvoteImage('`+ element.id + `')">Upvote</button>
       </div> </div> </div>`)
 
@@ -63,6 +63,9 @@ for (x = 0; x < allItems.length; x++) {
 
 function upvoteImage (id) {
    $.get("/noauth/upvote/" + id, function (data, status) {
-      console.log(data)
+      if(data === 'Upvoted'){
+         $('#upvotes'+id).text(parseInt($('#upvotes'+id).text())+1)
+      }
+      console.log(data);
   });
 }

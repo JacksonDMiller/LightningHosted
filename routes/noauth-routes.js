@@ -4,6 +4,19 @@ const User = require('../models/user-model');
 const nodemailer = require('nodemailer');
 const keys = require('../config/keys');
 
+
+var recentViews = {}
+var recentUpvotes = {}
+
+function recentCleanUp () {
+    setTimeout(function () {
+        recentViews = {};
+        recentUpvotes= {};
+        recentCleanUp();
+    }, 1000*60*60*2); // 2 hours 
+    }
+recentCleanUp();
+
 router.get('/', (req, res) => {
     if (!req.user) {
         res.render('index', { logInStatus: '<li class="nav-item"><a href="/noauth/google">Log in</a></li>' })
@@ -60,16 +73,6 @@ router.get('/topPosts/:page', (req, res) => {
 });
 
 router.get('/image/:fileName', (req, res) => {
-    // incrment the views
-    User.findOne({ 'images.fileName': req.params.fileName }).then((currentUser) => {
-        currentUser.images.forEach(element => {
-            if (element.fileName == req.params.fileName) {
-                element.views = element.views + 1
-                return
-            }
-        })
-        currentUser.save()
-    })
     res.sendFile('uploads/' + req.params.fileName, { root: './' });
 });
 
@@ -130,23 +133,80 @@ router.get('/share/:fileName', (req, res) => {
                 else {
                     res.render('share', { logInStatus: '<li class="nav-item"><a href="/noauth/logout">Logout</a></li>', image: element })
                 }
-                return
+            }
+            var found = false;
+            if (recentViews[req.connection.remoteAddress]) {
+                recentViews[req.connection.remoteAddress].forEach(function (element) {
+                    if (element === req.params.fileName) {
+                        found = true;
+                    }
+                })
+                if (found === true) {
+                    return;
+                }
+                recentViews[req.connection.remoteAddress].push(req.params.fileName)
+                currentUser.images.forEach(element => {
+                    if (element.fileName == req.params.fileName) {
+                        element.views = element.views + 1;
+                    }
+                })
+                currentUser.save();
+                return false;
+            }
+            else {
+                recentViews[req.connection.remoteAddress] = [];
+                recentViews[req.connection.remoteAddress].push(req.params.fileName)
+                    currentUser.images.forEach(element => {
+                        if (element.fileName == req.params.fileName) {
+                            element.views = element.views + 1;
+                        }
+                    })
+                    currentUser.save();
             }
         })
-        currentUser.save()
     })
+    console.log(recentViews)
 })
 
 router.get('/upvote/:id', (req, res) => {
-    User.findOne({ 'images._id': req.params.id }).then((currentUser) => {
-        currentUser.images.forEach(element => {
-            if (element._id == req.params.id) {
-                element.upVotes = element.upVotes + 1;
+    console.log(recentUpvotes);
+    var found = false;
+    if (recentUpvotes[req.connection.remoteAddress]) {
+        recentUpvotes[req.connection.remoteAddress].forEach(function (element) {
+            if (element === req.params.id) {
+                res.send('Already Upvoted')
+                found = true;
             }
         })
-        currentUser.save();
-        res.send('Upvoted')
-    })
+        if (found === true) {
+            return;
+        }
+        recentUpvotes[req.connection.remoteAddress].push(req.params.id)
+        User.findOne({ 'images._id': req.params.id }).then((currentUser) => {
+            currentUser.images.forEach(element => {
+                if (element._id == req.params.id) {
+                    element.upVotes = element.upVotes + 1;
+                }
+            })
+            currentUser.save();
+            res.send('Upvoted')
+            return false;
+        })
+    }
+    else {
+        recentUpvotes[req.connection.remoteAddress] = [];
+        recentUpvotes[req.connection.remoteAddress].push(req.params.id)
+        User.findOne({ 'images._id': req.params.id }).then((currentUser) => {
+            currentUser.images.forEach(element => {
+                if (element._id == req.params.id) {
+                    element.upVotes = element.upVotes + 1;
+                }
+            })
+            currentUser.save();
+            res.send('Upvoted')
+        })
+    }
+
 })
 
 module.exports = router;
