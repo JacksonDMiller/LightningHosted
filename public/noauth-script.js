@@ -16,7 +16,9 @@ infScroll.on('load', function (response) {
       $(".grid").append( `<div id="photoCard` + x + `" class="item photo">
       <div class="content"> 
       <div class="title"> <h3>` + element.title + `</h3> </div> 
-      <img class="photothumb" src="/noauth/image/` + element.fileName + `"> 
+      <a href="/noauth/share/`+element.fileName+`">
+     <img class="photothumb" src="/noauth/image/` + element.fileName + `"> 
+     </a>
       <div class="desc"> 
       <p>Views: ` + element.views + `</p>
       <p>Upvotes: ` + element.upVotes + `</p>
@@ -60,7 +62,7 @@ for (x = 0; x < allItems.length; x++) {
 }
 
 function upvoteImage (id) {
-   $.get("noauth/upvote/" + id, function (data, status) {
+   $.get("/noauth/upvote/" + id, function (data, status) {
       console.log(data)
   });
 }

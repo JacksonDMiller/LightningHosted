@@ -41,10 +41,12 @@
     <div id="shareImage" class="item photo" style="grid-row-end: span 11;">
       <div class="content">
         <div class="title">
-          <h3>ss</h3>
-        </div> <img class="photothumb" src="/noauth/image/<%- fileName %>">
+          <h3><%- image.title %></h3>
+        </div>  <img class="photothumb" src="/noauth/image/<%- image.fileName %>">
         <div class="desc">
-          <p>Views: 0</p>
+          <p>Views: <%- image.views %></p>
+          <p>Upvotes: <%- image.upVotes %></p>
+          <button class="btn" onclick="upvoteImage('<%- image._id %>')">Upvote</button>
         </div>
       </div>
     </div>

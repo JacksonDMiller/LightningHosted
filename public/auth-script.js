@@ -1,10 +1,16 @@
+FilePond.registerPlugin(FilePondPluginImageExifOrientation);
+FilePond.registerPlugin(FilePondPluginFileValidateType);
+FilePond.registerPlugin(FilePondPluginFileValidateSize);
+
+
 const inputElement = document.querySelector('input[type="file"]');
 const pondOne = FilePond.create(inputElement);
 const pond = document.querySelector('.filepond--root');
 
 
-FilePond.setOptions(
+pondOne.setOptions(
     {
+        maxFileSize: '5MB',
         acceptedFileTypes: ['image/*'],
         labelTapToUndo: 'Upload another file',
         labelFileProcessingComplete: '',
@@ -15,7 +21,7 @@ FilePond.setOptions(
                 onload: (res) => {
 
                     res = JSON.parse(res);
-                    showMessage('Please pay the invoice to complete the upload', res.image)
+                    showPayment(res.image, res.invoice)
                     checkPaymentStatus(res.invoice)
                     // select the right value in the response here and return
                     return res;
@@ -34,50 +40,59 @@ pondOne.on('addfile', (error, file) => {
 });
 
 
-function showMessage(message, image, link) {
-    if (image != undefined) {
-        $('#message-image').html('<img id="message-image" src="' + image + '" />')
-    }
-    else{
+function clearMessage() {
+    $('#message-container').slideToggle('fast')
+    setTimeout(function () {
         $('#message-image').html('')
-    }
-    if (link != undefined) {
-        $('#message-link').text(link)
-    }
-    else{
-        $('#message-link').html('')
-    }
+        $('#message').text('');
+        $('#message-invoice').text("")
+    }, 500);
+}
 
-    $('#message').text(message)
+function showPayment(image, invoice) {
+    $('#message-image').html('<img id="message-image" src="' + image + '" />')
+    $('#message').text('Please pay the invoice to complete the upload');
+    $('#message-invoice').attr("href", "lightning:" + invoice)
+
     setTimeout(function () {
         $('#message-container').slideToggle('slow')
-    }, 1000);
+    }, 500);
+}
 
-
+function showThankYou(link) {
+    $('#message').text('Thank you please use this link to share your photo and earn some sats!');
+    $('#message-link').text(link)
+    setTimeout(function () {
+        $('#message-container').slideToggle('slow')
+    }, 100);
 
 }
 
 $.get("./user/", function (data, status) {
     console.log(data);
+    $("#satsEarned").text(data.earnedSats)
 
     data.images.forEach(element => {
         if (element.deleted === false && element.payStatus === true) {
-            addCard(element.title, element.fileName, element.views, element._id, element.upVotes)
+            addCard(element.title, element.fileName, element.views, element._id, element.upVotes, element.sats)
         }
 
     });
 });
 
-function addCard(title, fileName, views, id, upvotes) {
+function addCard(title, fileName, views, id, upvotes, sats) {
     if (title != '') {
         $(".grid").append(
             `<div id="photoCard` + x + `" class="item photo">
      <div class="content"> 
      <div class="title"> <h3>` + title + `</h3> </div> 
+     <a href="/noauth/share/`+ fileName + `">
      <img class="photothumb" src="/noauth/image/` + fileName + `"> 
+     </a>
      <div class="desc"> 
      <p>Views: ` + views + `</p>
      <p>Upvotes: ` + upvotes + `</p>
+     <p>Sats Earned: ` + sats + `</p>
      <button class="btn" onclick="deleteImage('`+ id + `')">Delete</button>
      </div> </div> </div>`)
     }
@@ -92,10 +107,13 @@ function addCard(title, fileName, views, id, upvotes) {
                   <div class="bar"></div>
                 </div>
               </div> 
-     <img class="photothumb" src="/noauth/image/` + fileName + `"> 
+              <a href="/noauth/share/`+ fileName + `">
+              <img class="photothumb" src="/noauth/image/` + fileName + `"> 
+              </a>
      <div class="desc">
     <p>Views: ` + views + `</p>
      <p>Upvotes: ` + upvotes + `</p>
+     <p>Sats Earned: ` + sats + `</p>
      <button class="btn" onclick="deleteImage('`+ id + `')">Delete</button>
     </div> </div> </div>`
         )
@@ -130,10 +148,13 @@ function checkPaymentStatus(invoice, incrment) {
             }, 1000)
         }
         else {
-            $('#message-container').slideToggle('fast')
-            addCard('', data.fileName, 0, data._id, 0)
+            clearMessage();
+            addCard('', data.fileName, 0, data._id, 0, 0)
+            setTimeout(() => {
+                showThankYou(window.location.hostname + ':3000/noauth/share/' + data.fileName)
+            }, 1000)
             // this link will not work in production
-            showMessage('Thank you please use this link to share your photo and earn some sats!', undefined, window.location.hostname+':3000/noauth/share/'+data.fileName)
+
         }
     })
 };
@@ -142,4 +163,58 @@ function deleteImage(id) {
     $.get("./delete/" + id, function (data, status) {
         console.log(data)
     });
+}
+
+
+function withdraw() {
+    if($('#satsEarned').text() === '0'){
+        $.sweetModal({
+            content: 'You have no sats to withdraw',
+            title: 'Oh noes…',
+            icon: $.sweetModal.ICON_ERROR,
+
+            buttons: [
+                {
+                    label: 'That\'s fine',
+                    classes: 'redB'
+                }
+            ]
+        });
+    }
+    
+       else{
+
+    $.sweetModal.prompt('Enter a lighting invoice to withdraw', 'Lightning Invoice', '', function (val) {
+        
+        $.get("./withdraw/" + val, function (data, status) {
+            
+            if (data.status === 'success') {
+                $.sweetModal({
+                    content: 'This is a success.',
+                    icon: $.sweetModal.ICON_SUCCESS
+                });
+                console.log(data.amount,'dataamount')
+                console.log($('#satsEarned').text(parseInt($('#satsEarned').text())))
+                $('#satsEarned').text(parseInt($('#satsEarned').text())-data.amount)
+            }
+            else {
+                $.sweetModal({
+                    content: data,
+                    title: 'Oh noes…',
+                    icon: $.sweetModal.ICON_ERROR,
+
+                    buttons: [
+                        {
+                            label: 'That\'s fine',
+                            classes: 'redB'
+                        }
+                    ]
+                });
+            }
+        });
+
+
+
+    });
+}
 }

@@ -4,7 +4,7 @@ const User = require('../models/user-model');
 const nodemailer = require('nodemailer');
 const keys = require('../config/keys');
 
-router.get('/',(req,res) =>{
+router.get('/', (req, res) => {
     if (!req.user) {
         res.render('index', { logInStatus: '<li class="nav-item"><a href="/noauth/google">Log in</a></li>' })
     }
@@ -62,11 +62,9 @@ router.get('/topPosts/:page', (req, res) => {
 router.get('/image/:fileName', (req, res) => {
     // incrment the views
     User.findOne({ 'images.fileName': req.params.fileName }).then((currentUser) => {
-        console.log('foundrecord')
         currentUser.images.forEach(element => {
             if (element.fileName == req.params.fileName) {
-                element.views = element.views +1
-                console.log('found')
+                element.views = element.views + 1
                 return
             }
         })
@@ -98,46 +96,52 @@ router.post('/contact/submit', function (req, res) {
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
-          user: 'bitcoinacolyte@gmail.com',
-          pass: keys.email.password
+            user: 'bitcoinacolyte@gmail.com',
+            pass: keys.email.password
         }
-      });
-      
-      var mailOptions = {
+    });
+
+    var mailOptions = {
         from: req.body.email,
         to: keys.email.email,
-        subject: req.body.subject +' '+ req.body.email,
+        subject: req.body.subject + ' ' + req.body.email,
         text: req.body.message,
-      };
-      
-      transporter.sendMail(mailOptions, function(error, info){
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-          console.log(error);
+            console.log(error);
         } else {
-          console.log('Email sent: ' + info.response);
+            console.log('Email sent: ' + info.response);
         }
-      });
+    });
     res.send('Thank You! Your message has been sent.')
     console.log(req.body)
 });
 
 
 router.get('/share/:fileName', (req, res) => {
-    if (!req.user) {
-        res.render('share', { logInStatus: '<li class="nav-item"><a href="/noauth/google">Log in</a></li>', fileName: req.params.fileName})
-    }
-    else {
-        res.render('share', { logInStatus: '<li class="nav-item"><a href="/noauth/logout">Logout</a></li>', fileName: req.params.fileName})
-    }
+    User.findOne({ 'images.fileName': req.params.fileName }).then((currentUser) => {
+        currentUser.images.forEach(element => {
+            if (element.fileName == req.params.fileName) {
+                if (!req.user) {
+                    res.render('share', { logInStatus: '<li class="nav-item"><a href="/noauth/google">Log in</a></li>', image: element })
+                }
+                else {
+                    res.render('share', { logInStatus: '<li class="nav-item"><a href="/noauth/logout">Logout</a></li>', image: element })
+                }
+                return
+            }
+        })
+        currentUser.save()
+    })
 })
 
 router.get('/upvote/:id', (req, res) => {
     User.findOne({ 'images._id': req.params.id }).then((currentUser) => {
-        console.log(req.params.id)
         currentUser.images.forEach(element => {
             if (element._id == req.params.id) {
-                console.log('foundit')
-                element.upVotes = element.upVotes +1;
+                element.upVotes = element.upVotes + 1;
             }
         })
         currentUser.save();
@@ -145,5 +149,5 @@ router.get('/upvote/:id', (req, res) => {
     })
 })
 
-module.exports = router; 
+module.exports = router;
 

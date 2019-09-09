@@ -37,7 +37,6 @@ var call = lightning.subscribeInvoices({});
 call.on('data', function (invoice) {
     if (invoice.settled === true) {
         User.findOne({ 'images.paymentRequest': invoice.payment_request }).then(function (record) {
-            console.log('record', record)
             record.images.forEach(element => {
                 if (element.paymentRequest === invoice.payment_request) {
                     console.log(element, 'elment')
@@ -100,7 +99,8 @@ router.post('/upload', function (req, res) {
                     title: '',
                     caption: 'String',
                     paymentRequest: response.payment_request,
-                    upVotes: 0
+                    upVotes: 0,
+                    sats: 0,
                 })
                 currentUser.save().then(() => {
                     qrCode.toDataURL(response.payment_request, function (err, url) {
@@ -145,7 +145,6 @@ router.get('/paymentStatus/:invoice', authCheck, (req,res) => {
                 return
             }
         })
-        res.send('not found')
     })
 })
 
@@ -162,21 +161,39 @@ router.get('/delete/:id/', authCheck, (req, res) => {
     })
 });
 
+
+router.get('/withdraw/:invoice', authCheck, (req,res) => {
+    lightning.DecodePayReq(req.params.invoice, function (decodeErr, decodeReesponse) {
+        if(decodeErr){
+            res.send(decodeErr.details)
+        }
+        else{
+    console.log(decodeReesponse.num_satoshis,'  decode')
+    console.log(req.user.earnedSats,'  earnedssats ')
+    if(req.user.earnedSats >= decodeReesponse.num_satoshis){
+        lightning.sendPaymentSync({ payment_request: req.params.invoice }, function (err, response) {
+            if (err) {
+              res.send(err.details);
+            }
+            else { 
+              res.send({status:'success', amount: decodeReesponse.num_satoshis}); 
+              req.user.earnedSats = req.user.earnedSats - decodeReesponse.num_satoshis;
+              req.user.save();
+            };
+          })
+    }
+else {
+    res.send('Not enough sats')
+}}
+});
+});
+
 module.exports = router;
 
 
-// lightning.addInvoice({ value: 250, memo: 'LightningHosted Captcha' }, function (err, response) {
-//   pending[response.payment_request] = false;
-//   var x = {};
-//   QRCode.toDataURL(response.payment_request, function (err, url) {
-//     x.image = url;
-//     x.text = response.payment_request;
-//     res.send(x);
-//   });
-// }
-// );
 
-// lightning.DecodePayReq(req.params.lninvoice, function (err, response) {
+
+// 
 
 //   if (err) {
 //     console.log(err);
@@ -186,25 +203,3 @@ module.exports = router;
 
 //   User.findOne({AccountId: req.params.account}).then(function(record){
 
-
-
-//   if (response.num_satoshis <= record.Satoshis) {
-//     response.num_satoshis = parseInt(response.num_satoshis);
-//     record.Satoshis -= response.num_satoshis;
-//     record.Paid += response.num_satoshis;
-//     record.save();
-
-//     lightning.sendPaymentSync({ payment_request: req.params.lninvoice }, function (err, response) {
-//       if (err) {
-//         res.send('error');
-//       }
-//       else { 
-//         res.send('success'); 
-//       };
-//     })
-//   }
-//   else { 
-//     res.send('Not enough funds');
-//  };
-// });
-// });

@@ -104,11 +104,10 @@ h2 {
 }
 
 .grid {
-  /* margin-left: 20px;
-  margin-right: 20px; */
+  margin:10px;
   display: grid;
   grid-gap: 10px;
-  grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px,1fr));
   grid-auto-rows: 20px;
 }
 
@@ -160,7 +159,7 @@ h2 {
   padding: 10px 10px 5px 10px;
   background-color: #8c54a1;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr ;
 }
 
 .desc img{
@@ -304,6 +303,10 @@ input {
 
 @media only screen and (max-width: 720px) { 
 
+  .grid{
+    margin: 10px 0px 0px 0px !important;
+  }
+
   .btn{
     font-size: 0.8rem !important;
   }
@@ -399,6 +402,10 @@ input {
   border-radius: 0em 0em 0.5em 0.5em;
   padding-top: 0;
   display: none;
+  margin-left: 10px;
+  margin-right: 10px;
+  color: white;
+  text-align: center;
 }
 
 .filepond--root{
@@ -408,6 +415,8 @@ input {
 
 #filepond-container{
   position: relative;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .filepond-container-behind{
@@ -415,17 +424,14 @@ input {
   z-index: -1000;
 }
 
-#message-container p{
-  color: white;
-  text-align: center;
-  padding: 20px;
+#message-container p,#message-container img,#message-container a{
+  padding: 5px;
 }
 
 #message-image{
   width:200px;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 20px;
 }
 
 .aboutGrid h1{
@@ -573,4 +579,9 @@ input {
   color: white;
   margin-left: auto;
   margin-right: auto;
+}
+
+#withdrawDiv {
+  text-align: center;
+  padding-bottom: 10px; 
 }

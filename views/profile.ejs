@@ -2,6 +2,9 @@
 <!DOCTYPE html>
 
 <head>
+  <!-- testing -->
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
 
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0">
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
@@ -14,10 +17,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <script src="https://unpkg.com/infinite-scroll@3/dist/infinite-scroll.pkgd.min.js"></script>
+  <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.js"></script>
+  <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+  <script src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.js"></script>
+  <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+  <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
+  <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+  <link rel="stylesheet" href="../jquery.sweet-modal.min.css" />
+  <script src="../jquery.sweet-modal.min.js"></script>
 </head>
 
 <body>
-    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
     <div class="nav-wrapper">
       <div class="grad-bar"></div>
       <nav class="navbar">
@@ -42,6 +52,7 @@
       <p>Share Images And Stack Sats</p>
     </section>
     </div>
+    <div id='withdrawDiv'> Sats: <span id ="satsEarned">0</span> <button onclick="withdraw()" class='btn'>Withdraw</button></div>
     <div id ='filepond-container'>
     <input type="file">
   </div>
@@ -49,11 +60,11 @@
       <p id='message'></p>
       <p id='message-link'></p>
       <div id='message-image'></div>
+      <a id='message-invoice' href='#'>Open Wallet</a>
     </div>
   <div class="grid"></div>
 
   </div>
-    
 </body>
 <footer>
   <script src="../auth-script.js"></script>
