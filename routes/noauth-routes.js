@@ -4,17 +4,9 @@ const User = require('../models/user-model');
 const nodemailer = require('nodemailer');
 const keys = require('../config/keys');
 
-
 var recentViews = {}
 var recentUpvotes = {}
 
-function recentCleanUp () {
-    setTimeout(function () {
-        recentViews = {};
-        recentUpvotes= {};
-        recentCleanUp();
-    }, 1000*60*60*2); // 2 hours 
-    }
 recentCleanUp();
 
 router.get('/', (req, res) => {
@@ -25,7 +17,6 @@ router.get('/', (req, res) => {
         res.render('index', { logInStatus: '<li class="nav-item"><a href="/noauth/logout">Logout</a></li>' })
     }
 })
-
 
 // auth logout
 router.get('/logout', (req, res) => {
@@ -40,14 +31,14 @@ router.get('/google', passport.authenticate('google', {
 }));
 
 //callback route for google to redirect to
-
 router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
     res.redirect('/auth/');
 });
 
+// Sends images for infinite scroll 10 images at a time
 router.get('/topPosts/:page', (req, res) => {
     User.find({}).lean().then(function (record) {
-        topPostsList = []
+        topPostsList = [];
         record.forEach(element => {
             for (image in element.images) {
                 if (element.images[image].deleted != true && element.images[image].payStatus === true) {
@@ -68,6 +59,8 @@ router.get('/topPosts/:page', (req, res) => {
         });
         topPostsList.sort(function (a, b) { return parseFloat(b.views) - parseFloat(a.views) })
         var slicedTopPostList = topPostsList.slice((req.params.page - 1) * 10, req.params.page * 10)
+        if (slicedTopPostList == false) {
+        }
         res.send(slicedTopPostList)
     });
 });
@@ -119,10 +112,9 @@ router.post('/contact/submit', function (req, res) {
         }
     });
     res.send('Thank You! Your message has been sent.')
-    console.log(req.body)
 });
 
-
+// Share image page that counts views
 router.get('/share/:fileName', (req, res) => {
     User.findOne({ 'images.fileName': req.params.fileName }).then((currentUser) => {
         currentUser.images.forEach(element => {
@@ -134,42 +126,52 @@ router.get('/share/:fileName', (req, res) => {
                     res.render('share', { logInStatus: '<li class="nav-item"><a href="/noauth/logout">Logout</a></li>', image: element })
                 }
             }
-            var found = false;
-            if (recentViews[req.connection.remoteAddress]) {
-                recentViews[req.connection.remoteAddress].forEach(function (element) {
-                    if (element === req.params.fileName) {
-                        found = true;
-                    }
-                })
-                if (found === true) {
-                    return;
-                }
-                recentViews[req.connection.remoteAddress].push(req.params.fileName)
-                currentUser.images.forEach(element => {
-                    if (element.fileName == req.params.fileName) {
-                        element.views = element.views + 1;
-                    }
-                })
-                currentUser.save();
-                return false;
-            }
-            else {
-                recentViews[req.connection.remoteAddress] = [];
-                recentViews[req.connection.remoteAddress].push(req.params.fileName)
-                    currentUser.images.forEach(element => {
-                        if (element.fileName == req.params.fileName) {
-                            element.views = element.views + 1;
-                        }
-                    })
-                    currentUser.save();
-            }
         })
+        var found = false;
+        if (recentViews[req.connection.remoteAddress]) {
+            recentViews[req.connection.remoteAddress].forEach(function (element) {
+                if (element === req.params.fileName) {
+                    found = true;
+                }
+            })
+            if (found === true) {
+                return;
+            }
+            recentViews[req.connection.remoteAddress].push(req.params.fileName)
+            currentUser.images.forEach(element => {
+                if (element.fileName == req.params.fileName) {
+                    element.views = element.views + 1;
+                    if (element.views === 100) {
+                        console.log(currentUser.earnedSats)
+                        currentUser.earnedSats = currentUser.earnedSats + 250; //earned sats
+                        element.sats = element.sats + 250;
+                    };
+                }
+            })
+            currentUser.save();
+            return false;
+        }
+        else {
+            recentViews[req.connection.remoteAddress] = [];
+            recentViews[req.connection.remoteAddress].push(req.params.fileName)
+            currentUser.images.forEach(element => {
+                if (element.fileName == req.params.fileName) {
+                    element.views = element.views + 1;
+                    if (element.views === 100) {
+                        console.log(currentUser.earnedSats)
+                        currentUser.earnedSats = currentUser.earnedSats + 250; //earned sats
+                        element.sats = element.sats + 250;
+                    };
+                }
+            })
+            currentUser.save();
+        }
+
     })
-    console.log(recentViews)
 })
 
+// handles and counts unique upvotes 
 router.get('/upvote/:id', (req, res) => {
-    console.log(recentUpvotes);
     var found = false;
     if (recentUpvotes[req.connection.remoteAddress]) {
         recentUpvotes[req.connection.remoteAddress].forEach(function (element) {
@@ -208,6 +210,14 @@ router.get('/upvote/:id', (req, res) => {
     }
 
 })
+
+function recentCleanUp() {
+    setTimeout(function () {
+        recentViews = {};
+        recentUpvotes = {};
+        recentCleanUp();
+    }, 1000 * 60 * 60 * 2); // 2 hours 
+}
 
 module.exports = router;
 

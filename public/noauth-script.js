@@ -10,14 +10,14 @@ var infScroll = new InfiniteScroll('.grid', {
 });
 
 infScroll.on('load', function (response) {
+  
    var data = JSON.parse(response);
-   console.log(data)
-   data.forEach(element => {
-      $(".grid").append( `<div id="photoCard` + x + `" class="item photo">
+   data.forEach(element => { 
+      $(".grid").append( `<div id="photoCard` + x + `" class="item photo" style="display:none">
       <div class="content"> 
       <div class="title"> <h3>` + element.title + `</h3> </div> 
       <a href="/noauth/share/`+element.fileName+`">
-     <img class="photothumb" src="/noauth/image/` + element.fileName + `"> 
+     <img onload="$('#photoCard` + x + `').css('display', '')" class="photothumb" src="/noauth/image/` + element.fileName + `"> 
      </a>
       <div class="desc"> 
       <p>Views: ` + element.views + `</p>
@@ -30,6 +30,24 @@ infScroll.on('load', function (response) {
          imagesLoaded(allItems[x], resizeInstance);
       }
    });
+   if (data != false) {
+   $(".grid").append( `<div id="photoCard` + x + `" class="item photo">
+   <div class="content"> 
+   <div class="title"> <h3>Sponsor</h3> </div>
+   <div class="ads"> 
+   <iframe data-aa="1241606" src="//ad.a-ads.com/1241606?size=300x250" scrolling="no" style="width:300px; height:250px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
+   </div>
+   <div class="desc"> 
+   </div> </div> </div>`)
+
+
+   allItems = document.getElementsByClassName("item");
+   for (x = 0; x < allItems.length; x++) {
+      imagesLoaded(allItems[x], resizeInstance);
+   }
+}
+
+
 });
 
 infScroll.loadNextPage();
@@ -66,6 +84,5 @@ function upvoteImage (id) {
       if(data === 'Upvoted'){
          $('#upvotes'+id).text(parseInt($('#upvotes'+id).text())+1)
       }
-      console.log(data);
   });
 }

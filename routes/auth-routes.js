@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const grpc = require('grpc');
 const fs = require('fs');
 const qrCode = require('qrcode')
+var sizeOf = require('image-size');
 
 // setting up LND
 
@@ -39,7 +40,6 @@ call.on('data', function (invoice) {
         User.findOne({ 'images.paymentRequest': invoice.payment_request }).then(function (record) {
             record.images.forEach(element => {
                 if (element.paymentRequest === invoice.payment_request) {
-                    console.log(element, 'elment')
                     element.payStatus = true;
                 }
             })
@@ -83,35 +83,37 @@ router.post('/upload', function (req, res) {
         req.files.filepond.mv('./uploads/' + fileName + '.jpg', function (err) {
             if (err) { return res.status(500).send(err) };
 
-            User.findOne({ _id: req.user.id }).then((currentUser) => {
-                currentUser.images.push({
-                    imageId: fileName,
-                    reviewStatus: false,
-                    payStatus: false,
-                    deleted: false,
-                    views: 0,
-                    reports: 0,
-                    fileName: fileName + '.jpg',
-                    thumbNail: 'x',
-                    width: 1,
-                    height: 1,
-                    date: new (Date),
-                    title: '',
-                    caption: 'String',
-                    paymentRequest: response.payment_request,
-                    upVotes: 0,
-                    sats: 0,
-                })
-                currentUser.save().then(() => {
-                    qrCode.toDataURL(response.payment_request, function (err, url) {
-                        res.status(200).send({
-                            invoice: response.payment_request,
-                            image: url,
-                            fileName: fileName + ".jpg",
-                            id: currentUser.images[currentUser.images.length - 1].id
-                        });
+            sizeOf('./uploads/' + fileName + '.jpg', function (err, dimensions) {
+                User.findOne({ _id: req.user.id }).then((currentUser) => {
+                    currentUser.images.push({
+                        imageId: fileName,
+                        reviewStatus: false,
+                        payStatus: false,
+                        deleted: false,
+                        views: 0,
+                        reports: 0,
+                        fileName: fileName + '.jpg',
+                        thumbNail: 'x',
+                        width: dimensions.width,
+                        height: dimensions.height,
+                        date: new (Date),
+                        title: '',
+                        caption: 'String',
+                        paymentRequest: response.payment_request,
+                        upVotes: 0,
+                        sats: 0,
                     })
+                    currentUser.save().then(() => {
+                        qrCode.toDataURL(response.payment_request, function (err, url) {
+                            res.status(200).send({
+                                invoice: response.payment_request,
+                                image: url,
+                                fileName: fileName + ".jpg",
+                                id: currentUser.images[currentUser.images.length - 1].id
+                            });
+                        })
 
+                    });
                 });
             });
         });
@@ -137,7 +139,7 @@ router.get('/title/:id/:title', authCheck, (req, res) => {
     })
 });
 
-router.get('/paymentStatus/:invoice', authCheck, (req,res) => {
+router.get('/paymentStatus/:invoice', authCheck, (req, res) => {
     User.findOne({ 'images.paymentRequest': req.params.invoice }).then((currentUser) => {
         currentUser.images.forEach(element => {
             if (element.paymentRequest == req.params.invoice) {
@@ -149,7 +151,6 @@ router.get('/paymentStatus/:invoice', authCheck, (req,res) => {
 })
 
 router.get('/delete/:id/', authCheck, (req, res) => {
-    console.log(req.params.id)
     User.findOne({ 'images._id': req.params.id }).then((currentUser) => {
         currentUser.images.forEach(element => {
             if (element._id == req.params.id) {
@@ -162,44 +163,35 @@ router.get('/delete/:id/', authCheck, (req, res) => {
 });
 
 
-router.get('/withdraw/:invoice', authCheck, (req,res) => {
+router.get('/withdraw/:invoice', authCheck, (req, res) => {
     lightning.DecodePayReq(req.params.invoice, function (decodeErr, decodeReesponse) {
-        if(decodeErr){
+        if (decodeErr) {
             res.send(decodeErr.details)
         }
-        else{
-    console.log(decodeReesponse.num_satoshis,'  decode')
-    console.log(req.user.earnedSats,'  earnedssats ')
-    if(req.user.earnedSats >= decodeReesponse.num_satoshis){
-        lightning.sendPaymentSync({ payment_request: req.params.invoice }, function (err, response) {
-            if (err) {
-              res.send(err.details);
+        else {
+            if (req.user.earnedSats >= decodeReesponse.num_satoshis) {
+                lightning.sendPaymentSync({ payment_request: req.params.invoice }, function (err, response) {
+                    console.log(err, 'err')
+                    console.log(response,'res')
+                    if (err) {
+                        res.send(err.details);
+                    }
+                    if (response.payment_error) {
+                        res.send(response.payment_error);
+                    }
+                    else {
+                        res.send({ status: 'success', amount: decodeReesponse.num_satoshis });
+                        req.user.earnedSats = req.user.earnedSats - decodeReesponse.num_satoshis;
+                        req.user.save();
+                    };
+                })
             }
-            else { 
-              res.send({status:'success', amount: decodeReesponse.num_satoshis}); 
-              req.user.earnedSats = req.user.earnedSats - decodeReesponse.num_satoshis;
-              req.user.save();
-            };
-          })
-    }
-else {
-    res.send('Not enough sats')
-}}
-});
+            else {
+                res.send('Not enough sats')
+            }
+        }
+    });
 });
 
 module.exports = router;
-
-
-
-
-// 
-
-//   if (err) {
-//     console.log(err);
-//     res.send('Invalid Invoice');
-//     return false;
-//   }
-
-//   User.findOne({AccountId: req.params.account}).then(function(record){
 

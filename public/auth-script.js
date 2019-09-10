@@ -39,20 +39,26 @@ pondOne.on('addfile', (error, file) => {
     }
 });
 
+pondOne.on('removefile', e => {
+   clearMessage();
+    
+    
+});
+
 
 function clearMessage() {
     $('#message-container').slideToggle('fast')
     setTimeout(function () {
         $('#message-image').html('')
         $('#message').text('');
-        $('#message-invoice').text("")
+        $('#message-invoice').text('');
     }, 500);
 }
 
 function showPayment(image, invoice) {
     $('#message-image').html('<img id="message-image" src="' + image + '" />')
     $('#message').text('Please pay the invoice to complete the upload');
-    $('#message-invoice').attr("href", "lightning:" + invoice)
+    $('#message-invoice').attr("href", "lightning:" + invoice).text('Open Wallet')
 
     setTimeout(function () {
         $('#message-container').slideToggle('slow')
@@ -83,22 +89,22 @@ $.get("./user/", function (data, status) {
 function addCard(title, fileName, views, id, upvotes, sats) {
     if (title != '') {
         $(".grid").append(
-            `<div id="photoCard` + x + `" class="item photo">
+            `<div id="photoCard` + x + `" class="item photo" style="display:none">
      <div class="content"> 
      <div class="title"> <h3>` + title + `</h3> </div> 
      <a href="/noauth/share/`+ fileName + `">
-     <img class="photothumb" src="/noauth/image/` + fileName + `"> 
+     <img onload="$('#photoCard` + x + `').css('display', '')" class="photothumb" src="/noauth/image/` + fileName + `"> 
      </a>
      <div class="desc"> 
      <p>Views: ` + views + `</p>
      <p>Upvotes: ` + upvotes + `</p>
-     <p>Sats Earned: ` + sats + `</p>
+     <p>Sats: ` + sats + `</p>
      <button class="btn" onclick="deleteImage('`+ id + `')">Delete</button>
      </div> </div> </div>`)
     }
     else {
-        $(".grid").prepend(
-            `<div id="photoCard` + x + `" class="item photo">
+        $(".grid").append(
+            `<div id="photoCard` + x + `" class="item photo" style="display:none">
      <div class="content"> 
      <div id="title`+ id + `" class="centered titleInput title">
                 <div class="group"> 
@@ -108,12 +114,12 @@ function addCard(title, fileName, views, id, upvotes, sats) {
                 </div>
               </div> 
               <a href="/noauth/share/`+ fileName + `">
-              <img class="photothumb" src="/noauth/image/` + fileName + `"> 
+              <img onload="$('#photoCard` + x + `').css('display', '')" class="photothumb" src="/noauth/image/` + fileName + `"> 
               </a>
      <div class="desc">
     <p>Views: ` + views + `</p>
      <p>Upvotes: ` + upvotes + `</p>
-     <p>Sats Earned: ` + sats + `</p>
+     <p>Sats: ` + sats + `</p>
      <button class="btn" onclick="deleteImage('`+ id + `')">Delete</button>
     </div> </div> </div>`
         )
@@ -167,7 +173,7 @@ function deleteImage(id) {
 
 
 function withdraw() {
-    if($('#satsEarned').text() === '0'){
+    if ($('#satsEarned').text() === '0') {
         $.sweetModal({
             content: 'You have no sats to withdraw',
             title: 'Oh noes…',
@@ -181,40 +187,40 @@ function withdraw() {
             ]
         });
     }
-    
-       else{
 
-    $.sweetModal.prompt('Enter a lighting invoice to withdraw', 'Lightning Invoice', '', function (val) {
-        
-        $.get("./withdraw/" + val, function (data, status) {
-            
-            if (data.status === 'success') {
-                $.sweetModal({
-                    content: 'This is a success.',
-                    icon: $.sweetModal.ICON_SUCCESS
-                });
-                console.log(data.amount,'dataamount')
-                console.log($('#satsEarned').text(parseInt($('#satsEarned').text())))
-                $('#satsEarned').text(parseInt($('#satsEarned').text())-data.amount)
-            }
-            else {
-                $.sweetModal({
-                    content: data,
-                    title: 'Oh noes…',
-                    icon: $.sweetModal.ICON_ERROR,
+    else {
 
-                    buttons: [
-                        {
-                            label: 'That\'s fine',
-                            classes: 'redB'
-                        }
-                    ]
-                });
-            }
+        $.sweetModal.prompt('Enter a lighting invoice to withdraw', 'Lightning Invoice', '', function (val) {
+
+            $.get("./withdraw/" + val, function (data, status) {
+
+                if (data.status === 'success') {
+                    $.sweetModal({
+                        content: 'This is a success.',
+                        icon: $.sweetModal.ICON_SUCCESS
+                    });
+                    console.log(data.amount, 'dataamount')
+                    console.log($('#satsEarned').text(parseInt($('#satsEarned').text())))
+                    $('#satsEarned').text(parseInt($('#satsEarned').text()) - data.amount)
+                }
+                else {
+                    $.sweetModal({
+                        content: data,
+                        title: 'Oh noes…',
+                        icon: $.sweetModal.ICON_ERROR,
+
+                        buttons: [
+                            {
+                                label: 'That\'s fine',
+                                classes: 'redB'
+                            }
+                        ]
+                    });
+                }
+            });
+
+
+
         });
-
-
-
-    });
-}
+    }
 }

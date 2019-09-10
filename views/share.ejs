@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 
 <head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-133745471-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-133745471-2');
+</script>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0">
   <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
@@ -45,7 +54,7 @@
         </div>  <img class="photothumb" src="/noauth/image/<%- image.fileName %>">
         <div class="desc">
           <p>Views: <%- image.views %></p>
-          <p>Upvotes: <%- image.upVotes %></p>
+          <p>Upvotes: <span id="upvotes<%- image._id %>"> <%- image.upVotes %> </span></p>
           <button class="btn" onclick="upvoteImage('<%- image._id %>')">Upvote</button>
         </div>
       </div>

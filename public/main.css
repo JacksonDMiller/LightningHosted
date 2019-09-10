@@ -93,7 +93,7 @@ h2 {
 
 .headline {
   width: 100%;
-  height: 50vh;
+  height: 40vh;
   min-height: 250px;
   background: linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.7)), url('background.jpg');
   background-size: cover;
@@ -303,6 +303,13 @@ input {
 
 @media only screen and (max-width: 720px) { 
 
+  #ad1{
+    display: none;
+  }
+
+  #ad2{
+    display: inherit !important;
+  }
   .grid{
     margin: 10px 0px 0px 0px !important;
   }
@@ -406,11 +413,19 @@ input {
   margin-right: 10px;
   color: white;
   text-align: center;
+  padding: 5px;
 }
 
+#message-container a{
+  color: white;
+}
 .filepond--root{
   margin-bottom: 0 !important;
   
+}
+
+[data-filepond-item-state='processing-complete'] .filepond--item-panel {
+  background-color: #8c54a1 !important;
 }
 
 #filepond-container{
@@ -445,15 +460,14 @@ input {
 }
 
 .faqItem{
-  grid-row: span 8;
+  margin: 10px;
 }
 
 .aboutGrid{
   display: grid;
   grid-gap: 10px;
-  grid-template-columns: repeat(auto-fill, minmax(450px,1fr));
-  grid-auto-rows: 20px;
-  padding: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(350px,1fr));
+  padding: 10px;
 }
 
 .grid p{
@@ -547,6 +561,7 @@ input {
   
 
   .btn{
+    padding: 5px;
     background:transparent;
     border: 2px solid transparent;
     box-sizing: border-box;
@@ -584,4 +599,25 @@ input {
 #withdrawDiv {
   text-align: center;
   padding-bottom: 10px; 
+}
+
+#ad1{
+  text-align: center;
+}
+#ad2{
+  display: none;
+  text-align: center;
+}
+
+.ads{
+  text-align: center;
+}
+
+#contactPageContainer{
+  margin-left: 10px;
+  margin-right: 10px; 
+}
+
+.heading{
+text-align: center;
 }
