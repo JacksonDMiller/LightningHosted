@@ -2,14 +2,14 @@
 
 <head>
   <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-133745471-2"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-133745471-2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-  gtag('config', 'UA-133745471-2');
-</script>
+    gtag('config', 'UA-133745471-2');
+  </script>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0">
   <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
@@ -51,15 +51,40 @@
       <div class="content">
         <div class="title">
           <h3><%- image.title %></h3>
-        </div>  <img class="photothumb" src="/noauth/image/<%- image.fileName %>">
+        </div> <img class="photothumb" src="/noauth/image/<%- image.fileName %>">
         <div class="desc">
           <p>Views: <%- image.views %></p>
-          <p>Upvotes: <span id="upvotes<%- image._id %>"> <%- image.upVotes %> </span></p>
-          <button class="btn" onclick="upvoteImage('<%- image._id %>')">Upvote</button>
+          <p>Upvotes: <span id="upvotes<%- image._id %>"> <%- image.upVotes %> </span> <button class="upVotebtn"
+              onclick="upvoteImage('<%- image._id %>')"><span class="chevron top"></span></button></p>
+          <div id="share-buttons">
+            <p>Share
+              <span>
+            <!-- Facebook -->
+            <a href="http://www.facebook.com/sharer.php?u=http://192.168.0.33.nip.io:3000/noauth/share/<%- image.fileName %>"
+              target="_blank">
+              <img src="https://simplesharebuttons.com/images/somacro/facebook.png" alt="Facebook" />
+            </a>
+
+            <!-- Reddit -->
+            <a href="http://reddit.com/submit?url=http://192.168.0.33.nip.io:3000/noauth/share/<%- image.fileName %>&amp;title=<%- image.title %>"
+              target="_blank">
+              <img src="https://simplesharebuttons.com/images/somacro/reddit.png" alt="Reddit" />
+            </a>
+
+            <!-- Twitter -->
+            <a href="https://twitter.com/share?url=http://192.168.0.33.nip.io:3000/noauth/share/<%- image.fileName %>&amp;text=LightningHosted.com&amp;hashtags=LightningHosted"
+              target="_blank">
+              <img src="https://simplesharebuttons.com/images/somacro/twitter.png" alt="Twitter" />
+            </a>
+          </div>
+        </span>
+        </p>
         </div>
       </div>
     </div>
     <div class="grid"></div>
+
+
 
 </body>
 <footer>

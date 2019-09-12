@@ -10,19 +10,26 @@ var infScroll = new InfiniteScroll('.grid', {
 });
 
 infScroll.on('load', function (response) {
-  
+   if(!localStorage.getItem("upVoted")){
+      localStorage.setItem("upVoted", JSON.stringify({}))
+   }
+   var upVoted = JSON.parse(localStorage.getItem("upVoted"))
    var data = JSON.parse(response);
+   console.log(upVoted)
    data.forEach(element => { 
+      var voted = 'notUpvoted'+element.id
+      if(upVoted[element.id] === true){
+         var voted ="upVoted"
+      }
       $(".grid").append( `<div id="photoCard` + x + `" class="item photo" style="display:none">
       <div class="content"> 
       <div class="title"> <h3>` + element.title + `</h3> </div> 
       <a href="/noauth/share/`+element.fileName+`">
      <img onload="$('#photoCard` + x + `').css('display', '')" class="photothumb" src="/noauth/image/` + element.fileName + `"> 
      </a>
-      <div class="desc"> 
+      <div class="descNoAuth"> 
       <p>Views: ` + element.views + `</p>
-      <p>Upvotes: <span id="upvotes`+element.id+`" >` + element.upVotes + `</span></p>
-      <button class="btn" onclick="upvoteImage('`+ element.id + `')">Upvote</button>
+      <p>Upvotes: <span id="upvotes`+element.id+`" >` + element.upVotes + `</span> <button class="upVotebtn" onclick="upvoteImage('`+ element.id + `')"><span class="chevron top `+voted+`"></span></button></p>
       </div> </div> </div>`)
 
       allItems = document.getElementsByClassName("item");
@@ -83,6 +90,14 @@ function upvoteImage (id) {
    $.get("/noauth/upvote/" + id, function (data, status) {
       if(data === 'Upvoted'){
          $('#upvotes'+id).text(parseInt($('#upvotes'+id).text())+1)
+         $('.notUpvoted'+id).fadeOut(500, function() {
+         $('.notUpvoted'+id).css("color", "#000000").fadeIn(500);
+         var upVoted = JSON.parse(localStorage.getItem("upVoted"))
+         upVoted[id]=true;
+         localStorage.setItem("upVoted", JSON.stringify(upVoted));
+        });
       }
   });
 }
+
+// testing

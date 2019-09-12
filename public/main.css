@@ -155,6 +155,13 @@ h2 {
   grid-row-end: span 14;
 }
 
+.descNoAuth{
+  padding: 10px 10px 5px 10px;
+  background-color: #8c54a1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
 .desc{
   padding: 10px 10px 5px 10px;
   background-color: #8c54a1;
@@ -162,13 +169,14 @@ h2 {
   grid-template-columns: 1fr 1fr 1fr 1fr ;
 }
 
-.desc img{
+.desc img, .descNoAuth img{
   width: 50%;
   margin: 0 10px 10px 0;
+
   float: left;
 }
 
-.desc p{
+.desc p, .descNoAuth p{
   margin-bottom: 10px;
 }
 /* SEARCH FUNCTION */
@@ -315,6 +323,10 @@ input {
   }
 
   .btn{
+    font-size: 0.8rem !important;
+  }
+
+  .upVotebtn{
     font-size: 0.8rem !important;
   }
 
@@ -559,6 +571,22 @@ input {
     background: rgba(33, 150, 243, 0.3);
   }
   
+  .upVotebtn{
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 1.1rem;
+    outline:none;
+    top:0;
+    vertical-align: text-top;
+	background:#8c54a1;
+	color:#fff;
+  }
+
+  .upVoted
+  {
+    color: black !important;
+  }
+
 
   .btn{
     padding: 5px;
@@ -620,4 +648,33 @@ input {
 
 .heading{
 text-align: center;
+}
+
+.chevron::before {
+	border-style: solid;
+	border-width: 0.25em 0.25em 0 0;
+	content: '';
+	display: inline-block;
+	height: 0.45em;
+	left: 0.15em;
+	position: relative;
+	top: 0.15em;
+	transform: rotate(-45deg);
+	vertical-align: top;
+	width: 0.45em;
+}
+
+
+/* testing */
+
+#share-buttons img {
+  width: 35px;
+  padding: 5px;
+  border: 0;
+  box-shadow: 0;
+  display: inline;
+  }
+ 
+  #share-buttons a {
+  text-decoration: none;
 }
