@@ -2,59 +2,63 @@ var infScroll = new InfiniteScroll('.grid', {
    path: function () {
       return '/noauth/topPosts/' + this.pageIndex;
    },
-   // load response as flat text
    responseType: 'text',
    status: '.page-load-status',
    history: false,
    // maybe this should be disabled? histoy^ to get it to go back to the same part of the page
 });
 
+// check if there is a list of upvoted posts on the client
+if (!localStorage.getItem("upVoted")) {
+   localStorage.setItem("upVoted", JSON.stringify({}))
+}
+// loading the list of upvoted images from the client
+var upVoted = JSON.parse(localStorage.getItem("upVoted"))
+
+
 infScroll.on('load', function (response) {
-   if(!localStorage.getItem("upVoted")){
-      localStorage.setItem("upVoted", JSON.stringify({}))
-   }
-   var upVoted = JSON.parse(localStorage.getItem("upVoted"))
+
+
    var data = JSON.parse(response);
-   console.log(upVoted)
-   data.forEach(element => { 
-      var voted = 'notUpvoted'+element.id
-      if(upVoted[element.id] === true){
-         var voted ="upVoted"
+   console.log(data)
+   data.forEach(image => {
+      if ($('.' + image.imageId).length === 0) {
+         //checking if the image is already on the page in the share spot
+
+         //build a new photocard 
+         newCard = $("#photoCard").clone();
+         newCard.find('.photoThumb').attr('src', '/noauth/image/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
+         newCard.attr("id", "photoCard" + x);
+         newCard.addClass(image.imageId);
+         newCard.find('.shareLink').attr('href', '/noauth/share/' + image.imageId);
+         newCard.find('.views').text(image.views);
+         if (upVoted[image.imageId] === true) {
+            newCard.find('.chevron').addClass("upVoted");
+         }
+         newCard.find('.upVotes').text(image.upVotes);
+         newCard.find('.upVotebtn').attr('onclick', 'upvoteImage("' + image.imageId + '")');
+         newCard.find('.titleVal').text(image.title);
+         $(".grid").append(newCard);
+
+
+         allItems = document.getElementsByClassName("item");
+         for (x = 0; x < allItems.length; x++) {
+            imagesLoaded(allItems[x], resizeInstance);
+         }
       }
-      $(".grid").append( `<div id="photoCard` + x + `" class="item photo" style="display:none">
-      <div class="content"> 
-      <div class="title"> <h3>` + element.title + `</h3> </div> 
-      <a href="/noauth/share/`+element.fileName+`">
-     <img onload="$('#photoCard` + x + `').css('display', '')" class="photothumb" src="/noauth/image/` + element.fileName + `"> 
-     </a>
-      <div class="descNoAuth"> 
-      <p>Views: ` + element.views + `</p>
-      <p>Upvotes: <span id="upvotes`+element.id+`" >` + element.upVotes + `</span> <button class="upVotebtn" onclick="upvoteImage('`+ element.id + `')"><span class="chevron top `+voted+`"></span></button></p>
-      </div> </div> </div>`)
+   });
+   if (data != false) {
+      newAdCard = $('.adCardTemplate').clone();
+      newAdCard.removeClass('adCardTemplate');
+      newAdCard.attr("id", "photoCard" + x);
+      newAdCard.find('iframe').attr('onload', '$("#photoCard' + x + '").toggle()');
+      $(".grid").append(newAdCard);
 
       allItems = document.getElementsByClassName("item");
       for (x = 0; x < allItems.length; x++) {
          imagesLoaded(allItems[x], resizeInstance);
       }
-   });
-   if (data != false) {
-   $(".grid").append( `<div id="photoCard` + x + `" class="item photo">
-   <div class="content"> 
-   <div class="title"> <h3>Sponsor</h3> </div>
-   <div class="ads"> 
-   <iframe data-aa="1241606" src="//ad.a-ads.com/1241606?size=300x250" scrolling="no" style="width:300px; height:250px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
-   </div>
-   <div class="desc"> 
-   </div> </div> </div>`)
-
-
-   allItems = document.getElementsByClassName("item");
-   for (x = 0; x < allItems.length; x++) {
-      imagesLoaded(allItems[x], resizeInstance);
    }
-}
-
-
 });
 
 infScroll.loadNextPage();
@@ -86,18 +90,23 @@ for (x = 0; x < allItems.length; x++) {
    imagesLoaded(allItems[x], resizeInstance);
 }
 
-function upvoteImage (id) {
-   $.get("/noauth/upvote/" + id, function (data, status) {
-      if(data === 'Upvoted'){
-         $('#upvotes'+id).text(parseInt($('#upvotes'+id).text())+1)
-         $('.notUpvoted'+id).fadeOut(500, function() {
-         $('.notUpvoted'+id).css("color", "#000000").fadeIn(500);
-         var upVoted = JSON.parse(localStorage.getItem("upVoted"))
-         upVoted[id]=true;
-         localStorage.setItem("upVoted", JSON.stringify(upVoted));
-        });
-      }
-  });
+function upvoteImage(id) {
+   if ($('.' + id).find('.chevron').hasClass('upVoted')) {
+      $('.' + id).find('.upVotes').text(parseInt($('.' + id).find('.upVotes').text()) + -1)
+      var upVoted = JSON.parse(localStorage.getItem("upVoted"))
+      upVoted[id] = false;
+      localStorage.setItem("upVoted", JSON.stringify(upVoted));
+   }
+   else {
+      $('.' + id).find('.upVotes').text(parseInt($('.' + id).find('.upVotes').text()) + 1)
+      var upVoted = JSON.parse(localStorage.getItem("upVoted"))
+      upVoted[id] = true;
+      localStorage.setItem("upVoted", JSON.stringify(upVoted));
+      $.get("/noauth/upvote/" + id, function (data, status) {
+      });
+   }
+   $('.' + id).find('.chevron').toggleClass('upVoted')
 }
 
-// testing
+
+

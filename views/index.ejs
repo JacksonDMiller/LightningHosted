@@ -28,7 +28,7 @@
     <div class="nav-wrapper">
       <div class="grad-bar"></div>
       <nav class="navbar">
-        <a href="/"><img src="/LightningHosted.png" alt="Company Logo"></a>
+          <div id='logo'><a href="/"><h1>LightningHosted</h1></a></div>
         <div class="menu-toggle" id="mobile-menu">
           <span class="bar"></span>
           <span class="bar"></span>
@@ -39,13 +39,12 @@
           <li class="nav-item"><a href="/auth/#">Posts</a></li>
           <li class="nav-item"><a href="/noauth/about">About</a></li>
           <li class="nav-item"><a href="/noauth/contact">Contact</a></li>
-          <%- logInStatus %>
+          <li class="nav-item"><a id="logInStatus" class="<%= logInStatus %>" href="/noauth/google">Log In</a></li>
         </ul>
       </nav>
     </div>
     <section class="headline">
-      <h1>LightningHosted</h1>
-      <p>Share Images And Stack Sats</p>
+        <a href="/"><h1>Share Images And Stack Sats</h1></a>
     </section>
     <div id='ad1' class='ad'>
       <iframe data-aa="1241600" src="//ad.a-ads.com/1241600?size=728x90" scrolling="no"
@@ -57,6 +56,38 @@
     </div>
     <div class="grid">
     </div>
+    
+    <!-- image card template -->
+    <div id="photoCard" class="item photo" style="display:none">
+      <div class="content">
+        <div class="title">
+          <h3 class='titleVal'>Title</h3>
+        </div>
+        <a class='shareLink' href="/">
+          <img onload="" class="photoThumb" src="/">
+        </a>
+        <div class="descNoAuth">
+          <p>Views: <span class='views'></span></p>
+          <p class="outSide">Upvotes: <span class='upVotes'></span> <button class="upVotebtn" onclick=""><span class="chevron top"></span></button></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ad card template -->
+    <div id="photoCardAd" class="item photo adCardTemplate" style="display:none">
+      <div class="content">
+        <div class="title">
+          <h3>Sponsor</h3>
+        </div>
+        <div class="ads">
+          <iframe data-aa="1241606" src="//ad.a-ads.com/1241606?size=300x250" scrolling="no"
+            style="width:300px; height:250px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
+        </div>
+        <div class="desc">
+        </div>
+      </div>
+    </div>
+
 </body>
 <footer>
   <script src="script.js"></script>

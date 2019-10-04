@@ -5,9 +5,21 @@ const grpc = require('grpc');
 const fs = require('fs');
 const qrCode = require('qrcode')
 var sizeOf = require('image-size');
+const sharp = require('sharp');
+
+// Checks to see if a user is logged in before allowing them to access a page.
+const authCheck = (req, res, next) => {
+    if (!req.user) {
+        // if user is not logged in
+        res.redirect('../noauth/google')
+    }
+    else {
+        // if logged in
+        next();
+    }
+};
 
 // setting up LND
-
 process.env.GRPC_SSL_CIPHER_SUITES = 'HIGH+ECDSA';
 var m = fs.readFileSync('./config/admin.macaroon');
 var macaroon = m.toString('hex');
@@ -29,6 +41,7 @@ var credentials = grpc.credentials.combineChannelCredentials(sslCreds, macaroonC
 // Pass the crendentials when creating a channel
 var lnrpcDescriptor = grpc.load("./config/rpc.proto");
 var lnrpc = lnrpcDescriptor.lnrpc;
+
 // Testing
 var lightning = new lnrpc.Lightning('bitcoinacolyte.hopto.org:10009', credentials);
 lightning = new lnrpc.Lightning('localhost:10009', credentials);
@@ -48,77 +61,68 @@ call.on('data', function (invoice) {
 
     }
 })
-    .on('end', function () {
-        // The server has finished sendi
-    })
-    .on('status', function (status) {
-        // Process status
-        //  console.log("Current status" + status);
-    });
-
-
-// This checks to see if a user is logged in before allowing them to access a page.
-const authCheck = (req, res, next) => {
-    if (!req.user) {
-        // if user is not logged in
-        res.redirect('../noauth/google')
-    }
-    else {
-        // if logged in
-        next();
-    }
-};
 
 router.get('/', authCheck, (req, res) => {
     res.render('profile', { user: req.user });
 });
 
-// REORGONZINGING THIS MOVING THE DATBASE CALL INSIDE THE LIGHTNING CALLBACK 
+// Handles the upload and creation of a new image.
 router.post('/upload', function (req, res) {
     if (Object.keys(req.files).length == 0) {
         return res.status(400).send('No files were uploaded.');
     }
     lightning.addInvoice({ value: 250, memo: 'LightningHosted Captcha' }, function (err, response) {
-        fileName = crypto.randomBytes(20).toString('hex')
-        req.files.filepond.mv('./uploads/' + fileName + '.jpg', function (err) {
-            if (err) { return res.status(500).send(err) };
-
-            sizeOf('./uploads/' + fileName + '.jpg', function (err, dimensions) {
-                User.findOne({ _id: req.user.id }).then((currentUser) => {
-                    currentUser.images.push({
-                        imageId: fileName,
-                        reviewStatus: false,
-                        payStatus: false,
-                        deleted: false,
-                        views: 0,
-                        reports: 0,
-                        fileName: fileName + '.jpg',
-                        thumbNail: 'x',
-                        width: dimensions.width,
-                        height: dimensions.height,
-                        date: new (Date),
-                        title: '',
-                        caption: 'String',
-                        paymentRequest: response.payment_request,
-                        upVotes: 0,
-                        sats: 0,
-                    })
-                    currentUser.save().then(() => {
-                        qrCode.toDataURL(response.payment_request, function (err, url) {
-                            res.status(200).send({
-                                invoice: response.payment_request,
-                                image: url,
-                                fileName: fileName + ".jpg",
-                                id: currentUser.images[currentUser.images.length - 1].id
-                            });
-                        })
-
-                    });
+        var extension = req.files.filepond.name.split('.')[1]
+        fileName = crypto.randomBytes(8).toString('hex')
+        if (req.files.filepond.mimetype === 'image/jpeg') {
+            req.files.filepond.mv('./uploads/' + fileName + 'temp' + '.' + extension, function (err) {
+                sharp('./uploads/' + fileName + 'temp' + '.' + extension).rotate().toFile('./uploads/' + fileName + '.' + extension, function (err) {
+                    if (err) { return res.status(500).send(err) };
+                    createImage(extension,req,response)
                 });
+            })
+        }
+        else {
+            req.files.filepond.mv('./uploads/' + fileName + '.' + extension, function (err) {
+                createImage(extension,req,response)
+            })
+        }
+    })
+
+    function createImage(extension,req,response) {
+        sizeOf('./uploads/' + fileName + '.' + extension, function (err, dimensions) {
+            req.user.images.push({
+                imageId: fileName,
+                reviewStatus: false,
+                payStatus: false,
+                // payStatus: true, //testing
+                deleted: false,
+                views: 0,
+                reports: 0,
+                fileName: fileName + '.' + extension,
+                thumbNail: 'x',
+                width: dimensions.width,
+                height: dimensions.height,
+                date: new (Date),
+                title: '',
+                caption: 'String',
+                paymentRequest: response.payment_request,
+                upVotes: 0,
+                sats: 0,
+            })
+            req.user.save().then(() => {
+                qrCode.toDataURL(response.payment_request, function (err, url) {
+                    res.status(200).send({
+                        invoice: response.payment_request,
+                        image: url,
+                        fileName: fileName + "." + extension,
+                        imageId: fileName
+                    });
+                })
+
             });
         });
     }
-    );
 });
 
 router.get('/user', authCheck, (req, res) => {
@@ -127,39 +131,33 @@ router.get('/user', authCheck, (req, res) => {
     })
 });
 
-router.get('/title/:id/:title', authCheck, (req, res) => {
-    User.findOne({ 'images._id': req.params.id }).then((currentUser) => {
-        currentUser.images.forEach(element => {
-            if (element._id == req.params.id) {
-                element.title = req.params.title;
-            }
-        })
-        currentUser.save();
-        res.send('Title Updated')
-    })
+router.get('/title/:imageId/:title', authCheck, (req, res) => {
+    req.user.images.forEach(element => {
+        if (element.imageId == req.params.imageId) {
+            element.title = req.params.title;
+        }
+    });
+    req.user.save();
+    res.send('Title Updated')
 });
 
 router.get('/paymentStatus/:invoice', authCheck, (req, res) => {
-    User.findOne({ 'images.paymentRequest': req.params.invoice }).then((currentUser) => {
-        currentUser.images.forEach(element => {
-            if (element.paymentRequest == req.params.invoice) {
-                res.send(element)
-                return
-            }
-        })
+    req.user.images.forEach(element => {
+        if (element.paymentRequest == req.params.invoice) {
+            res.send(element)
+            return
+        }
     })
 })
 
 router.get('/delete/:id/', authCheck, (req, res) => {
-    User.findOne({ 'images._id': req.params.id }).then((currentUser) => {
-        currentUser.images.forEach(element => {
-            if (element._id == req.params.id) {
-                element.deleted = true;
-            }
-        })
-        currentUser.save();
-        res.send('Image deleted')
+    req.user.images.forEach(element => {
+        if (element.imageId == req.params.id) {
+            element.deleted = true;
+        }
     })
+    req.user.save();
+    res.send('Image deleted')
 });
 
 
@@ -169,10 +167,8 @@ router.get('/withdraw/:invoice', authCheck, (req, res) => {
             res.send(decodeErr.details)
         }
         else {
-            if (req.user.earnedSats >= decodeReesponse.num_satoshis) {
+            if (req.user.sats >= decodeReesponse.num_satoshis) {
                 lightning.sendPaymentSync({ payment_request: req.params.invoice }, function (err, response) {
-                    console.log(err, 'err')
-                    console.log(response,'res')
                     if (err) {
                         res.send(err.details);
                     }
@@ -181,7 +177,8 @@ router.get('/withdraw/:invoice', authCheck, (req, res) => {
                     }
                     else {
                         res.send({ status: 'success', amount: decodeReesponse.num_satoshis });
-                        req.user.earnedSats = req.user.earnedSats - decodeReesponse.num_satoshis;
+                        req.user.sats = req.user.sats - decodeReesponse.num_satoshis;
+                        req.user.paidSats = req.user.paidSats + decodeReesponse.num_satoshis;
                         req.user.save();
                     };
                 })

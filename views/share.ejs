@@ -28,7 +28,9 @@
     <div class="nav-wrapper">
       <div class="grad-bar"></div>
       <nav class="navbar">
-        <a href="/"><img src="/LightningHosted.png" alt="Company Logo"></a>
+        <div id='logo'><a href="/">
+            <h1>LightningHosted</h1>
+          </a></div>
         <div class="menu-toggle" id="mobile-menu">
           <span class="bar"></span>
           <span class="bar"></span>
@@ -39,55 +41,139 @@
           <li class="nav-item"><a href="/auth/#">Posts</a></li>
           <li class="nav-item"><a href="/noauth/about">About</a></li>
           <li class="nav-item"><a href="/noauth/contact">Contact</a></li>
-          <%- logInStatus %>
+          <li class="nav-item"><a id="logInStatus" class="<%= logInStatus %>" href="/noauth/google">Log In</a></li>
         </ul>
       </nav>
     </div>
     <section class="headline">
-      <h1>LightningHosted</h1>
-      <p>Share Images And Stack Sats</p>
+      <a href="/">
+        <h1>Share Images And Stack Sats</h1>
+      </a>
     </section>
-    <div id="shareImage" class="item photo" style="grid-row-end: span 11;">
+    <div id="shareImage" class="item photo <%- image.imageId %>" style="grid-row-end: span 11;">
       <div class="content">
         <div class="title">
           <h3><%- image.title %></h3>
-        </div> <img class="photothumb" src="/noauth/image/<%- image.fileName %>">
-        <div class="desc">
+        </div> <img class="sharePhoto" src="/noauth/image/<%- image.fileName %>">
+        <div class="shareDesc">
           <p>Views: <%- image.views %></p>
-          <p>Upvotes: <span id="upvotes<%- image._id %>"> <%- image.upVotes %> </span> <button class="upVotebtn"
-              onclick="upvoteImage('<%- image._id %>')"><span class="chevron top"></span></button></p>
+          <p>Upvotes: <span class="upVotes"> <%- image.upVotes %> </span> <button class="upVotebtn"
+              onclick="upvoteImage('<%-image.imageId%>')"><span id="<%- image.imageId %>"
+                class="chevron top"></span></button></p>
+
+          <p class='shareText'>Share:</p>
           <div id="share-buttons">
-            <p>Share
-              <span>
-            <!-- Facebook -->
-            <a href="http://www.facebook.com/sharer.php?u=http://192.168.0.33.nip.io:3000/noauth/share/<%- image.fileName %>"
-              target="_blank">
-              <img src="https://simplesharebuttons.com/images/somacro/facebook.png" alt="Facebook" />
-            </a>
 
-            <!-- Reddit -->
-            <a href="http://reddit.com/submit?url=http://192.168.0.33.nip.io:3000/noauth/share/<%- image.fileName %>&amp;title=<%- image.title %>"
-              target="_blank">
-              <img src="https://simplesharebuttons.com/images/somacro/reddit.png" alt="Reddit" />
-            </a>
+            <span>
+              <!-- Facebook -->
+              <a href="http://www.facebook.com/sharer.php?u=http://192.168.0.33.nip.io:3000/noauth/share/<%- image.imageId %>"
+                target="_blank">
+                <img src="https://simplesharebuttons.com/images/somacro/facebook.png" alt="Facebook" />
+              </a>
 
-            <!-- Twitter -->
-            <a href="https://twitter.com/share?url=http://192.168.0.33.nip.io:3000/noauth/share/<%- image.fileName %>&amp;text=LightningHosted.com&amp;hashtags=LightningHosted"
-              target="_blank">
-              <img src="https://simplesharebuttons.com/images/somacro/twitter.png" alt="Twitter" />
-            </a>
+              <!-- Reddit -->
+              <a href="http://reddit.com/submit?url=http://192.168.0.33.nip.io:3000/noauth/share/<%- image.imageId %>&amp;title=<%- image.title %>"
+                target="_blank">
+                <img src="https://simplesharebuttons.com/images/somacro/reddit.png" alt="Reddit" />
+              </a>
+
+              <!-- Twitter -->
+              <a href="https://twitter.com/share?url=http://192.168.0.33.nip.io:3000/noauth/share/<%- image.imageId %>&amp;text=LightningHosted.com&amp;hashtags=LightningHosted"
+                target="_blank">
+                <img src="https://simplesharebuttons.com/images/somacro/twitter.png" alt="Twitter" />
+              </a>
+            </span>
           </div>
-        </span>
-        </p>
+          <div id='commentSection'>
+            <div id='comments'>
+
+                <% for(var i=0; i < image.comments.length; i++) { %>
+                    <div id="<%= image.comments[i].commentId %>" class='commentString'>
+                        <div class="topLevelComment comment">
+                          <p><%= image.comments[i].comment %> </p>
+                          <button onclick="reply('<%= image.imageId %>','<%= image.comments[i].commentId %>')" class='btn replyBtn'>Reply</button>
+                        </div>
+                          <% for(var x=0; x < image.comments[i].subComments.length; x++) { %>
+                            <div id="<%= image.comments[i].subComments[x].subCommentId%>" class='subComment'>
+                                <p><%= image.comments[i].subComments[x].comment%></p>
+                                <button class='btn replyBtn' onclick='reply("<%= image.imageId %>","<%= image.comments[i].commentId %>","<%= image.comments[i].subComments[x].subCommentId%>")'>Reply</button>
+                              </div>
+                              <% } %>
+                        </div>
+               <% } %>
+            </div>
+            <div id='commentSubmit'>
+              <textarea class='commentBox replyBox'></textarea>
+              <button onclick='submitComment("<%- image.imageId %>")' class='bigSubmitBtn btn'>Submit</button>
+            </div>
+          
         </div>
       </div>
     </div>
-    <div class="grid"></div>
+  </div>
+  <div class="grid"></div>
+
+  <!-- image card template -->
+  <div id="photoCard" class="item photo" style="display:none">
+    <div class="content">
+      <div class="title">
+        <h3 class='titleVal'>Title</h3>
+      </div>
+      <a class='shareLink' href="/">
+        <img onload="" class="photoThumb" src="/">
+      </a>
+      <div class="descNoAuth">
+        <p>Views: <span class='views'></span></p>
+        <p>Upvotes: <span class='upVotes'></span> <button class="upVotebtn" onclick=""><span
+              class="chevron top"></span></button></p>
+      </div>
+    </div>
+  </div>
 
 
+  <!-- ad card template -->
+  <div id="photoCardAd" class="item photo adCardTemplate" style="display:none">
+    <div class="content">
+      <div class="title">
+        <h3>Sponsor</h3>
+      </div>
+      <div class="ads">
+        <iframe data-aa="1241606" src="//ad.a-ads.com/1241606?size=300x250" scrolling="no"
+          style="width:300px; height:250px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
+      </div>
+      <div class="desc">
+      </div>
+    </div>
+  </div>
+
+  <!-- comment string template -->
+  <div class='commentString commentStringTemplate' style="display:none"> 
+      <div class="topLevelComment comment">
+        <p></p>
+        <button class='btn replyBtn'>Reply</button>
+        <div class='replyBoxContainer' style="display:none">
+            <textarea class='replyBox'></textarea>
+            <button class='submitBtn btn'>Submit</button>
+        </div>
+      </div>
+      </div>
+
+  <!-- subcomment template -->
+  <div class='subComment subCommentTemplate' style="display:none">
+    <p></p>
+    <button class='replyBtn btn'>Reply</button>
+  </div>
+
+  <!-- reply box template -->
+
+  <div class='replyBoxContainer replyBoxContainertemplate' style="display:none">
+      <textarea class='replyBox'></textarea>
+      <button onclick='submitComment("")' class='btn submitBtn'>Submit</button>
+  </div>
 
 </body>
 <footer>
   <script src="/script.js"></script>
   <script src="/noauth-script.js"></script>
+  <script src="/share-script.js"></script>
 </footer>

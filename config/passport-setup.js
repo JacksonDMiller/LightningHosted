@@ -13,7 +13,6 @@ passport.deserializeUser((id, done) => {
     });
 });
 
-
 passport.use(
     new GoogleStrategy({
         //options for the google strat
@@ -34,6 +33,7 @@ passport.use(
                     thirdPartyId: profile.id,
                     estimatedSats: 0,
                     earnedSats: 0,
+                    sats:0,
                     paidSats: 0,
                     views: 0,
                     userName: profile.displayName,

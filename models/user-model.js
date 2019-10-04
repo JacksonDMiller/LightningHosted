@@ -1,6 +1,20 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const subCommentSchema = new Schema({
+    subCommentId: String,
+    date: Date,
+    comment: String,
+    upVotes: Number,
+})
+
+const commentSchema = new Schema({
+    commentId: String,
+    date: Date,
+    comment: String,
+    upVotes: Number,
+    subComments: [subCommentSchema]
+})
 
 const imageSchema = new Schema({
     imageId: String,
@@ -18,13 +32,15 @@ const imageSchema = new Schema({
     caption: String,
     paymentRequest: String,
     upVotes: Number,
-    sats :Number
-}, { strict: false });
+    sats :Number,
+    comments: [commentSchema]
+});
 
 const accountSchema = new Schema({
     thirdPartyId: String,
     estimatedSats: Number,
     earnedSats: Number,
+    sats: Number,
     paidSats: Number,
     views: Number,
     userName: String,

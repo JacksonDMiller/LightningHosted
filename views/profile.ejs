@@ -39,56 +39,110 @@
 </head>
 
 <body>
-  <div class="nav-wrapper">
-    <div class="grad-bar"></div>
-    <nav class="navbar">
-      <a href="/"><img src="../LightningHosted.png" alt="Company Logo"></a>
-      <div class="menu-toggle" id="mobile-menu">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
+  <div class="page-wrapper">
+    <div class="nav-wrapper">
+      <div class="grad-bar"></div>
+      <nav class="navbar">
+        <div id='logo'><a href="/"><h1>LightningHosted</h1></a></div>
+        <div class="menu-toggle" id="mobile-menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+        <ul class="nav no-search">
+          <li class="nav-item"><a href="/">Home</a></li>
+          <li class="nav-item"><a href="/auth/#">Posts</a></li>
+          <li class="nav-item"><a href="/noauth/about">About</a></li>
+          <li class="nav-item"><a href="/noauth/contact">Contact</a></li>
+          <li class="nav-item"><a href="/noauth/logout">Log Out</a></li>
+
+        </ul>
+      </nav>
+    </div>
+    <section class="headline">
+      <a href="/">
+        <a href="/"><h1>Share Images And Stack Sats</h1></a>
+      </a>
+    </section>
+    <div id='ad1' class='ad'>
+      <iframe data-aa="1241600" src="//ad.a-ads.com/1241600?size=728x90" scrolling="no"
+        style="width:728px; height:90px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
+    </div>
+    <div id='ad2' class='ad'>
+      <iframe data-aa="1241618" src="//ad.a-ads.com/1241618?size=320x50" scrolling="no"
+        style="width:320px; height:50px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
+    </div>
+    <div id='withdrawDiv'> Sats Earned: <span id="satsEarned">0</span> <button onclick="withdraw()"
+        class='btn withdrawBtn'>Withdraw</button>
+    </div>
+    <div id='filepond-container'>
+      <input type="file">
+    </div>
+    <div id='message-container'>
+      <p id='message'></p>
+      <p id='message-link'></p>
+      <div id='message-image'></div>
+      <a id='message-invoice' href='#'>Open Wallet</a>
+    </div>
+    <div class="grid"></div>
+  </div>
+
+
+  <!-- Card Template -->
+  <div id="photoCard" class="item photo" style="display:none">
+    <div class="content">
+      <div class="title">
+        <h3 class='titleVal'>Title</h3>
       </div>
-      <ul class="nav no-search">
-        <li class="nav-item"><a href="/">Home</a></li>
-        <li class="nav-item"><a href="/auth/#">Posts</a></li>
-        <li class="nav-item"><a href="/noauth/about">About</a></li>
-        <li class="nav-item"><a href="/noauth/contact">Contact</a></li>
-        <li class="nav-item"><a href="/noauth/logout">Logout</a></li>
-
-      </ul>
-    </nav>
+      <a class="shareLink" href="/">
+        <img onload="" class="photoThumb" src="/">
+      </a>
+      <div class="desc">
+        <p>Views: <span class='views'></span></p>
+        <p>Upvotes: <span class='upvotes'></span></p>
+        <p>Sats: <span class='sats'></span></p>
+        <button class="btn deleteBtn" onclick="">Delete</button>
+      </div>
+    </div>
   </div>
-  <section class="headline">
-    <h1>LightningHosted</h1>
-    <p>Share Images And Stack Sats</p>
-  </section>
-  </div>
-  <div id='ad1' class='ad'>
-    <iframe data-aa="1241600" src="//ad.a-ads.com/1241600?size=728x90" scrolling="no"
-      style="width:728px; height:90px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
-  </div>
-  <div id='ad2' class='ad'>
-    <iframe data-aa="1241618" src="//ad.a-ads.com/1241618?size=320x50" scrolling="no"
-      style="width:320px; height:50px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
-  </div>
-  <div id='withdrawDiv'> Sats: <span id="satsEarned">0</span> <button onclick="withdraw()" class='btn'>Withdraw</button>
-  </div>
-  <div id='filepond-container'>
-    <input type="file">
-  </div>
-  <div id='message-container'>
-    <p id='message'></p>
-    <p id='message-link'></p>
-    <div id='message-image'></div>
-    <a id='message-invoice' href='#'>Open Wallet</a>
-  </div>
-  <div class="grid"></div>
-
   </div>
 </body>
 <footer>
   <script src="../auth-script.js"></script>
   <script src="../script.js"></script>
+
+  <!-- title input template -->
+  <div id="TitleInputTemp" class="centered" style="display:none">
+    <div class="group">
+      <input type="text" class='emptyTitle' id="" required="required" autocomplete="off">
+      <label for="name">Title</label>
+      <div class="bar"></div>
+    </div>
+  </div>
 </footer>
+
+<!-- share buttons template -->
+<div id="share-buttons" class="shareButtonsTemplate" style="display:none">
+  <p>Share</p>
+  <span>
+    <!-- Facebook -->
+    <a class='facebookLink' href=""
+      target="_blank">
+      <img src="https://simplesharebuttons.com/images/somacro/facebook.png" alt="Facebook" />
+    </a>
+
+    <!-- Reddit -->
+    <a class='redditLink' href="http://reddit.com/submit?url=http://192.168.0.33.nip.io:3000/noauth/share/
+      target="_blank">
+      <img src="https://simplesharebuttons.com/images/somacro/reddit.png" alt="Reddit" />
+    </a>
+
+    <!-- Twitter -->
+    <a class='twitterLink' href="https://twitter.com/share?url=http://192.168.0.33.nip.io:3000/noauth/share/&amp;text=LightningHosted.com&amp;hashtags=LightningHosted"
+      target="_blank">
+      <img src="https://simplesharebuttons.com/images/somacro/twitter.png" alt="Twitter" />
+    </a>
+  </span>
+</div>
 
 </html>

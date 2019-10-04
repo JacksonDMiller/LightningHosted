@@ -1,17 +1,14 @@
-FilePond.registerPlugin(FilePondPluginImageExifOrientation);
 FilePond.registerPlugin(FilePondPluginFileValidateType);
 FilePond.registerPlugin(FilePondPluginFileValidateSize);
-
 
 const inputElement = document.querySelector('input[type="file"]');
 const pondOne = FilePond.create(inputElement);
 const pond = document.querySelector('.filepond--root');
 
-
 pondOne.setOptions(
     {
         maxFileSize: '5MB',
-        acceptedFileTypes: ['image/*'],
+        acceptedFileTypes: ['image/*','.gif'],
         labelTapToUndo: 'Upload another file',
         labelFileProcessingComplete: '',
         labelIdle: 'Drag & Drop your image or <span class="filepond--label-action">Browse</span> to get started',
@@ -19,11 +16,9 @@ pondOne.setOptions(
             url: './upload',
             process: {
                 onload: (res) => {
-
                     res = JSON.parse(res);
                     showPayment(res.image, res.invoice)
                     checkPaymentStatus(res.invoice)
-                    // select the right value in the response here and return
                     return res;
                 },
                 fetch: null,
@@ -32,110 +27,53 @@ pondOne.setOptions(
         }
     });
 
-pondOne.on('addfile', (error, file) => {
-    if (error) {
-        console.log('Oh no');
-        return;
-    }
-});
-
 pondOne.on('removefile', e => {
-   clearMessage();
-    
-    
+    clearMessage();
 });
-
-
-function clearMessage() {
-    $('#message-container').slideToggle('fast')
-    setTimeout(function () {
-        $('#message-image').html('')
-        $('#message').text('');
-        $('#message-invoice').text('');
-    }, 500);
-}
-
-function showPayment(image, invoice) {
-    $('#message-image').html('<img id="message-image" src="' + image + '" />')
-    $('#message').text('Please pay the invoice to complete the upload');
-    $('#message-invoice').attr("href", "lightning:" + invoice).text('Open Wallet')
-
-    setTimeout(function () {
-        $('#message-container').slideToggle('slow')
-    }, 500);
-}
-
-function showThankYou(link) {
-    $('#message').text('Thank you please use this link to share your photo and earn some sats!');
-    $('#message-link').text(link)
-    setTimeout(function () {
-        $('#message-container').slideToggle('slow')
-    }, 100);
-
-}
 
 $.get("./user/", function (data, status) {
-    console.log(data);
-    $("#satsEarned").text(data.earnedSats)
-
+    $("#satsEarned").text(data.sats)
+    data.images.reverse()
     data.images.forEach(element => {
         if (element.deleted === false && element.payStatus === true) {
-            addCard(element.title, element.fileName, element.views, element._id, element.upVotes, element.sats)
+            addCard(element)
         }
 
     });
 });
 
-function addCard(title, fileName, views, id, upvotes, sats) {
-    if (title != '') {
-        $(".grid").append(
-            `<div id="photoCard` + x + `" class="item photo" style="display:none">
-     <div class="content"> 
-     <div class="title"> <h3>` + title + `</h3> </div> 
-     <a href="/noauth/share/`+ fileName + `">
-     <img onload="$('#photoCard` + x + `').css('display', '')" class="photothumb" src="/noauth/image/` + fileName + `"> 
-     </a>
-     <div class="desc"> 
-     <p>Views: ` + views + `</p>
-     <p>Upvotes: ` + upvotes + `</p>
-     <p>Sats: ` + sats + `</p>
-     <button class="btn" onclick="deleteImage('`+ id + `')">Delete</button>
-     </div> </div> </div>`)
+function addCard(image, append) {
+    var newCard = $("#photoCard").clone();
+    newCard.find('.photoThumb').attr('src', '/noauth/image/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
+    newCard.attr("id", "photoCard" + x);
+    newCard.addClass(image.imageId);
+    newCard.find('.shareLink').attr('href', '/noauth/share/' + image.imageId);
+    newCard.find('.views').text(image.views);
+    newCard.find('.upvotes').text(image.upVotes);
+    newCard.find('.sats').text(image.sats);
+    newCard.find('.btn').attr('onclick', 'deleteImage("' + image.imageId + '")');
+    if (image.title === '') {
+        var newTitle = $("#TitleInputTemp").clone();
+        newTitle.attr('id', 'title' + image.imageId);
+        newTitle.find('.emptyTitle').attr('id', image.imageId);
+        newTitle.find('.emptyTitle').attr('onkeyup', 'submitTitle("' + image.imageId + '")');
+        newCard.find('.title').html(newTitle);
+        newCard.find('.title').attr('class', 'titleInput');
+        newTitle.toggle();
     }
     else {
-        $(".grid").append(
-            `<div id="photoCard` + x + `" class="item photo" style="display:none">
-     <div class="content"> 
-     <div id="title`+ id + `" class="centered titleInput title">
-                <div class="group"> 
-                  <input type="text" id="`+ id + `" required="required" autocomplete="off">
-                  <label for="name">Title</label>
-                  <div class="bar"></div>
-                </div>
-              </div> 
-              <a href="/noauth/share/`+ fileName + `">
-              <img onload="$('#photoCard` + x + `').css('display', '')" class="photothumb" src="/noauth/image/` + fileName + `"> 
-              </a>
-     <div class="desc">
-    <p>Views: ` + views + `</p>
-     <p>Upvotes: ` + upvotes + `</p>
-     <p>Sats: ` + sats + `</p>
-     <button class="btn" onclick="deleteImage('`+ id + `')">Delete</button>
-    </div> </div> </div>`
-        )
-        allItems = document.getElementsByClassName("item");
-        for (x = 0; x < allItems.length; x++) {
-            imagesLoaded(allItems[x], resizeInstance);
-        }
+        newCard.find('.titleVal').text(image.title)
+    }
+    if(append === true){
+        $(".grid").prepend(newCard)
+    }
+    else{
+    $(".grid").append(newCard)
+}
 
-        $('#' + id).keyup(function (event) {
-            if (event.which == 13) {
-                $.get("./title/" + $(':focus').attr('id') + "/" + $(':focus').val() + '/', function (data, status) {
-                    console.log('#title' + id)
-                    $('#title' + id).html(`<div class="title"> <h3>` + $(':focus').val() + `</h3> </div>`).removeClass('centered').removeClass('titleInput')
-                });
-            }
-        });
+    allItems = document.getElementsByClassName("item");
+    for (x = 0; x < allItems.length; x++) {
+        imagesLoaded(allItems[x], resizeInstance);
     }
 }
 
@@ -155,9 +93,9 @@ function checkPaymentStatus(invoice, incrment) {
         }
         else {
             clearMessage();
-            addCard('', data.fileName, 0, data._id, 0, 0)
+            addCard(data,true)
             setTimeout(() => {
-                showThankYou(window.location.hostname + ':3000/noauth/share/' + data.fileName)
+                showThankYou(window.location.hostname + ':3000/noauth/share/' + data.imageId)
             }, 1000)
             // this link will not work in production
 
@@ -166,42 +104,50 @@ function checkPaymentStatus(invoice, incrment) {
 };
 
 function deleteImage(id) {
-    $.get("./delete/" + id, function (data, status) {
-        console.log(data)
+    $.sweetModal.confirm('Are you sure you want to delete this image?', function () {
+        $.get("./delete/" + id, function (data, status) {
+        });
+        $('.' + id).remove()
+        $.sweetModal('Image deleted');
     });
+
 }
 
+function submitTitle(id) {
+    if (event.which == 13) {
+        $.get("./title/" + id + "/" + $(':focus').val() + '/', function (data, status) {
+            $('#title' + id).parent().html(`<h3>` + $(':focus').val() + `</h3>`).removeClass('centered').removeClass('titleInput').addClass('title')
+        });
+
+    }
+}
 
 function withdraw() {
     if ($('#satsEarned').text() === '0') {
         $.sweetModal({
             content: 'You have no sats to withdraw',
-            title: 'Oh noes…',
+            title: 'Sorry',
             icon: $.sweetModal.ICON_ERROR,
 
             buttons: [
                 {
-                    label: 'That\'s fine',
+                    label: 'Ok',
                     classes: 'redB'
                 }
             ]
         });
     }
-
     else {
-
         $.sweetModal.prompt('Enter a lighting invoice to withdraw', 'Lightning Invoice', '', function (val) {
 
             $.get("./withdraw/" + val, function (data, status) {
 
                 if (data.status === 'success') {
+                    $('#satsEarned').text(parseInt($('#satsEarned').text())-data.amount)
                     $.sweetModal({
-                        content: 'This is a success.',
+                        content: 'Sats sent!',
                         icon: $.sweetModal.ICON_SUCCESS
                     });
-                    console.log(data.amount, 'dataamount')
-                    console.log($('#satsEarned').text(parseInt($('#satsEarned').text())))
-                    $('#satsEarned').text(parseInt($('#satsEarned').text()) - data.amount)
                 }
                 else {
                     $.sweetModal({
@@ -211,16 +157,61 @@ function withdraw() {
 
                         buttons: [
                             {
-                                label: 'That\'s fine',
+                                label: 'OK',
                                 classes: 'redB'
                             }
                         ]
                     });
                 }
             });
-
-
-
         });
     }
+}
+
+function clearMessage() {
+    if($('#message-container').is(':visible')){
+    $('#message-container').slideToggle('fast')
+    setTimeout(function () {
+        $('#message-image').html('')
+        $('#message').text('');
+        $('#message-invoice').text('');
+        $('.copyBtn').remove();
+    }, 500);
+}
+}
+
+function showPayment(image, invoice) {
+    $('#message-image').html('<img id="message-image" src="' + image + '" />')
+    $('#message').text('Please pay the invoice to complete the upload');
+    $('#message-invoice').attr("href", "lightning:" + invoice).text('Open Wallet')
+    setTimeout(function () {
+        $('#message-container').slideToggle('slow')
+    }, 500);
+}
+
+function showThankYou(link) {
+    $('#message').text('Thank you please use this link to share your photo and earn some sats!');
+    $('#message-link').text(link)
+    $('#message-container').append('<button class="btn copyBtn" onclick="copy()">Copy</button>')
+    var shareBtns = $('.shareButtonsTemplate').clone()
+    shareBtns.find('.facebookLink').attr('href',"http://www.facebook.com/sharer.php?u="+link)
+    shareBtns.find('.redditLink').attr('href',"http://reddit.com/submit?url="+link)
+    shareBtns.find('.twitterLink').attr('href',"https://twitter.com/share?url=http://"+link+"&text=LightningHosted.com&hashtags=LightningHosted")
+    shareBtns.toggle();
+    $('#message-container').append(shareBtns)
+    setTimeout(function () {
+        $('#message-container').slideToggle('slow')
+    }, 100);
+
+}
+
+//working on a copy text button
+function copy(){
+    // var copyText = $("#message-link").val();
+
+    var copyText = $("#message-link").text();
+    $("body").append('<textarea id="temp">'+copyText+'</textarea>')
+    $('#temp').select();
+    document.execCommand("copy");
+    $("#temp").remove()
 }
