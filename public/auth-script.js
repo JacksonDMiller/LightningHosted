@@ -95,7 +95,7 @@ function checkPaymentStatus(invoice, incrment) {
             clearMessage();
             addCard(data,true)
             setTimeout(() => {
-                showThankYou(window.location.hostname + ':3000/noauth/share/' + data.imageId)
+                showThankYou(window.location.hostname + '/noauth/share/' + data.imageId)
             }, 1000)
             // this link will not work in production
 
