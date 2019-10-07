@@ -42,13 +42,23 @@ router.get('/topPosts/:page', (req, res) => {
         topPostsList = [];
         record.forEach(element => {
             for (image in element.images) {
+                // sorting to give new images a boost. 
+                var daysOld = Math.round((new Date - element.images[image].date) / 1000 / 60 / 60 / 24)
+                element.images[image].score = element.images[image].views - (daysOld * 10)
+                if (daysOld < 5) {
+                    element.images[image].score += 100
+                }
+                if (element.images[image].score < 0){
+                    element.images[image].score = 0;
+                }
+                console.log(element.images[image].score, 'days old', daysOld)
                 if (element.images[image].deleted != true && element.images[image].payStatus === true) {
                     topPostsList.push(element.images[image])
                 }
             }
 
         });
-        topPostsList.sort(function (a, b) { return parseFloat(b.views) - parseFloat(a.views) })
+        topPostsList.sort(function (a, b) { return parseFloat(b.score) - parseFloat(a.score) })
         var slicedTopPostList = topPostsList.slice((req.params.page - 1) * 10, req.params.page * 10)
         if (slicedTopPostList == false) {
         }
@@ -61,7 +71,7 @@ router.get('/image/:fileName', (req, res) => {
 });
 
 router.get('/comment/:imageId/:commentId/:comment', (req, res) => {
-    console.log('comment',req.params.comment, 'commID',req.params.commentId, 'imageID', req.params.imageId)
+    console.log('comment', req.params.comment, 'commID', req.params.commentId, 'imageID', req.params.imageId)
     if (req.params.commentId == 'undefined') {
         User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
             commentId = crypto.randomBytes(8).toString('hex')
@@ -126,14 +136,14 @@ router.post('/contact/submit', function (req, res) {
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
-            user: 'bitcoinacolyte@gmail.com',
+            user: keys.email.email,
             pass: keys.email.password
         }
     });
 
     var mailOptions = {
         from: req.body.email,
-        to: keys.email.email,
+        to: 'hello@lightninghosted.com',
         subject: req.body.subject + ' ' + req.body.email,
         text: req.body.message,
     };
