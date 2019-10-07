@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const https = require('https');
 
 // setting up express
 app.use(express.static('public'));
