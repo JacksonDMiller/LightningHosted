@@ -47,7 +47,7 @@ function addCard(image, append) {
     newCard.find('.photoThumb').attr('src', '/noauth/image/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
     newCard.attr("id", "photoCard" + x);
     newCard.addClass(image.imageId);
-    newCard.find('.shareLink').attr('href', '/noauth/share/' + image.imageId);
+    newCard.find('.shareLink').attr('href', '../s/' + image.imageId);
     newCard.find('.views').text(image.views);
     newCard.find('.upvotes').text(image.upVotes);
     newCard.find('.sats').text(image.sats);
@@ -95,7 +95,7 @@ function checkPaymentStatus(invoice, incrment) {
             clearMessage();
             addCard(data,true)
             setTimeout(() => {
-                showThankYou(window.location.hostname + '/noauth/share/' + data.imageId)
+                showThankYou(window.location.hostname + '/s/' + data.imageId)
             }, 1000)
             // this link will not work in production
 

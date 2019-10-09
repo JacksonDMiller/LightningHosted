@@ -4,8 +4,7 @@ const User = require('../models/user-model');
 const nodemailer = require('nodemailer');
 const keys = require('../config/keys');
 const crypto = require('crypto');
-
-var recentViews = {}
+// var recentViews = {}
 var recentUpvotes = {}
 
 recentCleanUp();
@@ -48,10 +47,9 @@ router.get('/topPosts/:page', (req, res) => {
                 if (daysOld < 5) {
                     element.images[image].score += 100
                 }
-                if (element.images[image].score < 0){
+                if (element.images[image].score < 0) {
                     element.images[image].score = 0;
                 }
-                console.log(element.images[image].score, 'days old', daysOld)
                 if (element.images[image].deleted != true && element.images[image].payStatus === true) {
                     topPostsList.push(element.images[image])
                 }
@@ -71,7 +69,6 @@ router.get('/image/:fileName', (req, res) => {
 });
 
 router.get('/comment/:imageId/:commentId/:comment', (req, res) => {
-    console.log('comment', req.params.comment, 'commID', req.params.commentId, 'imageID', req.params.imageId)
     if (req.params.commentId == 'undefined') {
         User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
             commentId = crypto.randomBytes(8).toString('hex')
@@ -158,68 +155,12 @@ router.post('/contact/submit', function (req, res) {
     res.send('Thank You! Your message has been sent.')
 });
 
-// Share image page that counts views
-router.get('/share/:imageId', (req, res) => {
-    User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
-        currentUser.images.forEach(element => {
-            if (element.imageId == req.params.imageId) {
-                if (!req.user) {
-                    res.render('share', { logInStatus: 'loggedOut', image: element })
-                }
-                else {
-                    res.render('share', { logInStatus: 'loggedIn', image: element })
-                }
-            }
-        })
-        var found = false;
-        if (recentViews[req.connection.remoteAddress]) {
-            recentViews[req.connection.remoteAddress].forEach(function (element) {
-                if (element === req.params.imageId) {
-                    found = true;
-                }
-            })
-            if (found === true) {
-                return;
-            }
-            recentViews[req.connection.remoteAddress].push(req.params.imageId)
-            currentUser.images.forEach(element => {
-                if (element.imageId == req.params.imageId) {
-                    element.views = element.views + 1;
-                    if (element.views === 100) {
-                        currentUser.earnedSats = currentUser.earnedSats + 250;
-                        currentUser.sats = currentUser.sats + 250; //earned sats
-                        element.sats = element.sats + 250;
-                    };
-                }
-            })
-            currentUser.save();
-            return false;
-        }
-        else {
-            recentViews[req.connection.remoteAddress] = [];
-            recentViews[req.connection.remoteAddress].push(req.params.imageId)
-            currentUser.images.forEach(element => {
-                if (element.imageId == req.params.imageId) {
-                    element.views = element.views + 1;
-                    if (element.views === 100) {
-                        currentUser.earnedSats = currentUser.earnedSats + 250; //earned sats
-                        currentUser.sats = currentUser.sats + 250;
-                        element.sats = element.sats + 250;
-                    };
-                }
-            })
-            currentUser.save();
-        }
-
-    })
-})
-
 // handles and counts unique upvotes 
-router.get('/upvote/:fileName', (req, res) => {
+router.get('/upvote/:imageId', (req, res) => {
     var found = false;
     if (recentUpvotes[req.connection.remoteAddress]) {
         recentUpvotes[req.connection.remoteAddress].forEach(function (element) {
-            if (element === req.params.fileName) {
+            if (element === req.params.imageId) {
                 res.send('Already Upvoted')
                 found = true;
             }
@@ -227,10 +168,10 @@ router.get('/upvote/:fileName', (req, res) => {
         if (found === true) {
             return;
         }
-        recentUpvotes[req.connection.remoteAddress].push(req.params.fileName)
-        User.findOne({ 'images.imageId': req.params.fileName }).then((currentUser) => {
+        recentUpvotes[req.connection.remoteAddress].push(req.params.imageId)
+        User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
             currentUser.images.forEach(element => {
-                if (element.imagefileName == req.params.fileName) {
+                if (element.imageId == req.params.imageId) {
                     element.upVotes = element.upVotes + 1;
                 }
             })
@@ -241,10 +182,10 @@ router.get('/upvote/:fileName', (req, res) => {
     }
     else {
         recentUpvotes[req.connection.remoteAddress] = [];
-        recentUpvotes[req.connection.remoteAddress].push(req.params.fileName)
-        User.findOne({ 'images.imageId': req.params.fileName }).then((currentUser) => {
+        recentUpvotes[req.connection.remoteAddress].push(req.params.imageId)
+        User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
             currentUser.images.forEach(element => {
-                if (element.imageId == req.params.fileName) {
+                if (element.imageId == req.params.imageId) {
                     element.upVotes = element.upVotes + 1;
                 }
             })

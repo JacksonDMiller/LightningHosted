@@ -11,6 +11,8 @@ const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const https = require('https');
+var recentViews = {}
+const User = require('./models/user-model');
 
 // setting up express
 app.use(express.static('public'));
@@ -19,6 +21,8 @@ app.set('view engine', 'ejs');
 
 app.listen(3000, () => console.log(`Yipyip the app listening on port 3000!`));
 
+
+//  comment out for testing
 app.use (function (req, res, next) {
   if (req.secure) {
           // request was via https, so do no special handling
@@ -28,9 +32,6 @@ app.use (function (req, res, next) {
           res.redirect('https://' + req.headers.host + req.url);
   }
 });
-
-
-//  comment out for testing
 const options = {
   key: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/privkey.pem', 'utf8'),
   cert: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/fullchain.pem', 'utf8')
@@ -75,5 +76,58 @@ app.get('/', function (req, res) {
   res.redirect('/noauth')
 });
 
+app.get('/s/:imageId', (req, res) => {
+  User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
+      currentUser.images.forEach(element => {
+          if (element.imageId == req.params.imageId) {
+              if (!req.user) {
+                  res.render('share', { logInStatus: 'loggedOut', image: element })
+              }
+              else {
+                  res.render('share', { logInStatus: 'loggedIn', image: element })
+              }
+          }
+      })
+      var found = false;
+      if (recentViews[req.connection.remoteAddress]) {
+          recentViews[req.connection.remoteAddress].forEach(function (element) {
+              if (element === req.params.imageId) {
+                  found = true;
+              }
+          })
+          if (found === true) {
+              return;
+          }
+          recentViews[req.connection.remoteAddress].push(req.params.imageId)
+          currentUser.images.forEach(element => {
+              if (element.imageId == req.params.imageId) {
+                  element.views = element.views + 1;
+                  if (element.views === 100) {
+                      currentUser.earnedSats = currentUser.earnedSats + 250;
+                      currentUser.sats = currentUser.sats + 250; //earned sats
+                      element.sats = element.sats + 250;
+                  };
+              }
+          })
+          currentUser.save();
+          return false;
+      }
+      else {
+          recentViews[req.connection.remoteAddress] = [];
+          recentViews[req.connection.remoteAddress].push(req.params.imageId)
+          currentUser.images.forEach(element => {
+              if (element.imageId == req.params.imageId) {
+                  element.views = element.views + 1;
+                  if (element.views === 100) {
+                      currentUser.earnedSats = currentUser.earnedSats + 250; //earned sats
+                      currentUser.sats = currentUser.sats + 250;
+                      element.sats = element.sats + 250;
+                  };
+              }
+          })
+          currentUser.save();
+      }
 
+  })
+})
 

@@ -30,7 +30,7 @@ infScroll.on('load', function (response) {
          newCard.find('.photoThumb').attr('src', '/noauth/image/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
          newCard.attr("id", "photoCard" + x);
          newCard.addClass(image.imageId);
-         newCard.find('.shareLink').attr('href', '/noauth/share/' + image.imageId);
+         newCard.find('.shareLink').attr('href', '/s/' + image.imageId);
          newCard.find('.views').text(image.views);
          if (upVoted[image.imageId] === true) {
             newCard.find('.chevron').addClass("upVoted");
