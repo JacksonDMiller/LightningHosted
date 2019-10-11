@@ -37,13 +37,15 @@ const imageSchema = new Schema({
 });
 
 const accountSchema = new Schema({
+    password: String,
+    email: String,
     thirdPartyId: String,
     estimatedSats: Number,
     earnedSats: Number,
     sats: Number,
     paidSats: Number,
     views: Number,
-    userName: String,
+    username: String,
     upVotes: Number,
     images: [imageSchema]
 });

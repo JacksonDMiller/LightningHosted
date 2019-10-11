@@ -25,7 +25,9 @@
     <div class="nav-wrapper">
       <div class="grad-bar"></div>
       <nav class="navbar">
-          <div id='logo'><a href="/"><h1>LightningHosted</h1></a></div>
+        <div id='logo'><a href="/">
+            <h1>LightningHosted</h1>
+          </a></div>
         <div class="menu-toggle" id="mobile-menu">
           <span class="bar"></span>
           <span class="bar"></span>
@@ -37,12 +39,14 @@
           <li class="nav-item"><a href="/noauth/about">About</a></li>
           <li class="nav-item"><a href="/noauth/contact">Contact</a></li>
           <li class="nav-item"><a id="logInStatus" class="<%= logInStatus %>" href="/noauth/login">Log In</a></li>
+
         </ul>
       </nav>
     </div>
     <section class="headline">
       <a href="/">
-        <a href="/"><h1>Share Images And Stack Sats</h1></a>
+        <h1>Share Images And Stack Sats</h1>
+      </a>
     </section>
     <div id='ad1' class='ad'>
       <iframe data-aa="1241600" src="//ad.a-ads.com/1241600?size=728x90" scrolling="no"
@@ -51,36 +55,19 @@
     <div id='ad2' class='ad'>
       <iframe data-aa="1241618" src="//ad.a-ads.com/1241618?size=320x50" scrolling="no"
         style="width:320px; height:50px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
-    </div>
-    <div id="contactPageContainer">
-      <h1 class='heading'>Contact Us</h1>
-      <div id="form-messages"></div>
-      <form id="ajax-contact" method="post" action="./contact/submit">
-
-        <div class="field">
-          <label class='email' for="email">Email:</label>
-          <input type="email" id="email" name="email" required>
-        </div>
-
-        <div class="field">
-          <label for="subject">Subject:</label>
-          <input type="text" id="subject" name="subject" required>
-        </div>
-
-        <div class="field">
-          <label for="message">Message:</label>
-          <textarea id="message" name="message" required></textarea>
-        </div>
-
-        <div class="field">
-          <button class='btn' type="submit">Send</button>
-        </div>
+</div>
+      
+        <form class='loginGrid' action="/noauth/register/submit" method="post">
+          <label class='thirdPartyLoginBtn' for="username"><b>Username</b></label>
+          <input class='thirdPartyLoginBtn' type="text" placeholder="Enter Username" name="username" required>
+      
+          <label class='thirdPartyLoginBtn' for="password"><b>Password</b></label>
+          <input class='thirdPartyLoginBtn' type="password" placeholder="Enter Password" name="password" required>
+      
+          <button class='btn deleteBtn thirdPartyLoginBtn' type="submit">Register</button>
       </form>
-    </div>
-  </div>
+      
 </body>
 <footer>
   <script src="/script.js"></script>
-  <script src="/contact-script.js"></script>
 </footer>
-</html>

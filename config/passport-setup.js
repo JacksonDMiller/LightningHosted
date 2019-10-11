@@ -2,6 +2,8 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20');
 const keys = require('./keys')
 const User = require('../models/user-model');
+const LocalStrategy = require('passport-local');
+const bcrypt = require('bcrypt')
 
 passport.serializeUser((user, done) => {
     done(null, user.id)
@@ -29,11 +31,13 @@ passport.use(
 
             } else {
                 //if not creat user in our db
+                console.log(profile)
                 new User({
+                    email: undefined,
                     thirdPartyId: profile.id,
                     estimatedSats: 0,
                     earnedSats: 0,
-                    sats:0,
+                    sats: 0,
                     paidSats: 0,
                     views: 0,
                     userName: profile.displayName,
@@ -47,3 +51,22 @@ passport.use(
     })
 );
 
+passport.use(new LocalStrategy(
+    function (username, password, done) {
+        User.findOne({ username: username }, function (err, user) {
+            if (err) { return done(err); }
+            if (!user) { 
+                console.log('nouser')
+                return done(null, false); }
+            bcrypt.compare(password, user.password, (bcryptErr, res) => {
+                if (bcryptErr) { return done(bcryptErr); }
+                if (!res) {
+                    console.log('wrong password')
+                    { return done(null, false); }
+                }
+                return done(null, user);
+            })
+        })
+    }
+
+));

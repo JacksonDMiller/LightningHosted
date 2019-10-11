@@ -11,7 +11,7 @@ const sharp = require('sharp');
 const authCheck = (req, res, next) => {
     if (!req.user) {
         // if user is not logged in
-        res.redirect('../noauth/google')
+        res.redirect('../noauth/login')
     }
     else {
         // if logged in

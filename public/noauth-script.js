@@ -20,7 +20,6 @@ infScroll.on('load', function (response) {
 
 
    var data = JSON.parse(response);
-   console.log(data)
    data.forEach(image => {
       if ($('.' + image.imageId).length === 0) {
          //checking if the image is already on the page in the share spot

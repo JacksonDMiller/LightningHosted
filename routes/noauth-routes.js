@@ -4,7 +4,7 @@ const User = require('../models/user-model');
 const nodemailer = require('nodemailer');
 const keys = require('../config/keys');
 const crypto = require('crypto');
-// var recentViews = {}
+const bcrypt = require('bcrypt');
 var recentUpvotes = {}
 
 recentCleanUp();
@@ -17,6 +17,57 @@ router.get('/', (req, res) => {
         res.render('index', { logInStatus: 'loggedIn' })
     }
 })
+
+
+router.get('/login/', (req, res) => {
+    res.render('login', { logInStatus: 'loggedOut' })
+})
+
+router.post('/login/submit', passport.authenticate('local', {
+    failureRedirect: '/noauth/login', successRedirect: '/auth/',
+}),
+);
+
+
+router.get('/register/', (req, res) => {
+    res.render('register', { logInStatus: 'loggedOut' })
+})
+
+
+router.post('/register/submit', async (req, res) => {
+
+    const hashedPassword = await bcrypt.hash(req.body.password, 10)
+    new User({
+        email: undefined,
+        thirdPartyId: undefined,
+        estimatedSats: 0,
+        earnedSats: 0,
+        sats: 0,
+        paidSats: 0,
+        views: 0,
+        username: req.body.username,
+        password: hashedPassword,
+        upVotes: 0,
+    }).save()
+    res.redirect('/noauth/login')
+
+});
+
+// app.post('/register', checkNotAuthenticated, async (req, res) => {
+//     try {
+//       const hashedPassword = await bcrypt.hash(req.body.password, 10)
+//       users.push({
+//         id: Date.now().toString(),
+//         name: req.body.name,
+//         email: req.body.email,
+//         password: hashedPassword
+//       })
+//       res.redirect('/login')
+//     } catch {
+//       res.redirect('/register')
+//     }
+//   })
+
 
 // auth logout
 router.get('/logout', (req, res) => {
