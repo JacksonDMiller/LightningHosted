@@ -11,13 +11,15 @@ const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const https = require('https');
-var recentViews = {}
 const User = require('./models/user-model');
+const flash = require('express-flash');
+var recentViews = {};
 
 // setting up express
 app.use(express.static('public'));
 app.use(bodyParser());
 app.set('view engine', 'ejs');
+app.use(flash());
 
 app.listen(3000, () => console.log(`Yipyip the app listening on port 3000!`));
 
@@ -32,6 +34,8 @@ app.use (function (req, res, next) {
           res.redirect('https://' + req.headers.host + req.url);
   }
 });
+
+
 const options = {
   key: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/privkey.pem', 'utf8'),
   cert: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/fullchain.pem', 'utf8')

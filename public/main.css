@@ -519,6 +519,11 @@ input {
   width: 500px;
   margin: 5px;
 }
+
+.loginMessage{
+  text-align: center;
+}
+
 .aboutGrid {
   display: grid;
   /* grid-gap: 20px; */

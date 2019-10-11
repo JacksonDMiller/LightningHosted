@@ -24,7 +24,9 @@ router.get('/login/', (req, res) => {
 })
 
 router.post('/login/submit', passport.authenticate('local', {
-    failureRedirect: '/noauth/login', successRedirect: '/auth/',
+    failureRedirect: '/noauth/login',
+    successRedirect: '/auth/',
+    failureFlash: true
 }),
 );
 

@@ -30,6 +30,7 @@
     "ejs": "^2.6.2",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.5",
+    "express-flash": "0.0.2",
     "fs": "0.0.1-security",
     "grpc": "^1.23.3",
     "image-size": "^0.7.4",

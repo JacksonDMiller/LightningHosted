@@ -57,12 +57,12 @@ passport.use(new LocalStrategy(
             if (err) { return done(err); }
             if (!user) { 
                 console.log('nouser')
-                return done(null, false); }
+                return done(null, false, { message: 'Username not found' }); }
             bcrypt.compare(password, user.password, (bcryptErr, res) => {
                 if (bcryptErr) { return done(bcryptErr); }
                 if (!res) {
                     console.log('wrong password')
-                    { return done(null, false); }
+                    { return done(null, false, { message: 'Incorect Password' }); }
                 }
                 return done(null, user);
             })

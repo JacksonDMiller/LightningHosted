@@ -44,7 +44,7 @@ var lnrpc = lnrpcDescriptor.lnrpc;
 
 // Testing
 var lightning = new lnrpc.Lightning('bitcoinacolyte.hopto.org:10009', credentials);
-lightning = new lnrpc.Lightning('localhost:10009', credentials);
+// lightning = new lnrpc.Lightning('localhost:10009', credentials);
 
 var call = lightning.subscribeInvoices({});
 
