@@ -694,6 +694,14 @@ margin: 5px;
   margin-right: auto;
 }
 
+#shareImageTall {
+  max-width: 500px;
+  margin: 20px;
+  color: white;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 #withdrawDiv {
   text-align: center;
   padding: 10px;

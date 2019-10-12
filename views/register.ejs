@@ -55,18 +55,19 @@
     <div id='ad2' class='ad'>
       <iframe data-aa="1241618" src="//ad.a-ads.com/1241618?size=320x50" scrolling="no"
         style="width:320px; height:50px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
-</div>
-      
-        <form class='loginGrid' action="/noauth/register/submit" method="post">
-          <label class='thirdPartyLoginBtn' for="username"><b>Username</b></label>
-          <input class='thirdPartyLoginBtn' type="text" placeholder="Enter Username" name="username" required>
-      
-          <label class='thirdPartyLoginBtn' for="password"><b>Password</b></label>
-          <input class='thirdPartyLoginBtn' type="password" placeholder="Enter Password" name="password" required>
-      
-          <button class='btn deleteBtn thirdPartyLoginBtn' type="submit">Register</button>
-      </form>
-      
+    </div>
+    
+    <form class='loginGrid' action="/noauth/register/submit" method="post">
+      <p class="loginMessage thirdPartyLoginBtn"><%= messages.error %> </p>
+      <label class='thirdPartyLoginBtn' for="username"><b>Username</b></label>
+      <input class='thirdPartyLoginBtn' type="text" placeholder="Enter Username" name="username" required>
+
+      <label class='thirdPartyLoginBtn' for="password"><b>Password</b></label>
+      <input class='thirdPartyLoginBtn' type="password" placeholder="Enter Password" name="password" required>
+
+      <button class='btn deleteBtn thirdPartyLoginBtn' type="submit">Register</button>
+    </form>
+
 </body>
 <footer>
   <script src="/script.js"></script>

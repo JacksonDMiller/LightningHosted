@@ -44,7 +44,7 @@ var lnrpc = lnrpcDescriptor.lnrpc;
 
 // Testing
 var lightning = new lnrpc.Lightning('bitcoinacolyte.hopto.org:10009', credentials);
-// lightning = new lnrpc.Lightning('localhost:10009', credentials);
+//  lightning = new lnrpc.Lightning('localhost:10009', credentials);
 
 var call = lightning.subscribeInvoices({});
 
@@ -132,6 +132,7 @@ router.get('/user', authCheck, (req, res) => {
 });
 
 router.get('/title/:imageId/:title', authCheck, (req, res) => {
+    req.params.title = req.params.title.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
     req.user.images.forEach(element => {
         if (element.imageId == req.params.imageId) {
             element.title = req.params.title;

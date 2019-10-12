@@ -6,6 +6,7 @@ const keys = require('../config/keys');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 var recentUpvotes = {}
+var usernameFormat = /[ !@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?]/;
 
 recentCleanUp();
 
@@ -37,7 +38,11 @@ router.get('/register/', (req, res) => {
 
 
 router.post('/register/submit', async (req, res) => {
+    if (usernameFormat.test(req.body.username)){
+        req.flash("error", "Invalid Username. The characters allowed are A-Z 0-9 and _ ")
+        res.redirect('/noauth/register') 
 
+    }
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
     new User({
         email: undefined,
@@ -51,25 +56,10 @@ router.post('/register/submit', async (req, res) => {
         password: hashedPassword,
         upVotes: 0,
     }).save()
-    res.redirect('/noauth/login')
+    req.flash("error", "Welcome Please Log in")
+    res.redirect('/noauth/login') 
 
 });
-
-// app.post('/register', checkNotAuthenticated, async (req, res) => {
-//     try {
-//       const hashedPassword = await bcrypt.hash(req.body.password, 10)
-//       users.push({
-//         id: Date.now().toString(),
-//         name: req.body.name,
-//         email: req.body.email,
-//         password: hashedPassword
-//       })
-//       res.redirect('/login')
-//     } catch {
-//       res.redirect('/register')
-//     }
-//   })
-
 
 // auth logout
 router.get('/logout', (req, res) => {
@@ -122,6 +112,7 @@ router.get('/image/:fileName', (req, res) => {
 });
 
 router.get('/comment/:imageId/:commentId/:comment', (req, res) => {
+    req.params.comment = req.params.comment.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
     if (req.params.commentId == 'undefined') {
         User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
             commentId = crypto.randomBytes(8).toString('hex')

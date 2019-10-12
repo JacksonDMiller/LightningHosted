@@ -58,7 +58,17 @@
       <iframe data-aa="1241618" src="//ad.a-ads.com/1241618?size=320x50" scrolling="no"
         style="width:320px; height:50px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
     </div>
-    <div id="shareImage" class="item photo <%- image.imageId %>" style="grid-row-end: span 11;">
+
+    <% if(image.width > image.height){ %>
+      <div id="shareImage" class="item photo <%- image.imageId %>" style="grid-row-end: span 11;">
+        
+   <% ;} %>
+   <% if(image.width <= image.height){ %>
+    <div id="shareImageTall" class="item photo <%- image.imageId %>" style="grid-row-end: span 11;">
+        
+ <% ;} %>
+
+    <!-- <div id="shareImage" class="item photo <%- image.imageId %>" style="grid-row-end: span 11;"> -->
       <div class="content">
         <div class="title">
           <h3><%- image.title %></h3>
