@@ -12,6 +12,10 @@ var infScroll = new InfiniteScroll('.grid', {
 if (!localStorage.getItem("upVoted")) {
    localStorage.setItem("upVoted", JSON.stringify({}))
 }
+
+if (localStorage.getItem("closedTwitter")) {
+   $('.footer').remove();
+}
 // loading the list of upvoted images from the client
 var upVoted = JSON.parse(localStorage.getItem("upVoted"))
 
@@ -107,5 +111,8 @@ function upvoteImage(id) {
    $('.' + id).find('.chevron').toggleClass('upVoted')
 }
 
-
+function removeFooter(){
+   $('.footer').remove()
+   localStorage.setItem("closedTwitter", true);
+}
 

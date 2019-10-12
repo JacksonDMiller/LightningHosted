@@ -2,7 +2,7 @@
   --background: #595457;
   --navTextColor: #ffffff;
   --textColor: #ffffff;
-  --cardColor: #8c55a0;
+  --cardColor: purple;
   --navColor: black;
 }
 
@@ -516,7 +516,7 @@ input {
 .thirdPartyLoginBtn{
   justify-self: center;
   grid-column: 1/-1;
-  width: 500px;
+  width: 350px;
   margin: 5px;
 }
 
@@ -986,4 +986,81 @@ margin: 5px;
 .withdrawBtn:hover{
   background: var(--navColor) !important;
   
+}
+
+.footer{
+  /* background: purple; */
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    color: white;
+    text-align: center;
+    height: 28px;
+    display: grid;
+    grid-template-columns: 1fr 30px 190px;
+}
+
+.facebookContainer{
+  /* margin-right:20px; */
+  grid-column-end: -1;
+  justify-self: end;
+}
+
+
+.close-container {
+  height: 5px;
+  align-self: center;
+  cursor: pointer;
+  grid-column-end: -2;
+
+}
+
+.leftright {
+  height: 4px;
+  width: 27px;
+  position: absolute;
+  background-color: var(--navTextColor);
+  border-radius: 2px;
+  transform: rotate(45deg);
+  transition: all 0.3s ease-in;
+}
+
+.rightleft {
+  height: 4px;
+  width: 27px;
+  position: absolute;
+  background-color: var(--navTextColor);
+  border-radius: 2px;
+  transform: rotate(-45deg);
+  transition: all 0.3s ease-in;
+}
+
+.close-container label {
+  color: white;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 0.6em;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease-in;
+  opacity: 0;
+}
+
+.close {
+
+  position: absolute;
+}
+
+.close-container:hover .leftright {
+  transform: rotate(-45deg);
+  background-color:var(--navColor);
+}
+
+.close-container:hover .rightleft {
+  transform: rotate(45deg);
+  background-color:var(--navColor);
+}
+
+.close-container:hover label {
+  opacity: 1;
 }
