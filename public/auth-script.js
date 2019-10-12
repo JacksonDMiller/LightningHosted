@@ -176,6 +176,7 @@ function clearMessage() {
         $('#message').text('');
         $('#message-invoice').text('');
         $('.copyBtn').remove();
+        $('.shareButtons').remove();
     }, 500);
 }
 }
@@ -194,6 +195,7 @@ function showThankYou(link) {
     $('#message-link').text(link)
     $('#message-container').append('<button class="btn copyBtn" onclick="copy()">Copy</button>')
     var shareBtns = $('.shareButtonsTemplate').clone()
+    shareBtns.removeClass('shareButtonsTemplate').addClass('shareButtons')
     shareBtns.find('.facebookLink').attr('href',"http://www.facebook.com/sharer.php?u="+link)
     shareBtns.find('.redditLink').attr('href',"http://reddit.com/submit?url="+link)
     shareBtns.find('.twitterLink').attr('href',"https://twitter.com/share?url=http://"+link+"&text=LightningHosted.com&hashtags=LightningHosted")
