@@ -25,6 +25,7 @@ app.listen(3000, () => console.log(`Yipyip the app listening on port 3000!`));
 
 
 //  comment out for testing
+
 app.use (function (req, res, next) {
   if (req.secure) {
           // request was via https, so do no special handling

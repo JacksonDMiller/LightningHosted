@@ -861,7 +861,7 @@ margin: 5px;
   border: none;
   font-size: 0.9rem;
   padding: 0.5rem 0.8em;
-  background: #8c55a0;
+  background: var(--cardColor);
   color: white;
   -webkit-font-smoothing: antialiased;
   font-weight: bold;
