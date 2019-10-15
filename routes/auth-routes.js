@@ -44,7 +44,7 @@ var lnrpc = lnrpcDescriptor.lnrpc;
 
 // Testing
 var lightning = new lnrpc.Lightning('bitcoinacolyte.hopto.org:10009', credentials);
-//   lightning = new lnrpc.Lightning('localhost:10009', credentials);
+  lightning = new lnrpc.Lightning('localhost:10009', credentials);
 
 var call = lightning.subscribeInvoices({});
 
@@ -72,38 +72,46 @@ router.post('/upload', function (req, res) {
         return res.status(400).send('No files were uploaded.');
     }
     lightning.addInvoice({ value: 250, memo: 'LightningHosted Captcha' }, function (err, response) {
-        if(err){res.status(500).send(err)}
+        if (err) { res.status(500).send(err) }
         var extension = req.files.filepond.name.split('.')[1]
         fileName = crypto.randomBytes(8).toString('hex')
         if (req.files.filepond.mimetype != 'image/gif') {
             req.files.filepond.mv('./uploads/' + fileName + 'temp' + '.' + extension, function (err) {
-                if(err){
+                if (err) {
                     res.status(500).send(err)
                 }
-                sharp('./uploads/' + fileName + 'temp' + '.' + extension).jpeg({quality: 100,force: true}).rotate().toFile('./uploads/' + fileName + '.' + 'jpeg', function (err) {
+                sharp('./uploads/' + fileName + 'temp' + '.' + extension).jpeg({ quality: 100, force: true }).rotate().toFile('./uploads/' + fileName + '.' + 'jpeg', function (err) {
                     if (err) { return res.status(500).send(err) };
-                    createImage('jpeg',req,response)
-                    fs.copyFile('./uploads/' + fileName + '.jpeg', './thumbnails/'+fileName + 'temp.jpeg', (err) => {
+                    createImage('jpeg', req, response)
+                    fs.copyFile('./uploads/' + fileName + '.jpeg', './thumbnails/' + fileName + 'temp.jpeg', (err) => {
                         if (err) throw err;
-                        sharp('./thumbnails/'+fileName+'temp.jpeg').jpeg({quality:40,force: true}).toFile('./thumbnails/'+fileName+'.jpeg',function (err) {
-                            fs.unlink('./thumbnails/'+fileName+'temp.jpeg')
-                            if(err){console.log(err)}})
-                      });
+                        sharp('./thumbnails/' + fileName + 'temp.jpeg').jpeg({ quality: 40, force: true }).toFile('./thumbnails/' + fileName + '.jpeg', function (err) {
+                            fs.unlink('./thumbnails/' + fileName + 'temp.jpeg', function (err) {
+                                if(err){
+                                    console.log(err)} 
+                                fs.unlink('./uploads/' + fileName + 'temp' + '.' + extension,function(err) {
+                                    if(err){
+    
+                                        console.log(err)} })})
+                                
+                            if (err) { console.log(err) }
+                        })
+                    });
                 });
             })
         }
         else {
             req.files.filepond.mv('./uploads/' + fileName + '.' + extension, function (err) {
-                if(err){res.status(500).send(err)}
-                createImage(extension,req,response)
-                fs.copyFile('./uploads/' + fileName + '.' + extension, './thumbnails/'+fileName + '.' + extension, (err) => {
+                if (err) { res.status(500).send(err) }
+                createImage(extension, req, response)
+                fs.copyFile('./uploads/' + fileName + '.' + extension, './thumbnails/' + fileName + '.' + extension, (err) => {
                     if (err) throw err;
-                  });
+                });
             })
         }
     })
 
-    function createImage(extension,req,response) {
+    function createImage(extension, req, response) {
         sizeOf('./uploads/' + fileName + '.' + extension, function (err, dimensions) {
             req.user.images.push({
                 imageId: fileName,
