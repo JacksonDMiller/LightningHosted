@@ -72,10 +72,14 @@ router.post('/upload', function (req, res) {
         return res.status(400).send('No files were uploaded.');
     }
     lightning.addInvoice({ value: 250, memo: 'LightningHosted Captcha' }, function (err, response) {
+        if(err){res.status(500).send(err)}
         var extension = req.files.filepond.name.split('.')[1]
         fileName = crypto.randomBytes(8).toString('hex')
         if (req.files.filepond.mimetype === 'image/jpeg') {
             req.files.filepond.mv('./uploads/' + fileName + 'temp' + '.' + extension, function (err) {
+                if(err){
+                    res.status(500).send(err)
+                }
                 sharp('./uploads/' + fileName + 'temp' + '.' + extension).rotate().toFile('./uploads/' + fileName + '.' + extension, function (err) {
                     if (err) { return res.status(500).send(err) };
                     createImage(extension,req,response)
@@ -84,6 +88,7 @@ router.post('/upload', function (req, res) {
         }
         else {
             req.files.filepond.mv('./uploads/' + fileName + '.' + extension, function (err) {
+                if(err){res.status(500).send(err)}
                 createImage(extension,req,response)
             })
         }
