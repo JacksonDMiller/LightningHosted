@@ -7,7 +7,8 @@ $(document).ready(function () {
 
 function submitComment(id, commentId, subId) {
     var commentText = $(':focus').siblings('.replyBox').val();
-    $.get("../noauth/comment/" + id + "/" + commentId + "/" + commentText + '/', function (data, status) {
+    var encodedCommentText = encodeURIComponent(commentText)
+    $.get("../noauth/comment/" + id + "/" + commentId + "/" + encodedCommentText + '/', function (data, status) {
         if (commentId == undefined) {
             comment = $('.commentStringTemplate').clone()
             comment.removeClass('commentStringTemplate')

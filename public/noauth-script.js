@@ -30,7 +30,7 @@ infScroll.on('load', function (response) {
 
          //build a new photocard 
          newCard = $("#photoCard").clone();
-         newCard.find('.photoThumb').attr('src', '/noauth/image/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
+         newCard.find('.photoThumb').attr('src', '/noauth/thumb/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
          newCard.attr("id", "photoCard" + x);
          newCard.addClass(image.imageId);
          newCard.find('.shareLink').attr('href', '/s/' + image.imageId);

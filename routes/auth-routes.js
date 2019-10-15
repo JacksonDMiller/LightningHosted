@@ -75,14 +75,20 @@ router.post('/upload', function (req, res) {
         if(err){res.status(500).send(err)}
         var extension = req.files.filepond.name.split('.')[1]
         fileName = crypto.randomBytes(8).toString('hex')
-        if (req.files.filepond.mimetype === 'image/jpeg') {
+        if (req.files.filepond.mimetype != 'image/gif') {
             req.files.filepond.mv('./uploads/' + fileName + 'temp' + '.' + extension, function (err) {
                 if(err){
                     res.status(500).send(err)
                 }
-                sharp('./uploads/' + fileName + 'temp' + '.' + extension).rotate().toFile('./uploads/' + fileName + '.' + extension, function (err) {
+                sharp('./uploads/' + fileName + 'temp' + '.' + extension).jpeg({quality: 100,force: true}).rotate().toFile('./uploads/' + fileName + '.' + 'jpeg', function (err) {
                     if (err) { return res.status(500).send(err) };
-                    createImage(extension,req,response)
+                    createImage('jpeg',req,response)
+                    fs.copyFile('./uploads/' + fileName + '.jpeg', './thumbnails/'+fileName + 'temp.jpeg', (err) => {
+                        if (err) throw err;
+                        sharp('./thumbnails/'+fileName+'temp.jpeg').jpeg({quality:40,force: true}).toFile('./thumbnails/'+fileName+'.jpeg',function (err) {
+                            fs.unlink('./thumbnails/'+fileName+'temp.jpeg')
+                            if(err){console.log(err)}})
+                      });
                 });
             })
         }
@@ -90,6 +96,9 @@ router.post('/upload', function (req, res) {
             req.files.filepond.mv('./uploads/' + fileName + '.' + extension, function (err) {
                 if(err){res.status(500).send(err)}
                 createImage(extension,req,response)
+                fs.copyFile('./uploads/' + fileName + '.' + extension, './thumbnails/'+fileName + '.' + extension, (err) => {
+                    if (err) throw err;
+                  });
             })
         }
     })
@@ -99,8 +108,8 @@ router.post('/upload', function (req, res) {
             req.user.images.push({
                 imageId: fileName,
                 reviewStatus: false,
-                payStatus: false,
-                // payStatus: true, //testing
+                // payStatus: false,
+                payStatus: true, //testing
                 deleted: false,
                 views: 0,
                 reports: 0,
@@ -137,7 +146,8 @@ router.get('/user', authCheck, (req, res) => {
 });
 
 router.get('/title/:imageId/:title', authCheck, (req, res) => {
-    req.params.title = req.params.title.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
+    req.params.title = req.params.title.replace(/[&\/\\#,+()$~%'":*<>{}]/g, ''
+    );
     req.user.images.forEach(element => {
         if (element.imageId == req.params.imageId) {
             element.title = req.params.title;

@@ -44,7 +44,7 @@ $.get("./user/", function (data, status) {
 
 function addCard(image, append) {
     var newCard = $("#photoCard").clone();
-    newCard.find('.photoThumb').attr('src', '/noauth/image/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
+    newCard.find('.photoThumb').attr('src', '/noauth/thumb/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
     newCard.attr("id", "photoCard" + x);
     newCard.addClass(image.imageId);
     newCard.find('.shareLink').attr('href', '../s/' + image.imageId);
@@ -115,7 +115,8 @@ function deleteImage(id) {
 
 function submitTitle(id) {
     if (event.which == 13) {
-        $.get("./title/" + id + "/" + $(':focus').val() + '/', function (data, status) {
+        var title = encodeURIComponent($(':focus').val())
+        $.get("./title/" + id + "/" + title + '/', function (data, status) {
             $('#title' + id).parent().html(`<h3>` + $(':focus').val() + `</h3>`).removeClass('centered').removeClass('titleInput').addClass('title')
         });
 

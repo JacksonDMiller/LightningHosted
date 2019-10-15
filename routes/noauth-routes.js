@@ -111,8 +111,12 @@ router.get('/image/:fileName', (req, res) => {
     res.sendFile('uploads/' + req.params.fileName, { root: './' });
 });
 
+router.get('/thumb/:fileName', (req, res) => {
+    res.sendFile('thumbnails/' + req.params.fileName, { root: './' });
+});
+
 router.get('/comment/:imageId/:commentId/:comment', (req, res) => {
-    req.params.comment = req.params.comment.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
+    req.params.comment = req.params.comment.replace(/[&\/\\#,+()$~%'":*<>{}]/g, '');
     if (req.params.commentId == 'undefined') {
         User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
             commentId = crypto.randomBytes(8).toString('hex')
