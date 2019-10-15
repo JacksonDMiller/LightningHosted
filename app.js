@@ -26,23 +26,23 @@ app.listen(3000, () => console.log(`Yipyip the app listening on port 3000!`));
 
 //  comment out for testing
 
-// app.use (function (req, res, next) {
-//   if (req.secure) {
-//           // request was via https, so do no special handling
-//           next();
-//   } else {
-//           // request was via http, so redirect to https
-//           res.redirect('https://' + req.headers.host + req.url);
-//   }
-// });
+app.use (function (req, res, next) {
+  if (req.secure) {
+          // request was via https, so do no special handling
+          next();
+  } else {
+          // request was via http, so redirect to https
+          res.redirect('https://' + req.headers.host + req.url);
+  }
+});
 
 
-// const options = {
-//   key: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/privkey.pem', 'utf8'),
-//   cert: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/fullchain.pem', 'utf8')
-// }
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/privkey.pem', 'utf8'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/fullchain.pem', 'utf8')
+}
 
-// https.createServer(options, app).listen(8443);
+https.createServer(options, app).listen(8443);
 
 
 
