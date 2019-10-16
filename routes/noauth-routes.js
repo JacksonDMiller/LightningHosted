@@ -44,6 +44,7 @@ router.post('/register/submit', async (req, res) => {
 
     }
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
+    lowerCaseUserName = req.body.username.toLowerCase()
     new User({
         email: undefined,
         thirdPartyId: undefined,
@@ -52,7 +53,7 @@ router.post('/register/submit', async (req, res) => {
         sats: 0,
         paidSats: 0,
         views: 0,
-        username: req.body.username,
+        username: lowerCaseUserName,
         password: hashedPassword,
         upVotes: 0,
     }).save()
