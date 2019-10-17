@@ -87,7 +87,7 @@ router.get('/topPosts/:page', (req, res) => {
             for (image in element.images) {
                 // sorting to give new images a boost. 
                 var daysOld = Math.round((new Date - element.images[image].date) / 1000 / 60 / 60 / 24)
-                element.images[image].score = element.images[image].views - (daysOld * 10)
+                element.images[image].score = element.upVotes + element.images[image].views - (daysOld * 10)
                 if (daysOld < 5) {
                     element.images[image].score += 100
                 }

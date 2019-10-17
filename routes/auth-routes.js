@@ -85,7 +85,7 @@ router.post('/upload', function (req, res) {
                     console.log(2,err)
                     res.status(500).send(err)
                 }
-                sharp('./uploads/' + fileName + 'temp' + '.' + extension).jpeg({ quality: 100, force: true }).rotate().toFile('./uploads/' + fileName + '.' + 'jpeg', function (err) {
+                sharp('./uploads/' + fileName + 'temp' + '.' + extension).jpeg({ quality: 75, force: true }).rotate().toFile('./uploads/' + fileName + '.' + 'jpeg', function (err) {
                     if (err) {
                         console.log(3,err)
                         return res.status(500).send(err)

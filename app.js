@@ -135,3 +135,6 @@ app.get('/s/:imageId', (req, res) => {
 
   })
 })
+app.get('/a/', function (req, res) {
+  res.render('aAds');
+});
