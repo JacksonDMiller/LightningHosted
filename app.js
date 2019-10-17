@@ -26,20 +26,20 @@ app.listen(3000, () => console.log(`Yipyip the app listening on port 3000!`));
 
 //  comment out for testing
 
-app.use (function (req, res, next) {
-  if (req.secure) {
-          // request was via https, so do no special handling
-          next();
-  } else {
-          // request was via http, so redirect to https
-          res.redirect('https://' + req.headers.host + req.url);
-  }
+app.use(function(req, res, next) {
+    if (req.secure) {
+        // request was via https, so do no special handling
+        next();
+    } else {
+        // request was via http, so redirect to https
+        res.redirect('https://' + req.headers.host + req.url);
+    }
 });
 
 
 const options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/privkey.pem', 'utf8'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/fullchain.pem', 'utf8')
+    key: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/privkey.pem', 'utf8'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/fullchain.pem', 'utf8')
 }
 
 https.createServer(options, app).listen(8443);
@@ -48,16 +48,16 @@ https.createServer(options, app).listen(8443);
 
 // setting up filepond
 app.use(fileUpload({
-  limits: { fileSize: 5 * 1024 * 1024 },
-  abortOnLimit: true,
-  safeFileNames: true,
-  preserveExtension: 4,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    abortOnLimit: true,
+    safeFileNames: true,
+    preserveExtension: 4,
 }));
 
 // setting up passport
 app.use(cookieSession({
-  maxAge: 24 * 60 * 60 * 1000,
-  keys: [keys.session.cookieKey]
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: [keys.session.cookieKey]
 }));
 
 app.use(passport.initialize());
@@ -71,70 +71,81 @@ app.use('/auth', authRoutes);
 mongoose.connect(keys.mongodb.dbURI);
 
 mongoose.connection.once('open', function () {
-  console.log('Yipyip the database has connected!');
+    console.log('Yipyip the database has connected!');
 }).on('error', function (error) {
-  console.log(error);
+    console.log(error);
 });
 
 // home page handler
 app.get('/', function (req, res) {
-  res.redirect('/noauth')
+    res.redirect('/noauth')
 });
 
 app.get('/s/:imageId', (req, res) => {
-  User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
-      currentUser.images.forEach(element => {
-          if (element.imageId == req.params.imageId) {
-              if (!req.user) {
-                  res.render('share', { logInStatus: 'loggedOut', image: element })
-              }
-              else {
-                  res.render('share', { logInStatus: 'loggedIn', image: element })
-              }
-          }
-      })
-      var found = false;
-      if (recentViews[req.connection.remoteAddress]) {
-          recentViews[req.connection.remoteAddress].forEach(function (element) {
-              if (element === req.params.imageId) {
-                  found = true;
-              }
-          })
-          if (found === true) {
-              return;
-          }
-          recentViews[req.connection.remoteAddress].push(req.params.imageId)
-          currentUser.images.forEach(element => {
-              if (element.imageId == req.params.imageId) {
-                  element.views = element.views + 1;
-                  if (element.views === 100) {
-                      currentUser.earnedSats = currentUser.earnedSats + 250;
-                      currentUser.sats = currentUser.sats + 250; //earned sats
-                      element.sats = element.sats + 250;
-                  };
-              }
-          })
-          currentUser.save();
-          return false;
-      }
-      else {
-          recentViews[req.connection.remoteAddress] = [];
-          recentViews[req.connection.remoteAddress].push(req.params.imageId)
-          currentUser.images.forEach(element => {
-              if (element.imageId == req.params.imageId) {
-                  element.views = element.views + 1;
-                  if (element.views === 100) {
-                      currentUser.earnedSats = currentUser.earnedSats + 250; //earned sats
-                      currentUser.sats = currentUser.sats + 250;
-                      element.sats = element.sats + 250;
-                  };
-              }
-          })
-          currentUser.save();
-      }
+    User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
+        currentUser.images.forEach(element => {
+            if (element.imageId == req.params.imageId) {
+                if (!req.user) {
+                    res.render('share', { logInStatus: 'loggedOut', image: element })
+                }
+                else {
+                    res.render('share', { logInStatus: 'loggedIn', image: element })
+                }
+            }
+        })
+        var found = false;
+        if (recentViews[req.connection.remoteAddress]) {
+            recentViews[req.connection.remoteAddress].forEach(function (element) {
+                if (element === req.params.imageId) {
+                    found = true;
+                }
+            })
+            if (found === true) {
+                return;
+            }
+            recentViews[req.connection.remoteAddress].push(req.params.imageId)
+            currentUser.images.forEach(element => {
+                if (element.imageId == req.params.imageId) {
+                    element.views = element.views + 1;
+                    if (element.views === 100) {
+                        currentUser.earnedSats = currentUser.earnedSats + 250;
+                        currentUser.sats = currentUser.sats + 250; //earned sats
+                        element.sats = element.sats + 250;
+                    };
+                }
+            })
+            currentUser.save();
+            return false;
+        }
+        else {
+            recentViews[req.connection.remoteAddress] = [];
+            recentViews[req.connection.remoteAddress].push(req.params.imageId)
+            currentUser.images.forEach(element => {
+                if (element.imageId == req.params.imageId) {
+                    element.views = element.views + 1;
+                    if (element.views === 100) {
+                        currentUser.earnedSats = currentUser.earnedSats + 250; //earned sats
+                        currentUser.sats = currentUser.sats + 250;
+                        element.sats = element.sats + 250;
+                    };
+                }
+            })
+            currentUser.save();
+        }
 
-  })
+    })
 })
 app.get('/a/', function (req, res) {
-  res.render('aAds');
+    res.render('aAds');
+});
+
+app.get('/api/:imageId', function (req, res) {
+    User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
+        currentUser.images.forEach(element => {
+            if (element.imageId == req.params.imageId) {
+                res.render('api', {image: element});
+            }
+        })
+    })
+
 });
