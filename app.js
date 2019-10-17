@@ -149,3 +149,16 @@ app.get('/api/:imageId', function (req, res) {
     })
 
 });
+
+
+app.get('/apiJ/:imageId', function (req, res) {
+    User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
+        currentUser.images.forEach(element => {
+            if (element.imageId == req.params.imageId) {
+                res.render('apij', {image: element});
+            }
+        })
+    })
+
+});
+
