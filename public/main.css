@@ -350,9 +350,9 @@ input {
 .item{
   margin-bottom:10px;
 }
-  #ad1 {
+  /* #ad1 {
     display: none;
-  }
+  } */
   #ad2 {
     display: inherit !important;
   }
@@ -714,7 +714,6 @@ margin: 5px;
 }
 
 #ad2 {
-  display: none;
   text-align: center;
 }
 
@@ -918,8 +917,10 @@ margin: 5px;
 
 .commentBox {
   height: 84px;
-  grid-column: 1 / 6;
+  grid-column: 1;
   border-radius: 5px;
+  resize: none;
+  font-size: 20px;
 }
 
 .replyBox {
@@ -1072,4 +1073,9 @@ margin: 5px;
 
 .close-container:hover label {
   opacity: 1;
+}
+
+.videoThumb{
+  width: 100%;
+  height: 100%;
 }

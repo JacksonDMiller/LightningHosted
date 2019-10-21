@@ -26,27 +26,52 @@ infScroll.on('load', function (response) {
    var data = JSON.parse(response);
    data.forEach(image => {
       if ($('.' + image.imageId).length === 0) {
-         //checking if the image is already on the page in the share spot
-
+         //checking if the image is already on the page in the share 
          //build a new photocard 
-         newCard = $("#photoCard").clone();
-         newCard.find('.photoThumb').attr('src', '/noauth/thumb/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
-         newCard.attr("id", "photoCard" + x);
-         newCard.addClass(image.imageId);
-         newCard.find('.shareLink').attr('href', '/s/' + image.imageId);
-         newCard.find('.views').text(image.views);
-         if (upVoted[image.imageId] === true) {
-            newCard.find('.chevron').addClass("upVoted");
+         if (getExtension(image.fileName) === 'mp4') {
+            newCard = $("#videoCard").clone();
+            newCard.find('.mp4').attr('src', '/noauth/thumb/' + image.fileName)
+            newCard.attr("id", "photoCard" + x);
+            newCard.find('.photoThumb').attr('onplay', ' allItems = document.getElementsByClassName("item"); for (x = 0; x < allItems.length; x++) {imagesLoaded(allItems[x], resizeInstance);}');
+            newCard.addClass(image.imageId);
+            newCard.find('.shareLink').attr('href', '/s/' + image.imageId);
+            newCard.find('.views').text(image.views);
+            if (upVoted[image.imageId] === true) {
+               newCard.find('.chevron').addClass("upVoted");
+            }
+            newCard.find('.upVotes').text(image.upVotes);
+            newCard.find('.upVotebtn').attr('onclick', 'upvoteImage("' + image.imageId + '")');
+            newCard.find('.titleVal').text(image.title);
+            newCard.toggle();
+            $(".grid").append(newCard);
+
+
+            allItems = document.getElementsByClassName("item");
+            for (x = 0; x < allItems.length; x++) {
+               imagesLoaded(allItems[x], resizeInstance);
+            }
          }
-         newCard.find('.upVotes').text(image.upVotes);
-         newCard.find('.upVotebtn').attr('onclick', 'upvoteImage("' + image.imageId + '")');
-         newCard.find('.titleVal').text(image.title);
-         $(".grid").append(newCard);
+
+         else {
+            newCard = $("#photoCard").clone();
+            newCard.find('.photoThumb').attr('src', '/noauth/thumb/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
+            newCard.attr("id", "photoCard" + x);
+            newCard.addClass(image.imageId);
+            newCard.find('.shareLink').attr('href', '/s/' + image.imageId);
+            newCard.find('.views').text(image.views);
+            if (upVoted[image.imageId] === true) {
+               newCard.find('.chevron').addClass("upVoted");
+            }
+            newCard.find('.upVotes').text(image.upVotes);
+            newCard.find('.upVotebtn').attr('onclick', 'upvoteImage("' + image.imageId + '")');
+            newCard.find('.titleVal').text(image.title);
+            $(".grid").append(newCard);
 
 
-         allItems = document.getElementsByClassName("item");
-         for (x = 0; x < allItems.length; x++) {
-            imagesLoaded(allItems[x], resizeInstance);
+            allItems = document.getElementsByClassName("item");
+            for (x = 0; x < allItems.length; x++) {
+               imagesLoaded(allItems[x], resizeInstance);
+            }
          }
       }
    });
@@ -54,7 +79,7 @@ infScroll.on('load', function (response) {
       newAdCard = $('.adCardTemplate').clone();
       newAdCard.removeClass('adCardTemplate');
       newAdCard.attr("id", "photoCard" + x);
-      newAdCard.find('iframe').attr('onload', '$("#photoCard' + x + '").toggle()');
+      newAdCard.find('.trezor').attr('onload', '$("#photoCard' + x + '").toggle()');
       $(".grid").append(newAdCard);
 
       allItems = document.getElementsByClassName("item");
@@ -111,8 +136,9 @@ function upvoteImage(id) {
    $('.' + id).find('.chevron').toggleClass('upVoted')
 }
 
-function removeFooter(){
+function removeFooter() {
    $('.footer').remove()
    localStorage.setItem("closedTwitter", true);
 }
+
 

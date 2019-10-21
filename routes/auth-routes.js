@@ -79,7 +79,7 @@ router.post('/upload', function (req, res) {
         }
         var extension = req.files.filepond.name.split('.')[1]
         fileName = crypto.randomBytes(8).toString('hex')
-        if (req.files.filepond.mimetype != 'image/gif') {
+        if (req.files.filepond.mimetype != 'image/gif' && req.files.filepond.mimetype != 'video/mp4' ) {
             req.files.filepond.mv('./uploads/' + fileName + 'temp' + '.' + extension, function (err) {
                 if (err) {
                     console.log(2,err)
@@ -132,7 +132,13 @@ router.post('/upload', function (req, res) {
     })
 
     function createImage(extension, req, response) {
+  // set the resolution of mp4s here 
         sizeOf('./uploads/' + fileName + '.' + extension, function (err, dimensions) {
+            if(!dimensions){
+                dimensions ={}
+                dimensions.width = 0;
+                dimensions.height = 0;
+            }
             req.user.images.push({
                 imageId: fileName,
                 reviewStatus: false,

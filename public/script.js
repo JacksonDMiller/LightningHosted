@@ -1,3 +1,16 @@
+var isMobile = false
+$(document).ready(function () {
+   isMobile = window.matchMedia("only screen and (max-width: 760px)").matches;
+
+   if (!isMobile) {
+      console.log('doing it')
+      $('#ad1').html('<iframe data-aa="1259137" src="//ad.a-ads.com/1259137?size=728x90" scrolling="no" style="width:728px; height:90px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>')
+   }
+
+})
+
+
+
 $('.menu-toggle').click(function () {
    $(".nav").toggleClass("mobile-nav");
    $(this).toggleClass("is-active");
@@ -44,14 +57,19 @@ for (x = 0; x < allItems.length; x++) {
    imagesLoaded(allItems[x], resizeInstance);
 }
 
-$(document).ready ( function(){
+$(document).ready(function () {
    setLogInButton()
 });
 
-function setLogInButton(){
-   if($('#logInStatus').hasClass('loggedIn')){
+function setLogInButton() {
+   if ($('#logInStatus').hasClass('loggedIn')) {
       $('#logInStatus').attr("href", "/noauth/logout")
       $('#logInStatus').text('Log Out')
 
    }
+}
+
+function getExtension(filename) {
+   var parts = filename.split('.');
+   return parts[parts.length - 1];
 }

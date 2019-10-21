@@ -8,7 +8,7 @@ const pond = document.querySelector('.filepond--root');
 pondOne.setOptions(
     {
         maxFileSize: '5MB',
-        acceptedFileTypes: ['image/*','.gif'],
+        acceptedFileTypes: ['image/*', '.gif', 'video/mp4'],
         labelTapToUndo: 'Upload another file',
         labelFileProcessingComplete: '',
         labelIdle: 'Drag & Drop your image or <span class="filepond--label-action">Browse</span> to get started',
@@ -43,37 +43,75 @@ $.get("./user/", function (data, status) {
 });
 
 function addCard(image, append) {
-    var newCard = $("#photoCard").clone();
-    newCard.find('.photoThumb').attr('src', '/noauth/thumb/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
-    newCard.attr("id", "photoCard" + x);
-    newCard.addClass(image.imageId);
-    newCard.find('.shareLink').attr('href', '../s/' + image.imageId);
-    newCard.find('.views').text(image.views);
-    newCard.find('.upvotes').text(image.upVotes);
-    newCard.find('.sats').text(image.sats);
-    newCard.find('.btn').attr('onclick', 'deleteImage("' + image.imageId + '")');
-    if (image.title === '') {
-        var newTitle = $("#TitleInputTemp").clone();
-        newTitle.attr('id', 'title' + image.imageId);
-        newTitle.find('.emptyTitle').attr('id', image.imageId);
-        newTitle.find('.emptyTitle').attr('onkeyup', 'submitTitle("' + image.imageId + '")');
-        newCard.find('.title').html(newTitle);
-        newCard.find('.title').attr('class', 'titleInput');
-        newTitle.toggle();
+    if (getExtension(image.fileName) === 'mp4') {
+        var newCard = $("#videoCard").clone();
+        newCard.toggle();
+        newCard.find('.mp4').attr('src', '/noauth/thumb/' + image.fileName)
+        newCard.find('.photoThumb').attr('onplay', ' allItems = document.getElementsByClassName("item"); for (x = 0; x < allItems.length; x++) {imagesLoaded(allItems[x], resizeInstance);}');
+        newCard.attr("id", "photoCard" + x);
+        newCard.addClass(image.imageId);
+        newCard.find('.shareLink').attr('href', '../s/' + image.imageId);
+        newCard.find('.views').text(image.views);
+        newCard.find('.upvotes').text(image.upVotes);
+        newCard.find('.sats').text(image.sats);
+        newCard.find('.btn').attr('onclick', 'deleteImage("' + image.imageId + '")');
+        if (image.title === '') {
+            var newTitle = $("#TitleInputTemp").clone();
+            newTitle.attr('id', 'title' + image.imageId);
+            newTitle.find('.emptyTitle').attr('id', image.imageId);
+            newTitle.find('.emptyTitle').attr('onkeyup', 'submitTitle("' + image.imageId + '")');
+            newCard.find('.title').html(newTitle);
+            newCard.find('.title').attr('class', 'titleInput');
+            newTitle.toggle();
+        }
+        else {
+            newCard.find('.titleVal').text(image.title)
+        }
+        if (append === true) {
+            $(".grid").prepend(newCard)
+        }
+        else {
+            $(".grid").append(newCard)
+        }
+
+        allItems = document.getElementsByClassName("item");
+        for (x = 0; x < allItems.length; x++) {
+            imagesLoaded(allItems[x], resizeInstance);
+        }
     }
     else {
-        newCard.find('.titleVal').text(image.title)
-    }
-    if(append === true){
-        $(".grid").prepend(newCard)
-    }
-    else{
-    $(".grid").append(newCard)
-}
+        var newCard = $("#photoCard").clone();
+        newCard.find('.photoThumb').attr('src', '/noauth/thumb/' + image.fileName).attr('onload', '$("#photoCard' + x + '").toggle()');
+        newCard.attr("id", "photoCard" + x);
+        newCard.addClass(image.imageId);
+        newCard.find('.shareLink').attr('href', '../s/' + image.imageId);
+        newCard.find('.views').text(image.views);
+        newCard.find('.upvotes').text(image.upVotes);
+        newCard.find('.sats').text(image.sats);
+        newCard.find('.btn').attr('onclick', 'deleteImage("' + image.imageId + '")');
+        if (image.title === '') {
+            var newTitle = $("#TitleInputTemp").clone();
+            newTitle.attr('id', 'title' + image.imageId);
+            newTitle.find('.emptyTitle').attr('id', image.imageId);
+            newTitle.find('.emptyTitle').attr('onkeyup', 'submitTitle("' + image.imageId + '")');
+            newCard.find('.title').html(newTitle);
+            newCard.find('.title').attr('class', 'titleInput');
+            newTitle.toggle();
+        }
+        else {
+            newCard.find('.titleVal').text(image.title)
+        }
+        if (append === true) {
+            $(".grid").prepend(newCard)
+        }
+        else {
+            $(".grid").append(newCard)
+        }
 
-    allItems = document.getElementsByClassName("item");
-    for (x = 0; x < allItems.length; x++) {
-        imagesLoaded(allItems[x], resizeInstance);
+        allItems = document.getElementsByClassName("item");
+        for (x = 0; x < allItems.length; x++) {
+            imagesLoaded(allItems[x], resizeInstance);
+        }
     }
 }
 
@@ -93,7 +131,7 @@ function checkPaymentStatus(invoice, incrment) {
         }
         else {
             clearMessage();
-            addCard(data,true)
+            addCard(data, true)
             setTimeout(() => {
                 showThankYou(window.location.hostname + '/s/' + data.imageId)
             }, 1000)
@@ -144,7 +182,7 @@ function withdraw() {
             $.get("./withdraw/" + val, function (data, status) {
 
                 if (data.status === 'success') {
-                    $('#satsEarned').text(parseInt($('#satsEarned').text())-data.amount)
+                    $('#satsEarned').text(parseInt($('#satsEarned').text()) - data.amount)
                     $.sweetModal({
                         content: 'Sats sent!',
                         icon: $.sweetModal.ICON_SUCCESS
@@ -170,16 +208,16 @@ function withdraw() {
 }
 
 function clearMessage() {
-    if($('#message-container').is(':visible')){
-    $('#message-container').slideToggle('fast')
-    setTimeout(function () {
-        $('#message-image').html('')
-        $('#message').text('');
-        $('#message-invoice').text('');
-        $('.copyBtn').remove();
-        $('.shareButtons').remove();
-    }, 500);
-}
+    if ($('#message-container').is(':visible')) {
+        $('#message-container').slideToggle('fast')
+        setTimeout(function () {
+            $('#message-image').html('')
+            $('#message').text('');
+            $('#message-invoice').text('');
+            $('.copyBtn').remove();
+            $('.shareButtons').remove();
+        }, 500);
+    }
 }
 
 function showPayment(image, invoice) {
@@ -197,9 +235,9 @@ function showThankYou(link) {
     $('#message-container').append('<button class="btn copyBtn" onclick="copy()">Copy</button>')
     var shareBtns = $('.shareButtonsTemplate').clone()
     shareBtns.removeClass('shareButtonsTemplate').addClass('shareButtons')
-    shareBtns.find('.facebookLink').attr('href',"http://www.facebook.com/sharer.php?u="+link)
-    shareBtns.find('.redditLink').attr('href',"http://reddit.com/submit?url="+link)
-    shareBtns.find('.twitterLink').attr('href',"https://twitter.com/share?url=http://"+link+"&text=LightningHosted.com&hashtags=LightningHosted")
+    shareBtns.find('.facebookLink').attr('href', "http://www.facebook.com/sharer.php?u=" + link)
+    shareBtns.find('.redditLink').attr('href', "http://reddit.com/submit?url=" + link)
+    shareBtns.find('.twitterLink').attr('href', "https://twitter.com/share?url=http://" + link + "&text=LightningHosted.com&hashtags=LightningHosted")
     shareBtns.toggle();
     $('#message-container').append(shareBtns)
     setTimeout(function () {
@@ -209,12 +247,17 @@ function showThankYou(link) {
 }
 
 //working on a copy text button
-function copy(){
+function copy() {
     // var copyText = $("#message-link").val();
 
     var copyText = $("#message-link").text();
-    $("body").append('<textarea id="temp">'+copyText+'</textarea>')
+    $("body").append('<textarea id="temp">' + copyText + '</textarea>')
     $('#temp').select();
     document.execCommand("copy");
     $("#temp").remove()
+}
+
+function getExtension(filename) {
+    var parts = filename.split('.');
+    return parts[parts.length - 1];
 }
