@@ -16,7 +16,6 @@
   <script src="/infinite-scroll.pkgd.min.js"></script>
   <meta property="og:title" content="<%- image.title %>">
   <meta property="og:url" content="https://LightningHosted.com/s/<%- image.imageId %>" />
-  <meta property="og:type" content="article">
   <meta property="og:image:width" content="<%- image.width %>">
   <meta property="og:image:height" content="<%- image.height %>">
   <meta name="twitter:card" content="summary_large_image">
@@ -25,9 +24,12 @@
   <meta name="twitter:description"
     content="<%- image.views %> views and <%- image.upVotes %> votes on LightningHosted.com">
   <meta name="twitter:image" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
-  <meta property="og:image" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>?fb">
-
-
+  <% if(!image.fileName.includes(".mp4")){ %>
+    <meta property="og:type" content="article">
+    <% ;} else{ %>
+    <meta property="og:type" content="video.other">
+  <% ;} %>
+  <meta property="og:image" content="https://lightninghosted.com/noauth/image/<%- image.imageId %>.jpeg?fb">
 
   <link rel="alternate" type="application/xml+oembed" href="https://lightninghosted.com/api/<%- image.imageId %>"
     title="<%- image.title %> - Stacking Sats With Lightning Hosted">
@@ -166,43 +168,43 @@
         </div>
       </div>
 
-        <!-- Video Card Template -->
-    <div id="videoCard" class="item photo" style="display:none">
-      <div class="content">
-        <div class="title">
-          <h3 class='titleVal'>Title</h3>
-        </div>
-        <a class="shareLink" href="/">
-          <video class="photoThumb videoThumb" width="" height="" autoplay loop controls muted>
-            <source class='mp4' src="/" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </a>
-        <div class="descNoAuth">
-          <p>Views: <span class='views'></span></p>
-          <p class="outSide">Upvotes: <span class='upVotes'></span> <button class="upVotebtn" onclick=""><span
-                class="chevron top"></span></button></p>
+      <!-- Video Card Template -->
+      <div id="videoCard" class="item photo" style="display:none">
+        <div class="content">
+          <div class="title">
+            <h3 class='titleVal'>Title</h3>
+          </div>
+          <a class="shareLink" href="/">
+            <video class="photoThumb videoThumb" width="" height="" autoplay loop controls muted>
+              <source class='mp4' src="/" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </a>
+          <div class="descNoAuth">
+            <p>Views: <span class='views'></span></p>
+            <p class="outSide">Upvotes: <span class='upVotes'></span> <button class="upVotebtn" onclick=""><span
+                  class="chevron top"></span></button></p>
+          </div>
         </div>
       </div>
-    </div>
 
 
-  <!-- ad card template -->
-  <div id="photoCardAd" class="item photo adCardTemplate" style="display:none">
-    <div class="content">
-      <div class="title">
-        <h3>Sponsor</h3>
+      <!-- ad card template -->
+      <div id="photoCardAd" class="item photo adCardTemplate" style="display:none">
+        <div class="content">
+          <div class="title">
+            <h3>Sponsor</h3>
+          </div>
+          <div class="ads">
+            <a href="https://trezor.io/?offer_id=12&aff_id=2619&file_id=268" target="_blank"><img class='trezor'
+                src="https://media.go2speed.org/brand/files/trezor/12/trezor-banner.jpg" width="300" height="250"
+                border="0" /></a><img src="https://trezor.go2cloud.org/aff_i?offer_id=12&file_id=268&aff_id=2619"
+              width="1" height="1" />
+          </div>
+          <div class="desc">
+          </div>
+        </div>
       </div>
-      <div class="ads">
-        <a href="https://trezor.io/?offer_id=12&aff_id=2619&file_id=268" target="_blank"><img class='trezor'
-            src="https://media.go2speed.org/brand/files/trezor/12/trezor-banner.jpg" width="300" height="250"
-            border="0" /></a><img src="https://trezor.go2cloud.org/aff_i?offer_id=12&file_id=268&aff_id=2619" width="1"
-          height="1" />
-      </div>
-      <div class="desc">
-      </div>
-    </div>
-  </div>
 
       <!-- comment string template -->
       <div class='commentString commentStringTemplate' style="display:none">

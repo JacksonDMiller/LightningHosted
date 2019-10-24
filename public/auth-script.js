@@ -8,7 +8,7 @@ const pond = document.querySelector('.filepond--root');
 pondOne.setOptions(
     {
         maxFileSize: '5MB',
-        acceptedFileTypes: ['image/*', '.gif', 'video/mp4'],
+        acceptedFileTypes: ['image/png', 'image/jpeg', 'video/mp4'],
         labelTapToUndo: 'Upload another file',
         labelFileProcessingComplete: '',
         labelIdle: 'Drag & Drop your image or <span class="filepond--label-action">Browse</span> to get started',

@@ -4,8 +4,10 @@ const crypto = require('crypto');
 const grpc = require('grpc');
 const fs = require('fs');
 const qrCode = require('qrcode')
-var sizeOf = require('image-size');
+const sizeOf = require('image-size');
 const sharp = require('sharp');
+const ThumbnailGenerator = require('video-thumbnail-generator').default;
+const getVideoDimensions = require('get-video-dimensions');
 
 // Checks to see if a user is logged in before allowing them to access a page.
 const authCheck = (req, res, next) => {
@@ -44,7 +46,7 @@ var lnrpc = lnrpcDescriptor.lnrpc;
 
 // Testing
 var lightning = new lnrpc.Lightning('bitcoinacolyte.hopto.org:10009', credentials);
-//    lightning = new lnrpc.Lightning('localhost:10009', credentials);
+// lightning = new lnrpc.Lightning('localhost:10009', credentials);
 
 var call = lightning.subscribeInvoices({});
 
@@ -68,110 +70,124 @@ router.get('/', authCheck, (req, res) => {
 
 // Handles the upload and creation of a new image.
 router.post('/upload', function (req, res) {
+    var newImageDimensions = {};
+    fileName = crypto.randomBytes(8).toString('hex');
     if (Object.keys(req.files).length == 0) {
         console.log('no files were uploaded')
         return res.status(400).send('No files were uploaded.');
     }
-    lightning.addInvoice({ value: 250, memo: 'LightningHosted Captcha' }, function (err, response) {
+    lightning.addInvoice({ value: 250, memo: 'LightningHosted Captcha' }, function (err, lndResponse) {
         if (err) {
-            console.log(1,err)
+            console.log(1, err)
             res.status(500).send(err)
-        }
-        var extension = req.files.filepond.name.split('.')[1]
-        fileName = crypto.randomBytes(8).toString('hex')
-        if (req.files.filepond.mimetype != 'image/gif' && req.files.filepond.mimetype != 'video/mp4' ) {
-            req.files.filepond.mv('./uploads/' + fileName + 'temp' + '.' + extension, function (err) {
+        };
+        if (req.files.filepond.mimetype != 'video/mp4') {
+            sharp(req.files.filepond.data).jpeg({ quality: 75, force: true }).rotate().toFile('./uploads/' + fileName + '.' + 'jpeg', function (err) {
                 if (err) {
-                    console.log(2,err)
-                    res.status(500).send(err)
+                    console.log(err);
+                    res.status(500).send(err);
                 }
-                sharp('./uploads/' + fileName + 'temp' + '.' + extension).jpeg({ quality: 75, force: true }).rotate().toFile('./uploads/' + fileName + '.' + 'jpeg', function (err) {
+                sizeOf('./uploads/' + fileName + '.jpeg', function (err, dimensions) {
                     if (err) {
-                        console.log(3,err)
-                        return res.status(500).send(err)
-                    };
-                    createImage('jpeg', req, response)
-                    fs.copyFile('./uploads/' + fileName + '.jpeg', './thumbnails/' + fileName + 'temp.jpeg', (err) => {
-                        if (err) {
-                            console.log(4,err)
-                            res.status(500).send(err)
-                        };
-                        sharp('./thumbnails/' + fileName + 'temp.jpeg').jpeg({ quality: 40, force: true }).toFile('./thumbnails/' + fileName + '.jpeg', function (err) {
-                            fs.unlink('./thumbnails/' + fileName + 'temp.jpeg', function (err) {
-                                if (err) {
-                                    console.log(5,err)
-                                    res.status(500).send(err)
-                                }
-                                fs.unlink('./uploads/' + fileName + 'temp' + '.' + extension, function (err) {
-                                    if (5,err) {
-
-                                        console.log(6,err)
-                                        res.status(500).send(err)
-                                    }
-                                })
-                            })
-
-                            if (err) { console.log(7,err) 
-                                res.status(500).send(err)}
-                        })
-                    });
+                        console.log(err);
+                        res.status(500).send(err);
+                    }
+                    newImageDimensions = dimensions;
+                    newRecord('jpeg', lndResponse);
                 });
+
+            })
+            sharp(req.files.filepond.data).jpeg({ quality: 40, force: true }).rotate().toFile('./thumbnails/' + fileName + '.' + 'jpeg', function (err) {
+                if (err) {
+                    console.log(err);
+                    res.status(500).send(err);
+                }
             })
         }
         else {
-            req.files.filepond.mv('./uploads/' + fileName + '.' + extension, function (err) {
-                if (err) {console.log(8,err) 
-                    res.status(500).send(err) }
-                createImage(extension, req, response)
-                fs.copyFile('./uploads/' + fileName + '.' + extension, './thumbnails/' + fileName + '.' + extension, (err) => {
-                    if (err) {console.log(8,err)
-                        res.status(500).send(err)};
+            req.files.filepond.mv('./uploads/' + fileName + '.mp4', function (err) {
+                if (err) {
+                    console.log(err);
+                    res.status(500).send(err);
+                }
+                fs.copyFile('./uploads/' + fileName + '.mp4', './thumbnails/' + fileName + '.mp4', (err) => {
+                    console.log('moving to thumb')
+                    if (err) {
+                        console.log(err);
+                        res.status(500).send(err);
+                    };
                 });
-            })
-        }
-    })
 
-    function createImage(extension, req, response) {
-  // set the resolution of mp4s here 
-        sizeOf('./uploads/' + fileName + '.' + extension, function (err, dimensions) {
-            if(!dimensions){
-                dimensions ={}
-                dimensions.width = 0;
-                dimensions.height = 0;
-            }
-            req.user.images.push({
-                imageId: fileName,
-                reviewStatus: false,
-                payStatus: false,
-                // payStatus: true, //testing
-                deleted: false,
-                views: 0,
-                reports: 0,
-                fileName: fileName + '.' + extension,
-                thumbNail: 'x',
-                width: dimensions.width,
-                height: dimensions.height,
-                date: new (Date),
-                title: '',
-                caption: 'String',
-                paymentRequest: response.payment_request,
-                upVotes: 0,
-                sats: 0,
-            })
-            req.user.save().then(() => {
-                qrCode.toDataURL(response.payment_request, function (err, url) {
-                    res.status(200).send({
-                        invoice: response.payment_request,
-                        image: url,
-                        fileName: fileName + "." + extension,
-                        imageId: fileName
+
+                getVideoDimensions('./uploads/' + fileName + '.mp4').then(function (dimensions) {
+                    newImageDimensions = dimensions;
+                    var tg = new ThumbnailGenerator({
+                        sourcePath: './uploads/' + fileName + '.mp4',
+                        thumbnailPath: './thumbnails/'
                     });
-                })
+                    tg.generateOneByPercentCb(90, { size: dimensions.width + 'x' + dimensions.height }, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                            res.status(500).send(err);
+                        }
+                        sharp('./thumbnails/' + result).jpeg({ quality: 80, force: true }).toFile('./uploads/' + fileName + '.' + 'jpeg', function (err) {
+                            if (err) {
+                                console.log(err);
+                                res.status(500).send(err);
+                            }
+                            fs.unlink('./thumbnails/' + result, function (err) {
+                                if (err) {
+                                    console.log(err);
+                                };
+                            });
+
+
+                        });
+                        newRecord('mp4', lndResponse);
+                    });
+                });
 
             });
+        };
+    });
+    function newRecord(extension, lndResponse) {
+        req.user.images.push({
+            imageId: fileName,
+            reviewStatus: false,
+            payStatus: false,
+            // payStatus: true, //testing
+            deleted: false,
+            views: 0,
+            reports: 0,
+            fileName: fileName + '.' + extension,
+            thumbNail: 'x',
+            width: newImageDimensions.width,
+            height: newImageDimensions.height,
+            date: new (Date),
+            title: '',
+            caption: 'String',
+            paymentRequest: lndResponse.payment_request,
+            upVotes: 0,
+            sats: 0,
+        })
+        req.user.save().then(() => {
+            qrCode.toDataURL(lndResponse.payment_request, function (err, url) {
+                if (err) {
+                    console.log(err);
+                    res.status(500).send(err);
+                }
+                res.status(200).send({
+                    invoice: lndResponse.payment_request,
+                    image: url,
+                    fileName: fileName + "." + extension,
+                    imageId: fileName
+                });
+            })
         });
     }
 });
+
+
 
 router.get('/user', authCheck, (req, res) => {
     User.findOne({ _id: req.user.id }).then((currentUser) => {
