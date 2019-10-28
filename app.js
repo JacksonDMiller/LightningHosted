@@ -26,23 +26,23 @@ app.listen(3000, () => console.log(`Yipyip the app listening on port 3000!`));
 
 //  comment out for testing
 
-app.use(function(req, res, next) {
-    if (req.secure) {
-        // request was via https, so do no special handling
-        next();
-    } else {
-        // request was via http, so redirect to https
-        res.redirect('https://' + req.headers.host + req.url);
-    }
-});
+// app.use(function(req, res, next) {
+//     if (req.secure) {
+//         // request was via https, so do no special handling
+//         next();
+//     } else {
+//         // request was via http, so redirect to https
+//         res.redirect('https://' + req.headers.host + req.url);
+//     }
+// });
 
 
-const options = {
-    key: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/privkey.pem', 'utf8'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/fullchain.pem', 'utf8')
-}
+// const options = {
+//     key: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/privkey.pem', 'utf8'),
+//     cert: fs.readFileSync('/etc/letsencrypt/live/lightninghosted.com/fullchain.pem', 'utf8')
+// }
 
-https.createServer(options, app).listen(8443);
+// https.createServer(options, app).listen(8443);
 
 
 
@@ -143,7 +143,8 @@ app.get('/api/:imageId', function (req, res) {
     User.findOne({ 'images.imageId': req.params.imageId }).then((currentUser) => {
         currentUser.images.forEach(element => {
             if (element.imageId == req.params.imageId) {
-                res.render('api', {image: element});
+                res.send(`<?xml version="1.0"?>
+<oembed version="1.0" encoding="utf-8" standalone="yes"><version>1.0</version><type>rich</type><provider_name>LightningHosted</provider_name><provider_url>https://lightninghosted.com</provider_url><width>540</width><height>500</height><html>&lt;img class=&quot;sharePhoto&quot; src=&quot;https://lightninghosted.com/noauth/image/`+element.fileName+`&quot;&gt;</html></oembed>`);
             }
         })
     })

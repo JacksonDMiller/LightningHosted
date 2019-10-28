@@ -8,6 +8,7 @@ const sizeOf = require('image-size');
 const sharp = require('sharp');
 const ThumbnailGenerator = require('video-thumbnail-generator').default;
 const getVideoDimensions = require('get-video-dimensions');
+const keys = require('../config/keys');
 
 // Checks to see if a user is logged in before allowing them to access a page.
 const authCheck = (req, res, next) => {
@@ -45,8 +46,7 @@ var lnrpcDescriptor = grpc.load("./config/rpc.proto");
 var lnrpc = lnrpcDescriptor.lnrpc;
 
 // Testing
-var lightning = new lnrpc.Lightning('bitcoinacolyte.hopto.org:10009', credentials);
-// lightning = new lnrpc.Lightning('localhost:10009', credentials);
+var lightning = new lnrpc.Lightning(keys.lnd.uri, credentials);
 
 var call = lightning.subscribeInvoices({});
 
@@ -151,6 +151,12 @@ router.post('/upload', function (req, res) {
         };
     });
     function newRecord(extension, lndResponse) {
+        var ogType = 'article'
+        var twitterCard ='summary_large_image'
+        if (extension === 'mp4'){
+            ogType = 'video.other'
+            twitterCard ='player'
+        }
         req.user.images.push({
             imageId: fileName,
             reviewStatus: false,
@@ -160,7 +166,7 @@ router.post('/upload', function (req, res) {
             views: 0,
             reports: 0,
             fileName: fileName + '.' + extension,
-            thumbNail: 'x',
+            thumbNail: fileName+'.jpeg',
             width: newImageDimensions.width,
             height: newImageDimensions.height,
             date: new (Date),
@@ -169,6 +175,10 @@ router.post('/upload', function (req, res) {
             paymentRequest: lndResponse.payment_request,
             upVotes: 0,
             sats: 0,
+            numberOfComments: 0,
+            fileType: extension,
+            ogType: ogType,
+            twitterCard: twitterCard, 
         })
         req.user.save().then(() => {
             qrCode.toDataURL(lndResponse.payment_request, function (err, url) {

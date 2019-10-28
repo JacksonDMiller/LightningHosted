@@ -33,7 +33,11 @@ const imageSchema = new Schema({
     paymentRequest: String,
     upVotes: Number,
     sats :Number,
+    numberOfComments: Number,
+    fileType: String,
+    ogType: String,
     comments: [commentSchema]
+    
 });
 
 const accountSchema = new Schema({

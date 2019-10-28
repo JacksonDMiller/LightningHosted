@@ -10,6 +10,37 @@
 
     gtag('config', 'UA-133745471-2');
   </script>
+  <title><%- image.title %></title>
+  <meta name="robots" content="follow, index">
+  <meta name="keywords"
+  content="images, photos, gif, gifs, memes, pictures, new pictures, reaction gifs, share photos, share images, latest images, funny, cute, visual storytelling, imgur">
+  <meta name="description"
+  content="<%- image.views %> views and <%- image.upVotes %> votes on LightningHosted.com">
+  <link rel="canonical" href="https://LightningHosted.com/s/<%- image.imageId %>">
+  <meta property="og:site_name" content="LightningHosted">
+  <meta name="twitter:site" content="@LightningHosted">
+  <meta name="twitter:domain" content="LightningHosted.com">
+  <meta name="twitter:title" content="<%- image.title %>">
+  <meta property="author" content="LightningHosted">
+  <meta property="article:author" content="LightningHosted">
+  <link rel="icon" type="image/png" href="https://lightninghosted.com/favicon.ico" sizes="16x16">
+  <meta name="msapplication-TileColor" content="#800080">
+  <link rel="image_src" href="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
+  <% if(image.ogType == 'video.other'){ %>
+    <meta property="og:video:width" content="<%- image.width %>">
+    <meta property="og:video:height" content="<%- image.height %>">
+    <meta property="og:video" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
+    <meta property="og:video:secure_url" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
+    <meta property="og:video:type" content="video/mp4">
+    <meta name="twitter:player" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>?twitter#t">
+    <meta name="twitter:player:width" content="<%- image.width %>">
+    <meta name="twitter:player:height" content="<%- image.height %>">
+    <meta name="twitter:player:stream" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
+    <meta name="twitter:player:stream:content_type" content="video/mp4">
+    <% ;} %>
+
+
+
   <meta name="viewport" content="width=device-width,initial-scale=0.85,user-scalable=0">
   <script src="/jquery-3.4.1.js"></script>
   <link rel="stylesheet" type="text/css" href="/main.css" />
@@ -23,13 +54,9 @@
     content="<%- image.views %> views and <%- image.upVotes %> votes on LightningHosted.com">
   <meta name="twitter:description"
     content="<%- image.views %> views and <%- image.upVotes %> votes on LightningHosted.com">
-  <meta name="twitter:image" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
-  <% if(!image.fileName.includes(".mp4")){ %>
-    <meta property="og:type" content="article">
-    <% ;} else{ %>
-    <meta property="og:type" content="video.other">
-  <% ;} %>
-  <meta property="og:image" content="https://lightninghosted.com/noauth/image/<%- image.imageId %>.jpeg?fb">
+  <meta name="twitter:image" content="https://lightninghosted.com/noauth/image/<%- image.thumbNail %>">
+  <meta property="og:type" content="<%- image.ogType %>">
+  <meta property="og:image" content="https://lightninghosted.com/noauth/image/<%- image.thumbNail %>">
 
   <link rel="alternate" type="application/xml+oembed" href="https://lightninghosted.com/api/<%- image.imageId %>"
     title="<%- image.title %> - Stacking Sats With Lightning Hosted">
