@@ -111,7 +111,6 @@ router.post('/upload', function (req, res) {
                     res.status(500).send(err);
                 }
                 fs.copyFile('./uploads/' + fileName + '.mp4', './thumbnails/' + fileName + '.mp4', (err) => {
-                    console.log('moving to thumb')
                     if (err) {
                         console.log(err);
                         res.status(500).send(err);
