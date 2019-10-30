@@ -38,9 +38,9 @@ router.get('/register/', (req, res) => {
 
 
 router.post('/register/submit', async (req, res) => {
-    if (usernameFormat.test(req.body.username)){
+    if (usernameFormat.test(req.body.username)) {
         req.flash("error", "Invalid Username. The characters allowed are A-Z 0-9 and _ ")
-        res.redirect('/noauth/register') 
+        res.redirect('/noauth/register')
 
     }
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
@@ -58,7 +58,7 @@ router.post('/register/submit', async (req, res) => {
         upVotes: 0,
     }).save()
     req.flash("error", "Welcome Please Log in")
-    res.redirect('/noauth/login') 
+    res.redirect('/noauth/login')
 
 });
 
@@ -129,7 +129,9 @@ router.get('/comment/:imageId/:commentId/:comment', (req, res) => {
                         comment: req.params.comment,
                         upVotes: 0,
                     })
+                    element.numberOfComments++
                 }
+
             })
             currentUser.save();
             res.send(commentId);

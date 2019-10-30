@@ -180,7 +180,7 @@ h2 {
   padding: 10px 10px 5px 10px;
   background-color: var(--cardColor);
   display: grid;
-  grid-template-columns: 2fr 2.5fr 1fr 3fr;
+  grid-template-columns: 2fr 2fr 2fr 2fr 2fr;
   align-items: center;
 }
 
@@ -534,7 +534,10 @@ input {
 
 .grid p {
   color: var(--textColor);
-  padding-top: inherit;
+}
+
+.grid a{
+  text-decoration: none;
 }
 
 /* testing */

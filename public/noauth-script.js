@@ -25,6 +25,9 @@ infScroll.on('load', function (response) {
 
    var data = JSON.parse(response);
    data.forEach(image => {
+      if (image.numberOfComments == undefined) {
+         image.numberOfComments = 0;
+      };
       if ($('.' + image.imageId).length === 0) {
          //checking if the image is already on the page in the share 
          //build a new photocard 
@@ -36,6 +39,10 @@ infScroll.on('load', function (response) {
             newCard.addClass(image.imageId);
             newCard.find('.shareLink').attr('href', '/s/' + image.imageId);
             newCard.find('.views').text(image.views);
+            newCard.find('.numberOfComments').text(image.numberOfComments);
+            newCard.find('.commentsLink').attr('href', '/s/' + image.imageId);
+
+
             if (upVoted[image.imageId] === true) {
                newCard.find('.chevron').addClass("upVoted");
             }
@@ -59,6 +66,8 @@ infScroll.on('load', function (response) {
             newCard.addClass(image.imageId);
             newCard.find('.shareLink').attr('href', '/s/' + image.imageId);
             newCard.find('.views').text(image.views);
+            newCard.find('.numberOfComments').text(image.numberOfComments);
+            newCard.find('.commentsLink').attr('href', '/s/' + image.imageId);
             if (upVoted[image.imageId] === true) {
                newCard.find('.chevron').addClass("upVoted");
             }

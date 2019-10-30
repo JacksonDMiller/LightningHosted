@@ -38,8 +38,8 @@
   <meta name="twitter:player:stream:content_type" content="video/mp4">
   <meta name="twitter:card" content="player">
   <% ;} else{ %>
-    <meta name="twitter:card" content="summary_large_image">
-    <% ;} %>
+  <meta name="twitter:card" content="summary_large_image">
+  <% ;} %>
   <meta property="og:title" content="<%- image.title %>">
   <meta property="og:url" content="https://LightningHosted.com/s/<%- image.imageId %>" />
   <meta property="og:image:width" content="<%- image.width %>">
@@ -93,170 +93,178 @@
       <iframe data-aa="1259139" src="//ad.a-ads.com/1259139?size=468x60" scrolling="no"
         style="width:468px; height:60px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
     </div>
-    <div id="shareImage" class="item photo <%- image.imageId %> <%- image.orientation %>" style="grid-row-end: span 11;">
-        <div class="content">
-          <div class="title">
-            <h3><%- image.title %></h3>
+    <div id="shareImage" class="item photo <%- image.imageId %> <%- image.orientation %>"
+      style="grid-row-end: span 11;">
+      <div class="content">
+        <div class="title">
+          <h3><%- image.title %></h3>
+        </div>
+        <%if(image.fileName.split('.').pop()=== 'mp4'){%>
+        <video class="photoThumb videoThumb" width="<%- image.width %>" height="<%- image.height %>" autoplay loop
+          controls muted>
+          <source class='mp4' src="/noauth/image/<%- image.fileName %>" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <% ;} else{ %>
+        <img alt="oops" class="sharePhoto" src="/noauth/image/<%- image.fileName %>">
+        <% } %>
+        <div class="shareDesc">
+          <p>Views: <%- image.views %></p>
+          <p>Upvotes: <span class="upVotes"> <%- image.upVotes %> </span> <button class="upVotebtn"
+              onclick="upvoteImage('<%-image.imageId%>')"><span id="<%- image.imageId %>"
+                class="chevron top"></span></button></p>
+          <p>Comments: <%- image.numberOfComments %></p>
+          <p class='shareText'>Share:</p>
+          <div id="share-buttons">
+
+            <span>
+              <!-- Facebook -->
+              <a href="http://www.facebook.com/sharer.php?u=https://LightningHosted.com/s/<%- image.imageId %>"
+                target="_blank">
+                <img src="https://simplesharebuttons.com/images/somacro/facebook.png" alt="Facebook" />
+              </a>
+
+              <!-- Reddit -->
+              <a href="http://reddit.com/submit?url=https://LightningHosted.com/s/<%- image.imageId %>&amp;title=<%- image.title %>"
+                target="_blank">
+                <img src="https://simplesharebuttons.com/images/somacro/reddit.png" alt="Reddit" />
+              </a>
+
+              <!-- Twitter -->
+              <a href="https://twitter.com/share?url=https://LightningHosted.com/s/<%- image.imageId %>&amp;text=LightningHosted.com&amp;hashtags=LightningHosted"
+                target="_blank">
+                <img src="https://simplesharebuttons.com/images/somacro/twitter.png" alt="Twitter" />
+              </a>
+            </span>
           </div>
-          <%if(image.fileName.split('.').pop()=== 'mp4'){%>
-          <video class="photoThumb videoThumb" width="<%- image.width %>" height="<%- image.height %>" autoplay loop controls muted>
-            <source class='mp4' src="/noauth/image/<%- image.fileName %>" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-          <% ;} else{ %>
-          <img alt="oops" class="sharePhoto" src="/noauth/image/<%- image.fileName %>">
-          <% } %>
-          <div class="shareDesc">
-            <p>Views: <%- image.views %></p>
-            <p>Upvotes: <span class="upVotes"> <%- image.upVotes %> </span> <button class="upVotebtn"
-                onclick="upvoteImage('<%-image.imageId%>')"><span id="<%- image.imageId %>"
-                  class="chevron top"></span></button></p>
+          <div id='commentSection'>
+            <div id='comments'>
 
-            <p class='shareText'>Share:</p>
-            <div id="share-buttons">
-
-              <span>
-                <!-- Facebook -->
-                <a href="http://www.facebook.com/sharer.php?u=https://LightningHosted.com/s/<%- image.imageId %>"
-                  target="_blank">
-                  <img src="https://simplesharebuttons.com/images/somacro/facebook.png" alt="Facebook" />
-                </a>
-
-                <!-- Reddit -->
-                <a href="http://reddit.com/submit?url=https://LightningHosted.com/s/<%- image.imageId %>&amp;title=<%- image.title %>"
-                  target="_blank">
-                  <img src="https://simplesharebuttons.com/images/somacro/reddit.png" alt="Reddit" />
-                </a>
-
-                <!-- Twitter -->
-                <a href="https://twitter.com/share?url=https://LightningHosted.com/s/<%- image.imageId %>&amp;text=LightningHosted.com&amp;hashtags=LightningHosted"
-                  target="_blank">
-                  <img src="https://simplesharebuttons.com/images/somacro/twitter.png" alt="Twitter" />
-                </a>
-              </span>
-            </div>
-            <div id='commentSection'>
-              <div id='comments'>
-
-                <% for(var i=0; i < image.comments.length; i++) { %>
-                <div id="<%= image.comments[i].commentId %>" class='commentString'>
-                  <div class="topLevelComment comment">
-                    <p><%= image.comments[i].comment %> </p>
-                    <button onclick="reply('<%= image.imageId %>','<%= image.comments[i].commentId %>')"
-                      class='btn replyBtn'>Reply</button>
-                  </div>
-                  <% for(var x=0; x < image.comments[i].subComments.length; x++) { %>
-                  <div id="<%= image.comments[i].subComments[x].subCommentId%>" class='subComment'>
-                    <p><%= image.comments[i].subComments[x].comment%></p>
-                    <button class='btn replyBtn'
-                      onclick='reply("<%= image.imageId %>","<%= image.comments[i].commentId %>","<%= image.comments[i].subComments[x].subCommentId%>")'>Reply</button>
-                  </div>
-                  <% } %>
+              <% for(var i=0; i < image.comments.length; i++) { %>
+              <div id="<%= image.comments[i].commentId %>" class='commentString'>
+                <div class="topLevelComment comment">
+                  <p><%= image.comments[i].comment %> </p>
+                  <button onclick="reply('<%= image.imageId %>','<%= image.comments[i].commentId %>')"
+                    class='btn replyBtn'>Reply</button>
+                </div>
+                <% for(var x=0; x < image.comments[i].subComments.length; x++) { %>
+                <div id="<%= image.comments[i].subComments[x].subCommentId%>" class='subComment'>
+                  <p><%= image.comments[i].subComments[x].comment%></p>
+                  <button class='btn replyBtn'
+                    onclick='reply("<%= image.imageId %>","<%= image.comments[i].commentId %>","<%= image.comments[i].subComments[x].subCommentId%>")'>Reply</button>
                 </div>
                 <% } %>
               </div>
-              <div id='commentSubmit'>
-                <textarea class='commentBox'></textarea>
-                <button onclick='submitComment("<%- image.imageId %>")' class='bigSubmitBtn btn'>Submit</button>
-              </div>
-
+              <% } %>
             </div>
+            <div id='commentSubmit'>
+              <textarea class='commentBox'></textarea>
+              <button onclick='submitComment("<%- image.imageId %>")' class='bigSubmitBtn btn'>Submit</button>
+            </div>
+
           </div>
         </div>
       </div>
-      <div class="grid"></div>
     </div>
-      <!-- image card template -->
-      <div id="photoCard" class="item photo" style="display:none">
-        <div class="content">
-          <div class="title">
-            <h3 class='titleVal'>Title</h3>
-          </div>
-          <a class='shareLink' href="/">
-            <img alt="oops" onload="" class="photoThumb" src="/">
-          </a>
-          <div class="descNoAuth">
-            <p>Views: <span class='views'></span></p>
-            <p>Upvotes: <span class='upVotes'></span> <button class="upVotebtn" onclick=""><span
-                  class="chevron top"></span></button></p>
-          </div>
-        </div>
+    <div class="grid"></div>
+  </div>
+  <!-- image card template -->
+  <div id="photoCard" class="item photo" style="display:none">
+    <div class="content">
+      <div class="title">
+        <h3 class='titleVal'>Title</h3>
       </div>
-
-      <!-- Video Card Template -->
-      <div id="videoCard" class="item photo" style="display:none">
-        <div class="content">
-          <div class="title">
-            <h3 class='titleVal'>Title</h3>
-          </div>
-          <a class="shareLink" href="/">
-            <video class="photoThumb videoThumb" autoplay loop muted>
-              <source class='mp4' src="/" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-          </a>
-          <div class="descNoAuth">
-            <p>Views: <span class='views'></span></p>
-            <p class="outSide">Upvotes: <span class='upVotes'></span> <button class="upVotebtn" onclick=""><span
-                  class="chevron top"></span></button></p>
-          </div>
-        </div>
+      <a class='shareLink' href="/">
+        <img alt="oops" onload="" class="photoThumb" src="/">
+      </a>
+      <div class="descNoAuth">
+        <p>Views: <span class='views'></span></p>
+        <p>Upvotes: <span class='upVotes'></span> <button class="upVotebtn" onclick=""><span
+              class="chevron top"></span></button></p>
+        <a class='commentsLink'>
+          <p>Comments: <span class='numberOfComments'></span></p>
+        </a>
       </div>
+    </div>
+  </div>
 
-
-      <!-- ad card template -->
-      <div id="photoCardAd" class="item photo adCardTemplate" style="display:none">
-        <div class="content">
-          <div class="title">
-            <h3>Sponsor</h3>
-          </div>
-          <div class="ads">
-            <a href="https://trezor.io/?offer_id=12&aff_id=2619&file_id=268" target="_blank"><img alt="oops" class='trezor'
-                src="https://media.go2speed.org/brand/files/trezor/12/trezor-banner.jpg" width="300" height="250"
-                border="0" /></a><img alt="oops" src="https://trezor.go2cloud.org/aff_i?offer_id=12&file_id=268&aff_id=2619"
-              width="1" height="1" />
-          </div>
-          <div class="desc">
-          </div>
-        </div>
+  <!-- Video Card Template -->
+  <div id="videoCard" class="item photo" style="display:none">
+    <div class="content">
+      <div class="title">
+        <h3 class='titleVal'>Title</h3>
       </div>
-
-      <!-- comment string template -->
-      <div class='commentString commentStringTemplate' style="display:none">
-        <div class="topLevelComment comment">
-          <p></p>
-          <button class='btn replyBtn'>Reply</button>
-        </div>
+      <a class="shareLink" href="/">
+        <video class="photoThumb videoThumb" autoplay loop muted>
+          <source class='mp4' src="/" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </a>
+      <div class="descNoAuth">
+        <p>Views: <span class='views'></span></p>
+        <p class="outSide">Upvotes: <span class='upVotes'></span> <button class="upVotebtn" onclick=""><span
+              class="chevron top"></span></button></p>
+        <a class='commentsLink'>
+          <p>Comments: <span class='numberOfComments'></span></p>
+        </a>
       </div>
+    </div>
+  </div>
 
-      <!-- subcomment template -->
-      <div class='subComment subCommentTemplate' style="display:none">
-        <p></p>
-        <button class='replyBtn btn'>Reply</button>
+
+  <!-- ad card template -->
+  <div id="photoCardAd" class="item photo adCardTemplate" style="display:none">
+    <div class="content">
+      <div class="title">
+        <h3>Sponsor</h3>
       </div>
-
-      <!-- reply box template -->
-
-      <div class='replyBoxContainer replyBoxContainertemplate' style="display:none">
-        <textarea class='replyBox'></textarea>
-        <button onclick='submitComment("")' class='btn submitBtn'>Submit</button>
+      <div class="ads">
+        <a href="https://trezor.io/?offer_id=12&aff_id=2619&file_id=268" target="_blank"><img alt="oops" class='trezor'
+            src="https://media.go2speed.org/brand/files/trezor/12/trezor-banner.jpg" width="300" height="250"
+            border="0" /></a><img alt="oops" src="https://trezor.go2cloud.org/aff_i?offer_id=12&file_id=268&aff_id=2619"
+          width="1" height="1" />
       </div>
-
-      <div class='footer'>
-        <div onclick="removeFooter()" class="close-container">
-          <div class="leftright"></div>
-          <div class="rightleft"></div>
-        </div>
-        <!-- <button class='removeFooterBtn' onclick="removeFooter()">X</button> -->
-        <div class='facebookContainer'>
-          <a href="https://twitter.com/LightningHosted?ref_src=twsrc%5Etfw" class="twitter-follow-button"
-            data-size="large" data-show-count="false">Follow @LightningHosted</a>
-          <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-        </div>
+      <div class="desc">
       </div>
-    
-      <script src="/script.js"></script>
-      <script src="/noauth-script.js"></script>
-      <script src="/share-script.js"></script>
-    
+    </div>
+  </div>
+
+  <!-- comment string template -->
+  <div class='commentString commentStringTemplate' style="display:none">
+    <div class="topLevelComment comment">
+      <p></p>
+      <button class='btn replyBtn'>Reply</button>
+    </div>
+  </div>
+
+  <!-- subcomment template -->
+  <div class='subComment subCommentTemplate' style="display:none">
+    <p></p>
+    <button class='replyBtn btn'>Reply</button>
+  </div>
+
+  <!-- reply box template -->
+
+  <div class='replyBoxContainer replyBoxContainertemplate' style="display:none">
+    <textarea class='replyBox'></textarea>
+    <button onclick='submitComment("")' class='btn submitBtn'>Submit</button>
+  </div>
+
+  <div class='footer'>
+    <div onclick="removeFooter()" class="close-container">
+      <div class="leftright"></div>
+      <div class="rightleft"></div>
+    </div>
+    <!-- <button class='removeFooterBtn' onclick="removeFooter()">X</button> -->
+    <div class='facebookContainer'>
+      <a href="https://twitter.com/LightningHosted?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-size="large"
+        data-show-count="false">Follow @LightningHosted</a>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </div>
+  </div>
+
+  <script src="/script.js"></script>
+  <script src="/noauth-script.js"></script>
+  <script src="/share-script.js"></script>
+
 </body>
