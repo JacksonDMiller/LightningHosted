@@ -3,7 +3,6 @@ $(document).ready(function () {
    isMobile = window.matchMedia("only screen and (max-width: 760px)").matches;
 
    if (!isMobile) {
-      console.log('doing it')
       $('#ad1').html('<iframe data-aa="1259137" src="//ad.a-ads.com/1259137?size=728x90" scrolling="no" style="width:728px; height:90px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>')
    }
 

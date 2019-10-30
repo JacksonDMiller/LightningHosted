@@ -7,15 +7,13 @@
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
-
     gtag('config', 'UA-133745471-2');
   </script>
   <title><%- image.title %></title>
   <meta name="robots" content="follow, index">
   <meta name="keywords"
-  content="images, photos, gif, gifs, memes, pictures, new pictures, reaction gifs, share photos, share images, latest images, funny, cute, visual storytelling, imgur">
-  <meta name="description"
-  content="<%- image.views %> views and <%- image.upVotes %> votes on LightningHosted.com">
+    content="images, photos, gif, gifs, memes, pictures, new pictures, reaction gifs, share photos, share images, latest images, funny, cute, visual storytelling, imgur">
+  <meta name="description" content="<%- image.views %> views and <%- image.upVotes %> votes on LightningHosted.com">
   <link rel="canonical" href="https://LightningHosted.com/s/<%- image.imageId %>">
   <meta property="og:site_name" content="LightningHosted">
   <meta name="twitter:site" content="@LightningHosted">
@@ -27,24 +25,17 @@
   <meta name="msapplication-TileColor" content="#800080">
   <link rel="image_src" href="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
   <% if(image.ogType == 'video.other'){ %>
-    <meta property="og:video:width" content="<%- image.width %>">
-    <meta property="og:video:height" content="<%- image.height %>">
-    <meta property="og:video" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
-    <meta property="og:video:secure_url" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
-    <meta property="og:video:type" content="video/mp4">
-    <meta name="twitter:player" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>?twitter#t">
-    <meta name="twitter:player:width" content="<%- image.width %>">
-    <meta name="twitter:player:height" content="<%- image.height %>">
-    <meta name="twitter:player:stream" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
-    <meta name="twitter:player:stream:content_type" content="video/mp4">
-    <% ;} %>
-
-
-
-  <meta name="viewport" content="width=device-width,initial-scale=0.85,user-scalable=0">
-  <script src="/jquery-3.4.1.js"></script>
-  <link rel="stylesheet" type="text/css" href="/main.css" />
-  <script src="/infinite-scroll.pkgd.min.js"></script>
+  <meta property="og:video:width" content="<%- image.width %>">
+  <meta property="og:video:height" content="<%- image.height %>">
+  <meta property="og:video" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
+  <meta property="og:video:secure_url" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
+  <meta property="og:video:type" content="video/mp4">
+  <meta name="twitter:player" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>?twitter#t">
+  <meta name="twitter:player:width" content="<%- image.width %>">
+  <meta name="twitter:player:height" content="<%- image.height %>">
+  <meta name="twitter:player:stream" content="https://lightninghosted.com/noauth/image/<%- image.fileName %>">
+  <meta name="twitter:player:stream:content_type" content="video/mp4">
+  <% ;} %>
   <meta property="og:title" content="<%- image.title %>">
   <meta property="og:url" content="https://LightningHosted.com/s/<%- image.imageId %>" />
   <meta property="og:image:width" content="<%- image.width %>">
@@ -62,6 +53,10 @@
     title="<%- image.title %> - Stacking Sats With Lightning Hosted">
   <link rel="alternate" type="application/json+oembed" href="https://lightninghosted.com/apij/<%- image.imageId %>"
     title="<%- image.title %> - Stacking Sats With Lightning Hosted">
+  <link rel="stylesheet" type="text/css" href="/main.css" />
+  <script src="/jquery-3.4.1.js"></script>
+  <script src="/infinite-scroll.pkgd.min.js"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=0.85,user-scalable=0">
 </head>
 
 <body>
@@ -95,17 +90,7 @@
       <iframe data-aa="1259139" src="//ad.a-ads.com/1259139?size=468x60" scrolling="no"
         style="width:468px; height:60px; border:0px; padding:0; overflow:hidden" allowtransparency="true"></iframe>
     </div>
-
-    <% if(image.width > image.height){ %>
-    <div id="shareImage" class="item photo <%- image.imageId %>" style="grid-row-end: span 11;">
-
-      <% ;} %>
-      <% if(image.width <= image.height){ %>
-      <div id="shareImageTall" class="item photo <%- image.imageId %>" style="grid-row-end: span 11;">
-
-        <% ;} %>
-
-        <!-- <div id="shareImage" class="item photo <%- image.imageId %>" style="grid-row-end: span 11;"> -->
+    <div id="shareImage" class="item photo <%- image.imageId %> <%- image.orientation %>" style="grid-row-end: span 11;">
         <div class="content">
           <div class="title">
             <h3><%- image.title %></h3>
@@ -177,7 +162,7 @@
         </div>
       </div>
       <div class="grid"></div>
-
+    </div>
       <!-- image card template -->
       <div id="photoCard" class="item photo" style="display:none">
         <div class="content">
@@ -266,6 +251,7 @@
           <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
         </div>
       </div>
+    
 
 </body>
 <footer>

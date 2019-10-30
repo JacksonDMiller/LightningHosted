@@ -151,13 +151,18 @@ router.post('/upload', function (req, res) {
         };
     });
     function newRecord(extension, lndResponse) {
-        var ogType = 'article'
-        var twitterCard ='summary_large_image'
+        var ogType = 'article';
+        var twitterCard ='summary_large_image';
+        var orientation = 'horizontal';
         if (extension === 'mp4'){
             ogType = 'video.other'
             twitterCard ='player'
-        }
+        };
+        if (newImageDimensions.height > newImageDimensions.width){
+            orientation = 'vertical';
+        };
         req.user.images.push({
+            orientation: orientation,
             imageId: fileName,
             reviewStatus: false,
             payStatus: false,

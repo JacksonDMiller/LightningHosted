@@ -36,6 +36,7 @@ const imageSchema = new Schema({
     numberOfComments: Number,
     fileType: String,
     ogType: String,
+    orientation: String,
     comments: [commentSchema]
     
 });
