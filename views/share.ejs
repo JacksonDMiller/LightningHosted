@@ -110,13 +110,14 @@
         <% } %>
         <div class="shareDesc">
           <p>Views: <%- image.views %></p>
-          <p>Upvotes: <span class="upVotes"> <%- image.upVotes %> </span> <button class="upVotebtn"
-              onclick="upvoteImage('<%-image.imageId%>')"><span id="<%- image.imageId %>"
-                class="chevron top"></span></button></p>
           <p>Comments: <%- image.numberOfComments %></p>
+          <p class=upvotesP>Upvotes: <%- image.upVotes %> </p>
+          <button class="upVotebtn" onclick="upvoteImage('<%-image.imageId%>')"><span id="<%- image.imageId %>"
+              class="chevron top"></span></button>
+          
           <div class=shareContainer>
-          <p class='shareText'>Share:</p>
-          <div id="share-buttons">
+            <p class='shareText'>Share:</p>
+            <div id="share-buttons">
               <!-- Facebook -->
               <a href="http://www.facebook.com/sharer.php?u=https://LightningHosted.com/s/<%- image.imageId %>"
                 target="_blank">
@@ -134,8 +135,8 @@
                 target="_blank">
                 <img src="https://simplesharebuttons.com/images/somacro/twitter.png" alt="Twitter" />
               </a>
+            </div>
           </div>
-        </div>
           <div id='commentSection'>
             <div id='comments'>
 

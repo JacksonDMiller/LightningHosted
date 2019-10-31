@@ -152,6 +152,7 @@ router.get('/comment/:imageId/:commentId/:comment', (req, res) => {
 
                             })
                         }
+                        element.numberOfComments++
                     })
                 }
             })

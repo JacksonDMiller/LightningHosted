@@ -173,14 +173,15 @@ h2 {
   padding: 10px 10px 5px 10px;
   background-color: var(--cardColor);
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  justify-items: center;
+  grid-template-columns: 1fr 1fr .75fr .25fr;
 }
 
 .shareDesc {
   padding: 10px 10px 5px 10px;
   background-color: var(--cardColor);
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr .75fr .25fr ;
   align-items: center;
   justify-items: center;
 }
@@ -360,24 +361,20 @@ input {
   .grid {
     margin: 10px 0px 0px 0px !important;
   }
-  .btn {
-    font-size: 0.8rem !important;
-  }
-  .upVotebtn {
-    font-size: 0.8rem !important;
-  }
+
+
   .horizontal {
     grid-column: auto;
   }
   /* MOBILE HEADINGS */
   h1 {
-    font-size: 1.9rem;
+    font-size: 1.9rem  !important;
   }
   h2 {
-    font-size: 1rem;
+    font-size: 1rem  !important;
   }
-  p {
-    font-size: 0.8rem;
+  p, a {
+    font-size: 0.8rem  !important;
   }
   /* MOBILE NAVIGATION */
   .navbar ul {
@@ -400,7 +397,7 @@ input {
     margin-top: 50px;
   }
   .navbar li a {
-    font-size: 1rem;
+    font-size: 1.2rem !important;
   }
   .menu-toggle, .bar {
     display: block;
@@ -639,10 +636,10 @@ input {
   cursor: pointer;
   font-size: 1.1rem;
   outline: none;
-  top: 0;
-  vertical-align: text-top;
   background: var(--cardColor);
   color: #fff;
+  justify-self: flex-start;
+  padding-left: 2px;
 }
 
 .upVoted {
@@ -731,6 +728,7 @@ margin: 5px;
   color: var(--textColor);
   margin: 20px;
 }
+
 
 .chevron::before {
   border-style: solid;
@@ -1105,4 +1103,12 @@ video::-webkit-media-controls-panel{
 .shareLink {
   z-index: 1;
   
+}
+
+.upvotesP{
+  justify-self: end;
+}
+
+.outSide{
+  justify-self: end;
 }
