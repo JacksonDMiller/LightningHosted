@@ -114,10 +114,9 @@
               onclick="upvoteImage('<%-image.imageId%>')"><span id="<%- image.imageId %>"
                 class="chevron top"></span></button></p>
           <p>Comments: <%- image.numberOfComments %></p>
+          <div class=shareContainer>
           <p class='shareText'>Share:</p>
           <div id="share-buttons">
-
-            <span>
               <!-- Facebook -->
               <a href="http://www.facebook.com/sharer.php?u=https://LightningHosted.com/s/<%- image.imageId %>"
                 target="_blank">
@@ -135,8 +134,8 @@
                 target="_blank">
                 <img src="https://simplesharebuttons.com/images/somacro/twitter.png" alt="Twitter" />
               </a>
-            </span>
           </div>
+        </div>
           <div id='commentSection'>
             <div id='comments'>
 
@@ -195,7 +194,7 @@
         <h3 class='titleVal'>Title</h3>
       </div>
       <a class="shareLink" href="/">
-        <video class="photoThumb videoThumb" autoplay loop muted>
+        <video class="photoThumb videoThumb" disableRemotePlayback autoplay loop muted>
           <source class='mp4' src="/" type="video/mp4">
           Your browser does not support the video tag.
         </video>

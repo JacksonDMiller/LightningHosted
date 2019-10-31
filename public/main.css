@@ -180,12 +180,13 @@ h2 {
   padding: 10px 10px 5px 10px;
   background-color: var(--cardColor);
   display: grid;
-  grid-template-columns: 2fr 2fr 2fr 2fr 2fr;
+  grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
+  justify-items: center;
 }
 
 .shareText {
-  text-align: right;
+  display: inline-block;
 }
 
 .desc {
@@ -755,8 +756,13 @@ margin: 5px;
 
 #share-buttons a {
   text-decoration: none;
+ 
 }
 
+#share-buttons{
+  display: inline-block;
+  vertical-align: middle;
+}
 /* contact css */
 
 #contactPageContainer {
@@ -1081,4 +1087,22 @@ margin: 5px;
 .videoThumb{
   width: 100%;
   height: 100%;
+}
+
+.shareContainer{
+  grid-column: 1/-1;
+  justify-self: center;
+}
+
+video::-webkit-media-controls-overlay-play-button {
+  display: none;
+}
+
+video::-webkit-media-controls-panel{
+  display: none;
+}
+
+.shareLink {
+  z-index: 1;
+  
 }
