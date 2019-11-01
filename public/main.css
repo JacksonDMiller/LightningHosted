@@ -697,7 +697,7 @@ margin: 5px;
   margin-right: auto;
 }
 
-#shareImageTall {
+#shareImage.vertical {
   max-width: 500px;
   margin: 20px;
   color: white;
