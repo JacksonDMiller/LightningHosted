@@ -992,7 +992,7 @@ margin: 5px;
   align-self: center;
 }
 
-.deleteBtn:hover, .copyBtn:hover{
+.deleteBtn:hover, .copyBtn:hover, .registerBtn:hover{
   background: var(--navColor)
 }
 
@@ -1002,6 +1002,8 @@ margin: 5px;
     width: 100px;
     justify-self: center;
 }
+
+.registerBtn
 
 .withdrawBtn{
   background: var(--cardColor) !important;
@@ -1102,10 +1104,6 @@ margin: 5px;
 
 video::-webkit-media-controls-overlay-play-button {
   display: none;
-}
-
-video::-webkit-media-controls-panel{
-  /* display: none; */
 }
 
 .shareLink {

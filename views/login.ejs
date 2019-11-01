@@ -48,7 +48,7 @@
     </div>
 
     <form class='loginGrid' action="/noauth/login/submit" method="post">
-      <button class='btn deleteBtn thirdPartyLoginBtn' type="button" onclick="location.href='/noauth/google';">Log In
+      <button class='btn registerBtn thirdPartyLoginBtn' type="button" onclick="location.href='/noauth/google';">Log In
         With Google</button>
       <p class="loginMessage thirdPartyLoginBtn"><%= messages.error %> </p>
       <label class='thirdPartyLoginBtn' for="username"><b>Username</b></label>
@@ -57,8 +57,8 @@
       <label class='thirdPartyLoginBtn' for="password"><b>Password</b></label>
       <input class='thirdPartyLoginBtn' type="password" placeholder="Enter Password" name="password" required>
 
-      <button class='btn deleteBtn thirdPartyLoginBtn' type="submit">Login</button>
-      <input class='btn deleteBtn thirdPartyLoginBtn' type="button" onclick="location.href='/noauth/register';"
+      <button class='btn registerBtn thirdPartyLoginBtn' type="submit">Login</button>
+      <input class='btn registerBtn thirdPartyLoginBtn' type="button" onclick="location.href='/noauth/register';"
         value="Register" />
     </form>
 
