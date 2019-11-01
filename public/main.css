@@ -174,7 +174,8 @@ h2 {
   background-color: var(--cardColor);
   display: grid;
   justify-items: center;
-  grid-template-columns: 1fr 1fr .75fr .1fr ;
+  grid-template-columns:.75fr 1.15fr .85fr .25fr;
+  font-size: .8rem;
 }
 
 .shareDesc {
@@ -194,7 +195,7 @@ h2 {
   padding: 10px 10px 5px 10px;
   background-color: var(--cardColor);
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr .75fr 1.25fr;
   align-items: center;
 }
 
@@ -995,6 +996,13 @@ margin: 5px;
   background: var(--navColor)
 }
 
+
+.deleteBtn{
+    grid-column: 1 / -1;
+    width: 100px;
+    justify-self: center;
+}
+
 .withdrawBtn{
   background: var(--cardColor) !important;
   margin-left: 5px;
@@ -1097,7 +1105,7 @@ video::-webkit-media-controls-overlay-play-button {
 }
 
 video::-webkit-media-controls-panel{
-  display: none;
+  /* display: none; */
 }
 
 .shareLink {

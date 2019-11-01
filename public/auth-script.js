@@ -43,6 +43,9 @@ $.get("./user/", function (data, status) {
 });
 
 function addCard(image, append) {
+    if(image.numberOfComments == undefined){
+        image.numberOfComments = 0;
+    }
     if (getExtension(image.fileName) === 'mp4') {
         var newCard = $("#videoCard").clone();
         newCard.toggle();
@@ -54,6 +57,8 @@ function addCard(image, append) {
         newCard.find('.views').text(image.views);
         newCard.find('.upvotes').text(image.upVotes);
         newCard.find('.sats').text(image.sats);
+        newCard.find('.numberOfComments').text(image.numberOfComments);
+        newCard.find('.commentsLink').attr('href', '/s/' + image.imageId);
         newCard.find('.btn').attr('onclick', 'deleteImage("' + image.imageId + '")');
         if (image.title === '') {
             var newTitle = $("#TitleInputTemp").clone();
@@ -88,6 +93,8 @@ function addCard(image, append) {
         newCard.find('.views').text(image.views);
         newCard.find('.upvotes').text(image.upVotes);
         newCard.find('.sats').text(image.sats);
+        newCard.find('.numberOfComments').text(image.numberOfComments);
+        newCard.find('.commentsLink').attr('href', '/s/' + image.imageId);
         newCard.find('.btn').attr('onclick', 'deleteImage("' + image.imageId + '")');
         if (image.title === '') {
             var newTitle = $("#TitleInputTemp").clone();
