@@ -996,6 +996,9 @@ margin: 5px;
   background: var(--navColor)
 }
 
+.copyBtn {
+  vertical-align: text-bottom;
+}
 
 .deleteBtn{
     grid-column: 1 / -1;

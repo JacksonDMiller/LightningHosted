@@ -142,7 +142,6 @@ function checkPaymentStatus(invoice, incrment) {
             setTimeout(() => {
                 showThankYou(window.location.hostname + '/s/' + data.imageId)
             }, 1000)
-            // this link will not work in production
 
         }
     })
@@ -221,7 +220,6 @@ function clearMessage() {
             $('#message-image').html('')
             $('#message').text('');
             $('#message-invoice').text('');
-            $('.copyBtn').remove();
             $('.shareButtons').remove();
         }, 500);
     }
@@ -239,7 +237,6 @@ function showPayment(image, invoice) {
 function showThankYou(link) {
     $('#message').text('Thank you please use this link to share your photo and earn some sats!');
     $('#message-link').text(link)
-    $('#message-container').append('<button class="btn copyBtn" onclick="copy()">Copy</button>')
     var shareBtns = $('.shareButtonsTemplate').clone()
     shareBtns.removeClass('shareButtonsTemplate').addClass('shareButtons')
     shareBtns.find('.facebookLink').attr('href', "http://www.facebook.com/sharer.php?u=" + link)
