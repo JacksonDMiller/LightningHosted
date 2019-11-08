@@ -118,6 +118,10 @@ h2 {
   margin-bottom: 10px;
 }
 
+.profile {
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)) !important;
+}
+
 .grid {
   margin: 10px 10px 0px 10px;
   display: grid;
@@ -197,6 +201,7 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 1fr .75fr 1.25fr;
   align-items: center;
+  justify-items: center;
 }
 
 .desc img, .descNoAuth img {
