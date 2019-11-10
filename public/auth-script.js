@@ -236,14 +236,15 @@ function showPayment(image, invoice) {
 
 function showThankYou(link) {
     $('#message').text('Thank you please use this link to share your photo and earn some sats!');
-    $('#message-link').text(link)
-    var shareBtns = $('.shareButtonsTemplate').clone()
-    shareBtns.removeClass('shareButtonsTemplate').addClass('shareButtons')
-    shareBtns.find('.facebookLink').attr('href', "http://www.facebook.com/sharer.php?u=" + link)
-    shareBtns.find('.redditLink').attr('href', "http://reddit.com/submit?url=" + link)
-    shareBtns.find('.twitterLink').attr('href', "https://twitter.com/share?url=http://" + link + "&text=LightningHosted.com&hashtags=LightningHosted")
+    $('#message-link').text(link);
+    $('#why').remove();
+    var shareBtns = $('.shareButtonsTemplate').clone();
+    shareBtns.removeClass('shareButtonsTemplate').addClass('shareButtons');
+    shareBtns.find('.facebookLink').attr('href', "http://www.facebook.com/sharer.php?u=" + link);
+    shareBtns.find('.redditLink').attr('href', "http://reddit.com/submit?url=" + link);
+    shareBtns.find('.twitterLink').attr('href', "https://twitter.com/share?url=http://" + link + "&text=LightningHosted.com&hashtags=LightningHosted");
     shareBtns.toggle();
-    $('#message-container').append(shareBtns)
+    $('#message-container').append(shareBtns);
     setTimeout(function () {
         $('#message-container').slideToggle('slow')
     }, 100);

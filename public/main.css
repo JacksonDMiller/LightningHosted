@@ -118,6 +118,10 @@ h2 {
   margin-bottom: 10px;
 }
 
+#why{
+  display: block;
+}
+
 .profile {
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)) !important;
 }
