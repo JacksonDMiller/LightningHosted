@@ -45,7 +45,6 @@ var credentials = grpc.credentials.combineChannelCredentials(sslCreds, macaroonC
 var lnrpcDescriptor = grpc.load("./config/rpc.proto");
 var lnrpc = lnrpcDescriptor.lnrpc;
 
-// Testing
 var lightning = new lnrpc.Lightning(keys.lnd.uri, credentials);
 
 var call = lightning.subscribeInvoices({});
@@ -164,8 +163,7 @@ router.post('/upload', function (req, res) {
             orientation: orientation,
             imageId: fileName,
             reviewStatus: false,
-            payStatus: false,
-            // payStatus: true, //testing
+            payStatus: true,
             deleted: false,
             views: 0,
             reports: 0,

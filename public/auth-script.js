@@ -17,8 +17,13 @@ pondOne.setOptions(
             process: {
                 onload: (res) => {
                     res = JSON.parse(res);
-                    showPayment(res.image, res.invoice)
-                    checkPaymentStatus(res.invoice)
+                    //added this to make uploading free temporairly 
+                    showFreeThankYou(window.location.hostname + '/s/' + res.imageId);
+                        //commented these out to make uploading free temprairly.
+                        // showPayment(res.image, res.invoice)
+                        // checkPaymentStatus(res.invoice)
+                     checkPaymentStatusFree(res.invoice)
+
                     return res;
                 },
                 fetch: null,
@@ -147,6 +152,26 @@ function checkPaymentStatus(invoice, incrment) {
     })
 };
 
+function checkPaymentStatusFree(invoice, incrment) {
+    if (incrment === undefined) {
+        incrment = 1
+    }
+    $.get("./paymentStatus/" + invoice, function (data, status) {
+        if (data.payStatus === false) {
+            if (incrment === 300) {
+                return
+            }
+            incrment++
+            setTimeout(() => {
+                checkPaymentStatus(invoice, incrment)
+            }, 1000)
+        }
+        else {
+            addCard(data, true)
+        }
+    })
+};
+
 function deleteImage(id) {
     $.sweetModal.confirm('Are you sure you want to delete this image?', function () {
         $.get("./delete/" + id, function (data, status) {
@@ -236,6 +261,25 @@ function showPayment(image, invoice) {
 
 function showThankYou(link) {
     $('#message').text('Thank you please use this link to share your photo and earn some sats!');
+    $('#message-link').text(link);
+    $('#why').remove();
+    var shareBtns = $('.shareButtonsTemplate').clone();
+    shareBtns.removeClass('shareButtonsTemplate').addClass('shareButtons');
+    shareBtns.find('.facebookLink').attr('href', "http://www.facebook.com/sharer.php?u=" + link);
+    shareBtns.find('.redditLink').attr('href', "http://reddit.com/submit?url=" + link);
+    shareBtns.find('.twitterLink').attr('href', "https://twitter.com/share?url=http://" + link + "&text=LightningHosted.com&hashtags=LightningHosted");
+    shareBtns.toggle();
+    $('#message-container').append(shareBtns);
+    setTimeout(function () {
+        $('#message-container').slideToggle('slow')
+    }, 100);
+
+}
+
+
+function showFreeThankYou(link) {
+    $('#message-invoice').remove();
+    $('#message').text('Thank you! Your upload is free today! Please use this link to share your photo and earn some sats!');
     $('#message-link').text(link);
     $('#why').remove();
     var shareBtns = $('.shareButtonsTemplate').clone();
