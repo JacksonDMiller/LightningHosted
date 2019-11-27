@@ -37,6 +37,8 @@ const imageSchema = new Schema({
     fileType: String,
     ogType: String,
     orientation: String,
+    twitterCard: String,
+    suppressed:  Boolean,
     comments: [commentSchema]
     
 });

@@ -180,7 +180,8 @@ router.post('/upload', function (req, res) {
             numberOfComments: 0,
             fileType: extension,
             ogType: ogType,
-            twitterCard: twitterCard, 
+            twitterCard: twitterCard,
+            suppressed:  false,
         })
         req.user.save().then(() => {
             qrCode.toDataURL(lndResponse.payment_request, function (err, url) {

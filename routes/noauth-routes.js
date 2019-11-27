@@ -94,7 +94,7 @@ router.get('/topPosts/:page', (req, res) => {
                 if (element.images[image].score < 0) {
                     element.images[image].score = 0;
                 }
-                if (element.images[image].deleted != true && element.images[image].payStatus === true) {
+                if (element.images[image].deleted != true && element.images[image].payStatus === true && element.images[image].suppressed != true) {
                     topPostsList.push(element.images[image])
                 }
             }
