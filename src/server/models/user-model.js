@@ -17,6 +17,7 @@ const commentSchema = new Schema({
 })
 
 const imageSchema = new Schema({
+    userId: String,
     imageId: String,
     reviewStatus: Boolean,
     payStatus: Boolean,
@@ -32,15 +33,15 @@ const imageSchema = new Schema({
     caption: String,
     paymentRequest: String,
     upVotes: Number,
-    sats :Number,
+    sats: Number,
     numberOfComments: Number,
     fileType: String,
     ogType: String,
     orientation: String,
     twitterCard: String,
-    suppressed:  Boolean,
+    suppressed: Boolean,
     comments: [commentSchema]
-    
+
 });
 
 const accountSchema = new Schema({
@@ -57,7 +58,7 @@ const accountSchema = new Schema({
     images: [imageSchema]
 });
 
-const User = mongoose.model('User', accountSchema);
- 
+const Users = mongoose.model('Users', accountSchema);
 
-module.exports = User;
+
+module.exports = Users;
