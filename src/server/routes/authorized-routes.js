@@ -14,17 +14,19 @@ var upload = multer({
     // filter uploaded files using molter
     fileFilter: function fileFilter(req, file, cb) {
         const acceptedMimeTypes = ["image/jpeg", "video/mp4", "image/gif", "image/png"]
-        console.log(file.mimetype)
-        if (acceptedMimeTypes.includes(file.mimetype) && req.user) {
-            console.log('accepted')
+        if (!req.user) {
+            cb('Error: please login first', false)
+        }
+        if (!acceptedMimeTypes.includes(file.mimetype)) {
+            console.log('rejected')
             //accept
-            cb(null, true)
+            cb('Error: Unsported file type', false)
         }
         else {
             //reject
-            console.log('rejected!!')
+            console.log('accepted')
 
-            cb('Error: Unsported file type', false)
+            cb(null, true)
         }
         // The function should call `cb` with a boolean
         // to indicate if the file should be accepted
@@ -57,71 +59,93 @@ module.exports = function (app) {
 
     //handles the upload, compression, creation of thumbnail, and setting image info for a new image and creates a new database entry.
     app.post('/api/upload', upload.single("filepond"), function (req, res, next) {
-        if (err instanceof multer.MulterError) {
-            console.log(err)
-            res.status(500).send(err);
-        }
-        if (!req.user) {
-            return res.status(400).send('Please login first')
-        }
+
         if (Object.keys(req.file).length === 0) {
             console.log('no files were uploaded')
             return res.status(400).send('No files were uploaded.');
         }
+        else {
+            var imageWidth = 0;
+            var imageHeight = 0;
+            var imageOrientation = 'horizontal'
+            var imageExtension = 'jpeg'
+            var imageFileName = crypto.randomBytes(8).toString('hex');
 
-        var imageWidth = 0;
-        var imageHeight = 0;
-        var imageOrientation = 'horizontal'
-        var imageExtension = 'jpeg'
-        var imageFileName = crypto.randomBytes(8).toString('hex');
 
+            if (req.file.mimetype === 'image/gif') {
+                imageExtension = 'gif'
+                fs.copyFileSync(req.file.path, 'src/server/uploads/compressed/' + imageFileName + '.gif', makeThumbnail())
+            }
+            // it's not working because its and array of objects not an array 
+            if (req.file.mimetype === 'image/jpeg' || req.file.mimetype === 'image/png') {
+                sharp(req.file.path).jpeg({ quality: 75, force: true }).rotate().toFile('src/server/uploads/compressed/' + imageFileName + '.' + 'jpeg', function (err) {
+                    if (err) {
+                        // find a good way to do some error loggin here.
+                        console.log(err);
+                        res.status(500).send('Something went wrong.');
+                    }
+                    makeThumbnail();
+                })
+            }
 
-        if (req.file.mimetype === 'image/gif') {
-            imageExtension = 'gif'
-            fs.copyFileSync(req.file.path, 'src/server/uploads/compressed/' + imageFileName + '.gif', makeThumbnail())
-        }
-        // it's not working because its and array of objects not an array 
-        if (req.file.mimetype === 'image/jpeg' || req.file.mimetype === 'image/png') {
-            sharp(req.file.path).jpeg({ quality: 75, force: true }).rotate().toFile('src/server/uploads/compressed/' + imageFileName + '.' + 'jpeg', function (err) {
-                if (err) {
-                    // find a good way to do some error loggin here.
-                    console.log(err);
-                    res.status(500).send('Something went wrong.');
-                }
-                makeThumbnail();
-            })
-        }
-
-        if (req.file.mimetype === 'video/mp4') {
-            imageExtension = 'mp4'
-            const tg = new ThumbnailGenerator({
-                sourcePath: req.file.path,
-                thumbnailPath: 'src/server/uploads/thumbnails/',
-            });
-            tg.generateOneByPercentCb(90, { size: imageWidth + 'x' + imageHeight }, (err, result) => {
-                if (err) {
-                    console.log(err);
-                    res.status(500).send(err);
-                }
-                sharp('src/server/uploads/thumbnails/' + result).jpeg({ quality: 80, force: true }).toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg', function (err) {
+            if (req.file.mimetype === 'video/mp4') {
+                imageExtension = 'mp4'
+                const tg = new ThumbnailGenerator({
+                    sourcePath: req.file.path,
+                    thumbnailPath: 'src/server/uploads/thumbnails/',
+                });
+                tg.generateOneByPercentCb(90, { size: imageWidth + 'x' + imageHeight }, (err, result) => {
                     if (err) {
                         console.log(err);
                         res.status(500).send(err);
                     }
-                    fs.unlink('src/server/uploads/thumbnails/' + result, function (err) {
+                    sharp('src/server/uploads/thumbnails/' + result).jpeg({ quality: 80, force: true }).toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg', function (err) {
                         if (err) {
                             console.log(err);
-                        };
-                    });
-                    fs.unlink('src/server/uploads/' + req.file.filename, function (err) {
-                        if (err) {
-                            console.log(err);
-                        };
-                    });
+                            res.status(500).send(err);
+                        }
+                        fs.unlink('src/server/uploads/thumbnails/' + result, function (err) {
+                            if (err) {
+                                console.log(err);
+                            };
+                        });
+                        fs.unlink('src/server/uploads/' + req.file.filename, function (err) {
+                            if (err) {
+                                console.log(err);
+                            };
+                        });
 
-                    imageSize('src/server/uploads/thumbnails/' + imageFileName + '.jpeg', function (err, dimensions) {
+                        imageSize('src/server/uploads/thumbnails/' + imageFileName + '.jpeg', function (err, dimensions) {
+                            if (err) {
+                                console.log(err);
+                                res.status(500).send(err);
+                            }
+                            imageWidth = dimensions.width;
+                            imageHeight = dimensions.height;
+                            if (imageHeight > imageWidth) {
+                                imageOrientation = 'vertical';
+                            };
+                            addDatabaseRecord();
+                        });
+
+
+                    });
+                });
+                fs.copyFile(req.file.path, 'src/server/uploads/compressed/' + imageFileName + '.mp4', function (err) {
+                    if (err) {
+                        console.log(err);
+                    };
+                })
+            }
+
+            function makeThumbnail() {
+                sharp(req.file.path).jpeg({ quality: 40, force: true }).rotate().toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg', function (err) {
+                    if (err) {
+                        console.log(err);
+                        res.status(500).send(err);
+                    }
+                    imageSize('src/server/uploads/compressed/' + imageFileName + '.' + imageExtension, function (err, dimensions) {
                         if (err) {
-                            console.log(err);
                             res.status(500).send(err);
                         }
                         imageWidth = dimensions.width;
@@ -132,72 +156,45 @@ module.exports = function (app) {
                         addDatabaseRecord();
                     });
 
+                    fs.unlink('src/server/uploads/' + req.file.filename, function (err) {
+                        if (err) {
+                            console.log(err);
+                        };
+                    });
+                })
 
-                });
-            });
-            fs.copyFile(req.file.path, 'src/server/uploads/compressed/' + imageFileName + '.mp4', function (err) {
-                if (err) {
-                    console.log(err);
-                };
-            })
-        }
+            }
 
-        function makeThumbnail() {
-            sharp(req.file.path).jpeg({ quality: 40, force: true }).rotate().toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg', function (err) {
-                if (err) {
-                    console.log(err);
-                    res.status(500).send(err);
-                }
-                imageSize('src/server/uploads/compressed/' + imageFileName + '.' + imageExtension, function (err, dimensions) {
-                    if (err) {
-                        res.status(500).send(err);
-                    }
-                    imageWidth = dimensions.width;
-                    imageHeight = dimensions.height;
-                    if (imageHeight > imageWidth) {
-                        imageOrientation = 'vertical';
-                    };
-                    addDatabaseRecord();
-                });
+            function addDatabaseRecord() {
 
-                fs.unlink('src/server/uploads/' + req.file.filename, function (err) {
-                    if (err) {
-                        console.log(err);
-                    };
-                });
-            })
-
-        }
-
-        function addDatabaseRecord() {
-
-            req.user.images.push({
-                posterId: req.user._id,
-                orientation: imageOrientation,
-                imageId: imageFileName,
-                reviewStatus: false,
-                payStatus: false,
-                deleted: false,
-                views: 0,
-                reports: 0,
-                fileName: imageFileName + '.' + imageExtension,
-                thumbNail: imageFileName + '.jpeg',
-                width: imageWidth,
-                height: imageHeight,
-                date: new (Date),
-                title: '',
-                caption: '',
-                paymentRequest: 0,
-                upVotes: 0,
-                sats: 0,
-                numberOfComments: 0,
-                fileType: imageExtension,
-                ogType: 'ogType',
-                twitterCard: 'twitterCard',
-                suppressed: false,
-            })
-            req.user.save()
-            res.send([req.file.filename]);
+                req.user.images.push({
+                    posterId: req.user._id,
+                    orientation: imageOrientation,
+                    imageId: imageFileName,
+                    reviewStatus: false,
+                    payStatus: false,
+                    deleted: false,
+                    views: 0,
+                    reports: 0,
+                    fileName: imageFileName + '.' + imageExtension,
+                    thumbNail: imageFileName + '.jpeg',
+                    width: imageWidth,
+                    height: imageHeight,
+                    date: new (Date),
+                    title: '',
+                    caption: '',
+                    paymentRequest: 0,
+                    upVotes: 0,
+                    sats: 0,
+                    numberOfComments: 0,
+                    fileType: imageExtension,
+                    ogType: 'ogType',
+                    twitterCard: 'twitterCard',
+                    suppressed: false,
+                })
+                req.user.save()
+                res.send([req.file.filename]);
+            }
         }
     });
 }
