@@ -1,6 +1,8 @@
 import React from 'react'
 import M from 'materialize-css/dist/js/materialize.min.js';
 import { BrowserRouter, Link } from 'react-router-dom';
+import '../app.css';
+import "materialize-css/dist/css/materialize.min.css";
 
 const Navbar = () => {
     document.addEventListener('DOMContentLoaded', function () {

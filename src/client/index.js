@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import Navbar from './Components/Navbar';
 import { BrowserRouter, Link, Switch, Route, useParams } from 'react-router-dom';
 import Home from './Components/Home'
 import "materialize-css/dist/css/materialize.min.css";
@@ -14,12 +14,12 @@ function BlogPost() {
 
 ReactDOM.render(
     <BrowserRouter>
-        <App />
+        <Navbar />
         <Switch>
             <Route exact path='/' component={Home} />
             <Route path='/uploader' component={Uploader} />
-            <Route path="/blog/:image" component={Share} />
+            <Route path="/s/:imageId" component={Share} />
         </Switch>
 
-    </BrowserRouter>
+    </BrowserRouter >
     , document.getElementById('root'));

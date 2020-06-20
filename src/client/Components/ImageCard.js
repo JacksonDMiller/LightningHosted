@@ -8,7 +8,7 @@ const ImageCard = (props) => {
             <div className="card">
                 <div className="card-title center-align">Card Title</div>
                 <div className="card-image">
-                    {props.imageData.fileType === 'mp4' ? <video controls autoPlay loop className='responsive-video'> <source src={"/api/i/" + props.imageData.fileName} type="video/mp4" /></video>
+                    {props.imageData.fileType === 'mp4' ? <video autoPlay muted loop className='responsive-video'> <source src={"/api/i/" + props.imageData.fileName} type="video/mp4" /></video>
                         : <img src={"/api/i/" + props.imageData.fileName} alt="image" />}
 
                 </div>
