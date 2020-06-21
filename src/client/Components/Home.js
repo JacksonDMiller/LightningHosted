@@ -35,9 +35,7 @@ export default class Home extends Component {
         const { images } = this.state;
         return (
             <div>
-                <Uploader />
                 <InfiniteScroll
-
                     dataLength={images.length}
                     next={this.getMoreImages}
                     hasMore={this.state.hasMore}

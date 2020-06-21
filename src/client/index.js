@@ -4,7 +4,7 @@ import Navbar from './Components/Navbar';
 import { BrowserRouter, Link, Switch, Route, useParams } from 'react-router-dom';
 import Home from './Components/Home'
 import "materialize-css/dist/css/materialize.min.css";
-import Uploader from './Components/Uploader';
+import Profile from './Components/Profile';
 import Share from './Components/Share';
 
 function BlogPost() {
@@ -17,7 +17,7 @@ ReactDOM.render(
         <Navbar />
         <Switch>
             <Route exact path='/' component={Home} />
-            <Route path='/uploader' component={Uploader} />
+            <Route path='/profile' component={Profile} />
             <Route path="/s/:imageId" component={Share} />
         </Switch>
 
