@@ -19,7 +19,10 @@ const Navbar = () => {
                     <ul id="nav-mobile" className="right hide-on-med-and-down">
                         <li> <Link to="/about">About</Link> </li>
                         <li> <Link to="/">Home</Link> </li>
-                        <li> <Link to="/Uploader">Uploader</Link> </li>
+                        <li> <Link to="/Profile">Profile</Link> </li>
+                        <li> <Link to="/login">Login In</Link> </li>
+                        <li> <Link to="/contact">Contact Us</Link> </li>
+
                     </ul>
                 </div>
 
@@ -27,7 +30,9 @@ const Navbar = () => {
             <ul id="slide-out" className="sidenav">
                 <li className="sidenav-close"> <Link to="/about">About</Link> </li>
                 <li className="sidenav-close"> <Link to="/">Home</Link> </li>
-                <li className="sidenav-close"> <Link to="/Uploader">Uploader</Link> </li>
+                <li className="sidenav-close"> <Link to="/Profile">Profile</Link> </li>
+                <li className="sidenav-close"> <Link to="/login">Login in</Link> </li>
+                <li className="sidenav-close"> <Link to="/contact">Contact Us</Link> </li>
             </ul>
 
         </div>

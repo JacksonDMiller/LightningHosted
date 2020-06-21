@@ -12,7 +12,7 @@ export default class Profile extends Component {
         fetch('/api/pi/')
             .then(res => res.json())
             .then(userData => {
-                
+
                 this.setState({
                     images: userData.images,
                 })
@@ -26,19 +26,19 @@ export default class Profile extends Component {
     render() {
         const { images } = this.state;
         return (
-            <div>
-                <Uploader/>
+            <div className='container'>
+                <Uploader />
 
-                    <Masonry
-                        breakpointCols={4}
-                        className="my-masonry-grid"
-                        columnClassName="my-masonry-grid_column">
+                <Masonry
+                    breakpointCols={4}
+                    className="my-masonry-grid"
+                    columnClassName="my-masonry-grid_column">
 
-                        {images ? images.map((image) => {
-                            return <ImageCard key={image.imageId} imageData={image} />
-                        }) : null}
+                    {images ? images.map((image) => {
+                        return <ImageCard key={image.imageId} imageData={image} />
+                    }) : null}
 
-                    </Masonry>
+                </Masonry>
             </div >
         )
     }

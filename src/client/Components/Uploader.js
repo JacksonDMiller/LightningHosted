@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import axios from 'axios';
+var QRCode = require('qrcode.react');
 
 
 // Import React FilePond
@@ -18,44 +18,34 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 // Register the plugins
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileValidateSize);
 
-// Our app
-// class Uploader extends Component {
-
-//     state = {
-//         // Set initial files, type 'local' means this is a file
-//         // that has already been uploaded to the server (see docs)
-//         file: []
-//     }
-
-//     render() {
-//         return (
-
-//             <FilePond
-
-//                 files={this.state.file}
-//                 allowMultiple={false}
-//                 server="/api/upload"
-//                 instantUpload={false}
-//                 maxFileSize='5mb'
-//             >
-//             </FilePond >
-
-//         );
-//     }
-// }
-
-
 
 function Uploader() {
     const [file, setFiles] = useState([])
+    const [invoice, setInvoice] = useState(null)
+    const [paid, setPaid] = useState('false')
     return (
-        <FilePond
-            files={file}
-            allowMultiple={false}
-            server="/api/upload"
-            instantUpload={false}
-            maxFileSize='5mb'
-        />
+        <div>
+            {invoice ? <QRCode value={invoice} /> : null}
+            <span>{paid === true ? 'Paid' : null} </span>
+            <FilePond
+                files={file}
+                allowMultiple={false}
+                server={{
+                    process: {
+                        url: "/api/upload",
+                        onload: (res) => setInvoice(JSON.parse(res).paymentRequest)
+                    },
+                    revert: null,
+                    restore: null,
+                    load: null,
+                    fetch: null,
+                }
+                }
+                instantUpload={false}
+                maxFileSize='5mb'
+            />
+
+        </div>
     )
 }
 
