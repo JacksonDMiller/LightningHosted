@@ -62,7 +62,7 @@ module.exports = function (app) {
             var imageInvoice = createInvoice({ lnd, description: 'LightningHosted deposit', tokens: '100' })
 
             const processedImage = new Promise(async (resolve, reject) => {
-                console.log('starting image proccessing')
+                // console.log('starting image proccessing')
                 //this error hanlding does not work :( try to fix it
                 if (req.file.mimetype === 'image/gif') {
                     await fsPromises.rename(req.file.path, 'src/server/uploads/compressed/' + imageFileName + '.gif')
@@ -84,11 +84,11 @@ module.exports = function (app) {
 
             })
             await processedImage.then(ext => imageExtension = ext).catch((err) => console.log(err));
-            console.log('image has been proccesed')
+            // console.log('image has been proccesed')
 
 
             const getDimensions = new Promise(async (resolve, reject) => {
-                console.log('getting dimensions')
+                // console.log('getting dimensions')
                 if (imageExtension === 'mp4') {
                     result = await getVideoDimensions('src/server/uploads/compressed/' + imageFileName + '.mp4')
                     resolve(result)
@@ -102,11 +102,11 @@ module.exports = function (app) {
             })
 
             var dimensions = await getDimensions.then((d) => dimensions = d);
-            console.log(dimensions, 'got dimensions')
+            // console.log(dimensions, 'got dimensions')
 
 
             const generateThumbnail = new Promise(async (resolve, reject) => {
-                console.log('begining thumbnail creation')
+                // console.log('begining thumbnail creation')
                 if (imageExtension === 'mp4') {
                     const tg = new ThumbnailGenerator({
                         sourcePath: 'src/server/uploads/compressed/' + imageFileName + '.mp4',
@@ -128,14 +128,14 @@ module.exports = function (app) {
 
 
             await generateThumbnail
-            console.log('the thumbnail is done')
+            // console.log('the thumbnail is done')
 
 
 
 
             await imageInvoice.then((invoice) => {
                 imageInvoice = invoice;
-                console.log(invoice)
+                // console.log(invoice)
             })
             let imageOrientation = 'horizontal'
             if (dimensions.height > dimensions.width) {
@@ -167,7 +167,7 @@ module.exports = function (app) {
                 twitterCard: 'twitterCard',
                 suppressed: false,
             }
-            console.log(imageData)
+            // console.log(imageData)
             await req.user.images.push(imageData);
             req.user.save();
 

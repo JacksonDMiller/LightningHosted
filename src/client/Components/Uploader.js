@@ -22,7 +22,26 @@ registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, F
 function Uploader() {
     const [file, setFiles] = useState([])
     const [invoice, setInvoice] = useState(null)
-    const [paid, setPaid] = useState('false')
+    const [paid, setPaid] = useState(false)
+
+    const checkForPayment = (invoice) => {
+        var counter = 0
+        var cp = setInterval(async () => {
+            counter = counter + 1
+            if (counter === 300) {
+                clearInterval(cp)
+            }
+            let res = await fetch('/api/checkpayment/' + invoice)
+            console.log(res.status)
+            if (res.status === 200) {
+                setPaid(true)
+                clearInterval(cp)
+            }
+
+        }, 1000);
+    }
+
+
     return (
         <div>
             {invoice ? <QRCode value={invoice} /> : null}
@@ -33,7 +52,11 @@ function Uploader() {
                 server={{
                     process: {
                         url: "/api/upload",
-                        onload: (res) => setInvoice(JSON.parse(res).paymentRequest)
+                        onload: (res) => {
+                            res = JSON.parse(res)
+                            setInvoice(res.paymentRequest);
+                            checkForPayment(res.paymentRequest);
+                        }
                     },
                     revert: null,
                     restore: null,
