@@ -8,15 +8,16 @@ export default class Profile extends Component {
         images: [],
     };
 
-    getUserData = () => {
-        fetch('/api/pi/')
-            .then(res => res.json())
-            .then(userData => {
-
-                this.setState({
-                    images: userData.images,
-                })
-            });
+    getUserData = async () => {
+        var res = await fetch('/api/pi/')
+        if (res.status === 401) {
+            console.log('not authorezed')
+        }
+        res = await res.json()
+        this.setState({
+            images: res.images,
+        })
+        // });
     }
 
     componentDidMount() {

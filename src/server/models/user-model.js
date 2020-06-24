@@ -13,6 +13,8 @@ const commentSchema = new Schema({
     date: Date,
     comment: String,
     upVotes: Number,
+    comenter: String,
+    avatar: String,
     subComments: [subCommentSchema]
 })
 
@@ -40,7 +42,8 @@ const imageSchema = new Schema({
     orientation: String,
     twitterCard: String,
     suppressed: Boolean,
-    comments: [commentSchema]
+    comments: [commentSchema],
+    recentViews: [{ type: String }]
 
 });
 

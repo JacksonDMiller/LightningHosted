@@ -64,4 +64,19 @@ module.exports = function (app) {
         res.send(topPostsList.slice(start, end))
     })
 
+    // incrment page view and store ip address if ip address has not already been seen
+    app.get('/api/incrementPageView/:imageId', async (req, res) => {
+        const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
+        const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
+        if (!doc.images[index].recentViews.includes(req.connection.remoteAddress)) {
+            doc.images[index].views = doc.images[index].views + 1;
+            let arr = doc.images[index].recentViews
+            arr.push(req.connection.remoteAddress)
+            doc.images[index].recentViews = arr
+            console.log(doc.images[index].recentViews)
+            doc.save()
+
+        }
+        res.status(200).send()
+    })
 }

@@ -10,9 +10,8 @@ const Users = require('./models/user-model');
 // setting up express
 const app = express();
 app.use(express.static('dist'));
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
     keys: [keys.session.cookieKey]

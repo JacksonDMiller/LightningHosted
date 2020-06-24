@@ -143,6 +143,7 @@ module.exports = function (app) {
             };
 
             imageData = {
+                recentViews: [],
                 posterId: req.user._id,
                 orientation: imageOrientation,
                 imageId: imageFileName,
@@ -176,11 +177,54 @@ module.exports = function (app) {
         //there is a random false console log in this function no idea why
     })
 
-
+    // photo information change this name
     app.get('/api/pi/', (req, res) => {
-      Users.findById(req.user._id).then((doc) => {
-          res.send(doc)
-      }
-      )
+        if (req.user) {
+            Users.findById(req.user._id).then((doc) => {
+                res.send(doc)
+            })
+        }
+        else {
+            res.status(401).send()
+        }
+    })
+
+    app.get('/api/upvote/:imageId', async (req, res) => {
+
+        if (req.user) {
+            const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
+
+            const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
+            doc.images[index].upVotes = doc.images[index].upVotes + 1;
+            doc.save()
+            res.send({ message: 'ok' })
+        }
+        else {
+            res.send('please login')
+        }
+    })
+
+    app.get('/api/report/:imageId', async (req, res) => {
+        if (req.user) {
+            const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
+            const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
+            doc.images[index].reports = doc.images[index].reports + 1;
+            console.log(index)
+            doc.save()
+            res.send({ message: 'ok' })
+        }
+        else {
+            res.send('please login')
+        }
+    })
+
+    app.post('/api/newcomment', async (req, res) => {
+        if (req.user) {
+            console.log(req.body)
+            res.send({ message: 'ok' })
+        }
+        else {
+            res.send('please login')
+        }
     })
 }
