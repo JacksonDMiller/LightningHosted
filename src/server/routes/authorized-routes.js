@@ -168,7 +168,6 @@ module.exports = function (app) {
                 twitterCard: 'twitterCard',
                 suppressed: false,
             }
-            // console.log(imageData)
             await req.user.images.push(imageData);
             req.user.save();
 
@@ -197,7 +196,7 @@ module.exports = function (app) {
             const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
             doc.images[index].upVotes = doc.images[index].upVotes + 1;
             doc.save()
-            res.send({ message: 'ok' })
+            res.status(200).send()
         }
         else {
             res.send('please login')
@@ -209,9 +208,8 @@ module.exports = function (app) {
             const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
             const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
             doc.images[index].reports = doc.images[index].reports + 1;
-            console.log(index)
             doc.save()
-            res.send({ message: 'ok' })
+            res.status(200).send()
         }
         else {
             res.send('please login')
@@ -219,9 +217,24 @@ module.exports = function (app) {
     })
 
     app.post('/api/newcomment', async (req, res) => {
+        var { imageId, comment } = req.body
         if (req.user) {
-            console.log(req.body)
-            res.send({ message: 'ok' })
+            var newComment = {
+                commentId: 'CI' + crypto.randomBytes(8).toString('hex'),
+                date: new Date,
+                comment: comment,
+                upVotes: 0,
+                comenterId: req.user._id,
+                comenter: req.user.userName,
+                avatar: req.user.avatar,
+            }
+            const doc = await Users.findOne({ 'images.imageId': imageId })
+            const index = await doc.images.findIndex(image => image.imageId === imageId)
+            console.log(doc.images[index])
+            doc.images[index].comments.push(newComment)
+            doc.save()
+            res.status(200).send()
+
         }
         else {
             res.send('please login')

@@ -11,15 +11,18 @@ passport.use(
         clientID: keys.google.clientID,
         clientSecret: keys.google.clientSecret
     }, (accessToken, refreshToken, profile, done) => {
+        console.log(profile.displayName)
         Users.findOne({ thirdPartyId: profile.id }).then((currentUser) => {
             if (currentUser) {
+                console.log('already signed up')
                 //already have the user
                 done(null, currentUser);
 
             } else {
                 //if not creat user in our db
-                console.log(profile)
+                console.log(profile._json.picture)
                 new Users({
+                    avatar: profile._json.picture,
                     email: undefined,
                     thirdPartyId: profile.id,
                     estimatedSats: 0,

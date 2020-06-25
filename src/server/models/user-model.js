@@ -1,13 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const subCommentSchema = new Schema({
-    subCommentId: String,
-    date: Date,
-    comment: String,
-    upVotes: Number,
-})
-
 const commentSchema = new Schema({
     commentId: String,
     date: Date,
@@ -15,7 +8,7 @@ const commentSchema = new Schema({
     upVotes: Number,
     comenter: String,
     avatar: String,
-    subComments: [subCommentSchema]
+    comenterId: String,
 })
 
 const imageSchema = new Schema({
@@ -56,8 +49,9 @@ const accountSchema = new Schema({
     sats: Number,
     paidSats: Number,
     views: Number,
-    username: String,
+    userName: String,
     upVotes: Number,
+    avatar: String,
     images: [imageSchema]
 });
 

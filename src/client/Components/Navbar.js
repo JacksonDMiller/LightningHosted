@@ -20,7 +20,8 @@ const Navbar = () => {
                         <li> <Link to="/about">About</Link> </li>
                         <li> <Link to="/">Home</Link> </li>
                         <li> <Link to="/Profile">Profile</Link> </li>
-                        <li> <Link to="/login">Login In</Link> </li>
+                        <li> <a href="/api/Google">Login in</a> </li>
+                        <li> <a href="/api/logout">Log out</a> </li>
                         <li> <Link to="/contact">Contact Us</Link> </li>
 
                     </ul>
