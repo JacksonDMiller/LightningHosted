@@ -14,9 +14,10 @@ import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orien
 import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 
 // Register the plugins
-registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileValidateSize);
+registerPlugin(FilePondPluginFileValidateType, FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileValidateSize);
 
 
 function Uploader({ addImage }) {
@@ -62,6 +63,7 @@ function Uploader({ addImage }) {
                 </div>
                 : null}
             <FilePond
+                acceptedFileTypes={['image/png', 'image/jpeg', 'image/gif', 'video/mp4']}
                 ref={pond}
                 files={file}
                 allowMultiple={false}

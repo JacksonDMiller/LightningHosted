@@ -33,18 +33,6 @@ var upload = multer({
         else {
             cb(null, true);
         }
-        // The function should call `cb` with a boolean
-        // to indicate if the file should be accepted
-
-        // To reject this file pass `false`, like so:
-        // cb(null, false)
-
-        // To accept the file pass `true`, like so:
-        // cb(null, true)
-
-        // You can always pass an error if something goes wrong:
-        // cb(new Error('I don\'t have a clue!'))
-
     },
 })
 
@@ -176,19 +164,16 @@ module.exports = function (app) {
         //there is a random false console log in this function no idea why
     })
 
-    // photo information change this name
     app.get('/api/profileinfo/', async (req, res) => {
         if (req.user) {
-            const doc = await Users.findById(req.user._id).then((doc) => {
-                const imagesThatAreNotDeleted = doc.images.filter((image) => {
-                    if (image.deleted === false) {
-                        return image;
-                    }
+            fillteredImages = req.user.images.filter((image) => {
+                if (image.deleted === false) {
+                    return image;
+                }
 
-                })
-                doc.images = imagesThatAreNotDeleted;
-                res.send(doc)
             })
+            req.user.images = fillteredImages;
+            res.send(req.user)
         }
         else {
             res.status(401).send()
@@ -248,12 +233,13 @@ module.exports = function (app) {
         }
     })
 
+    // im kind of suprised this works but i guess req.user pulls the datbase everytime 
     app.get('/api/deleteimage/:imageId', async (req, res) => {
         if (req.user) {
-            const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
-            const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
-            doc.images[index].deleted = true;
-            doc.save()
+            const index = await req.user.images
+                .findIndex(image => image.imageId === req.params.imageId)
+            req.user.images[index].deleted = true;
+            req.user.save()
             res.status(200).send({ message: 'deleted' })
         }
         else {
