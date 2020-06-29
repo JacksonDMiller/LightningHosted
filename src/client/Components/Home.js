@@ -1,64 +1,73 @@
-import React, { Component } from 'react'
-import Uploader from './Uploader';
+
+
+import { useState, useEffect } from 'react'
 import ImageCard from './ImageCard';
 import InfiniteScroll from "react-infinite-scroll-component";
 import Masonry from 'react-masonry-css'
+import Navbar from './Navbar';
 
-export default class Home extends Component {
-    state = {
-        images: [],
-        page: 0,
-        hasMore: true,
+import React from 'react'
+
+export default function Home() {
+    const [images, setImages] = useState([]);
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [auth, setAuth] = useState(false);
+
+    const isLoggedIn = async () => {
+        const res = await fetch('/api/checkifauthorized/');
+        setAuth(await res.json());
     };
 
-    getMoreImages = () => {
-        fetch('/api/tt/' + this.state.page)
-            .then(res => res.json())
-            .then(imageData => {
-                if (imageData.length === 0) {
-                    this.setState({
-                        hasMore: false
-                    })
+    const getMoreImages = async () => {
+        const res = await fetch('/api/recomendedimages/' + page);
+        const imageData = await res.json();
+        if (imageData.length === 0) {
+            setHasMore(false);
+        }
+        setImages(images.concat(imageData));
+        setPage(page + 1);
+    }
+
+    useEffect(() => {
+        getMoreImages();
+        isLoggedIn();
+    }, [])
+
+    return (
+        <div className=''>
+            <Navbar auth={auth} />
+            <InfiniteScroll
+                dataLength={images.length}
+                next={getMoreImages}
+                hasMore={hasMore}
+                loader={<h4>Loading...</h4>}
+                endMessage={
+                    <p style={{ textAlign: 'center' }}>
+                        <b>Yay! You have seen it all</b>
+                    </p>
                 }
-                this.setState({
-                    images: this.state.images.concat(imageData),
-                    page: this.state.page + 1
-                })
-            });
-    }
+            >
 
-    componentDidMount() {
-        this.getMoreImages()
-    }
+                <Masonry
+                    breakpointCols={
+                        {
+                            default: 4,
+                            1100: 3,
+                            700: 2,
+                            500: 1
+                        }}
+                    className="my-masonry-grid"
+                    columnClassName="my-masonry-grid_column">
 
-    render() {
-        const { images } = this.state;
-        return (
-            <div>
-                <InfiniteScroll
-                    dataLength={images.length}
-                    next={this.getMoreImages}
-                    hasMore={this.state.hasMore}
-                    loader={<h4>Loading...</h4>}
-                    endMessage={
-                        <p style={{ textAlign: 'center' }}>
-                            <b>Yay! You have seen it all</b>
-                        </p>
-                    }
-                >
+                    {images ? images.map((image, index) => {
+                        // this is weird im not sure why there is a key collision with the imageId added index to the key to stop it.
+                        return <ImageCard key={image.imageId + index} imageData={image} />
+                    }) : null}
 
-                    <Masonry
-                        breakpointCols={4}
-                        className="my-masonry-grid"
-                        columnClassName="my-masonry-grid_column">
+                </Masonry>
+            </InfiniteScroll>
+        </div >
+    )
 
-                        {images ? images.map((image) => {
-                            return <ImageCard key={image.imageId} imageData={image} />
-                        }) : null}
-
-                    </Masonry>
-                </InfiniteScroll>
-            </div >
-        )
-    }
 }

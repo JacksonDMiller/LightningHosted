@@ -23,6 +23,10 @@ export default function Share(props) {
         }
         getImageInfo();
     }, [])
+
+    const reportImage = async (imageId) => {
+        const res = await fetch('/api/report/' + imageId)
+    }
     return (
         <div>
             <div className='container row'>
@@ -39,6 +43,7 @@ export default function Share(props) {
                                 <p className="flow-text">This is the caption someone will make.</p>
                             </div>
                         </div>
+                        <button className='btn' onClick={() => reportImage(imageId)}>Report</button>
                     </div>
                     : null}
 

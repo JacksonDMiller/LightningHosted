@@ -21,12 +21,15 @@ sub.on('invoice_updated', async invoice => {
 
 module.exports = function (app) {
     //pay an lnd invoice
-    app.get('/api/payinvoice/:invoice', (req, res) => {
-        pay({ lnd, request: req.params.invoice })
-            .catch((err) => {
-                console.log(err);
-                res.send(err)
-            })
+    app.get('/api/payinvoice/:invoice', async (req, res) => {
+        try {
+            const lndRes = await pay({ lnd, request: req.params.invoice })
+            console.log(lndRes)
+            res.send({ message: 'Paid!' })
+        }
+        catch (err) {
+            res.send(err)
+        }
     })
 
     app.get('/api/checkpayment/:invoice', async (req, res) => {

@@ -19,10 +19,12 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileValidateSize);
 
 
-function Uploader() {
-    const [file, setFiles] = useState([])
+function Uploader({ addImage }) {
+    const [file, setFile] = useState([])
     const [invoice, setInvoice] = useState(null)
     const [paid, setPaid] = useState(false)
+    const [caption, setCaption] = useState('')
+    const [title, setTitle] = useState('')
 
     const checkForPayment = (invoice) => {
         var counter = 0
@@ -32,7 +34,6 @@ function Uploader() {
                 clearInterval(cp)
             }
             let res = await fetch('/api/checkpayment/' + invoice)
-            console.log(res.status)
             if (res.status === 200) {
                 setPaid(true)
                 clearInterval(cp)
@@ -41,32 +42,71 @@ function Uploader() {
         }, 1000);
     }
 
+    const pond = React.createRef()
+    const upload = () => {
+        pond.current.processFiles()
+    }
+
 
     return (
         <div>
             {invoice ? <QRCode value={invoice} /> : null}
             <span>{paid === true ? 'Paid' : null} </span>
+            {file.length !== 0 ?
+                <div className="row">
+                    <div className="input-field col s12">
+                        <i className="material-icons prefix">mode_edit</i>
+                        <textarea onChange={(e) => { setTitle(e.target.value) }} id="icon_prefix3" className="materialize-textarea"></textarea>
+                        <label htmlFor="icon_prefix3">Title</label>
+                    </div>
+                </div>
+                : null}
             <FilePond
+                ref={pond}
                 files={file}
                 allowMultiple={false}
+                onupdatefiles={(e) => setFile(e)}
                 server={{
                     process: {
+                        ondata: (formData) => {
+                            formData.append('title', title);
+                            formData.append('caption', caption);
+                            return formData;
+                        },
                         url: "/api/upload",
                         onload: (res) => {
                             res = JSON.parse(res)
+                            addImage(res)
                             setInvoice(res.paymentRequest);
                             checkForPayment(res.paymentRequest);
-                        }
+                            setCaption('');
+                            setTitle('');
+                            setFile([]);
+                        },
+
                     },
                     revert: null,
                     restore: null,
                     load: null,
                     fetch: null,
+
                 }
                 }
+                allowProcess={false}
+                allowRevert={false}
                 instantUpload={false}
                 maxFileSize='5mb'
             />
+            {file.length !== 0 ?
+                <div className="row">
+                    <div className="input-field col s10">
+                        <textarea onChange={(e) => { setCaption(e.target.value) }} id="icon_prefix4" className="materialize-textarea"></textarea>
+                        <label htmlFor="icon_prefix4">Caption</label>
+                    </div>
+                    <button onClick={upload}><i className="material-icons prefix col s2">arrow_upward</i> Upload</button>
+
+                </div>
+                : null}
 
         </div>
     )

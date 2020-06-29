@@ -8,7 +8,7 @@ module.exports = function (app) {
 
 
     app.get('/api/google', passport.authenticate('google', {
-        scope: ['profile']
+        scope: ['profile', 'email']
     }));
 
     app.get('/api/google/redirect', passport.authenticate('google'), (req, res) => {

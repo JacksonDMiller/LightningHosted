@@ -157,10 +157,10 @@ module.exports = function (app) {
                 width: dimensions.width,
                 height: dimensions.height,
                 date: new (Date),
-                title: '',
-                caption: '',
+                title: req.body.title,
+                caption: req.body.caption,
                 paymentRequest: imageInvoice.request,
-                upVotes: 0,
+                upvotes: 0,
                 sats: 0,
                 numberOfComments: 0,
                 fileType: imageExtension,
@@ -177,9 +177,16 @@ module.exports = function (app) {
     })
 
     // photo information change this name
-    app.get('/api/pi/', (req, res) => {
+    app.get('/api/profileinfo/', async (req, res) => {
         if (req.user) {
-            Users.findById(req.user._id).then((doc) => {
+            const doc = await Users.findById(req.user._id).then((doc) => {
+                const imagesThatAreNotDeleted = doc.images.filter((image) => {
+                    if (image.deleted === false) {
+                        return image;
+                    }
+
+                })
+                doc.images = imagesThatAreNotDeleted;
                 res.send(doc)
             })
         }
@@ -194,7 +201,7 @@ module.exports = function (app) {
             const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
 
             const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
-            doc.images[index].upVotes = doc.images[index].upVotes + 1;
+            doc.images[index].upvotes = doc.images[index].upvotes + 1;
             doc.save()
             res.status(200).send()
         }
@@ -223,7 +230,7 @@ module.exports = function (app) {
                 commentId: 'CI' + crypto.randomBytes(8).toString('hex'),
                 date: new Date,
                 comment: comment,
-                upVotes: 0,
+                upvotes: 0,
                 comenterId: req.user._id,
                 comenter: req.user.userName,
                 avatar: req.user.avatar,
@@ -240,4 +247,18 @@ module.exports = function (app) {
             res.send('please login')
         }
     })
+
+    app.get('/api/deleteimage/:imageId', async (req, res) => {
+        if (req.user) {
+            const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
+            const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
+            doc.images[index].deleted = true;
+            doc.save()
+            res.status(200).send({ message: 'deleted' })
+        }
+        else {
+            res.send({ message: 'please login' })
+        }
+    })
+
 }

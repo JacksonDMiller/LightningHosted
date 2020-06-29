@@ -11,7 +11,8 @@ passport.use(
         clientID: keys.google.clientID,
         clientSecret: keys.google.clientSecret
     }, (accessToken, refreshToken, profile, done) => {
-        console.log(profile.displayName)
+        console.log(profile)
+
         Users.findOne({ thirdPartyId: profile.id }).then((currentUser) => {
             if (currentUser) {
                 console.log('already signed up')
@@ -23,7 +24,7 @@ passport.use(
                 console.log(profile._json.picture)
                 new Users({
                     avatar: profile._json.picture,
-                    email: undefined,
+                    email: profile._json.email,
                     thirdPartyId: profile.id,
                     estimatedSats: 0,
                     earnedSats: 0,
@@ -31,7 +32,7 @@ passport.use(
                     paidSats: 0,
                     views: 0,
                     userName: profile.displayName,
-                    upVotes: 0,
+                    upvotes: 0,
                 }).save().then((newUser) => {
                     done(null, newUser);
                 });

@@ -10,20 +10,18 @@ setInterval(function () {
     updateTopTenList();
 }, 1000);
 
-updateTopTenList = () => {
+updateTopTenList = async () => {
     topPostsList = [];
-    Users.find({}).lean().then(function (record) {
-        record.forEach(element => {
-            //sort the images here
-            for (image in element.images) {
-                if (element.images[image].deleted !== true && element.images[image].suppressed !== true) {
-                    topPostsList.push(element.images[image])
-                }
+    const record = await Users.find({}).lean()
+    record.forEach(element => {
+        //sort the images here
+        for (image in element.images) {
+            if (element.images[image].deleted !== true && element.images[image].suppressed !== true) {
+                topPostsList.push(element.images[image])
             }
+        }
 
-        });
     })
-
 }
 // initail server start update 
 updateTopTenList();
@@ -58,7 +56,7 @@ module.exports = function (app) {
     });
 
     // get the top ten images tt = top ten
-    app.get('/api/tt/:page', (req, res) => {
+    app.get('/api/recomendedimages/:page', (req, res) => {
         let start = 0 + (req.params.page * 10)
         let end = 15 + (req.params.page * 10)
         res.send(topPostsList.slice(start, end))
@@ -78,5 +76,13 @@ module.exports = function (app) {
 
         }
         res.status(200).send()
+    })
+
+
+    app.get('/api/checkifauthorized/', (req, res) => {
+        if (req.user) {
+            res.send(true)
+        }
+        else { res.send(false) }
     })
 }

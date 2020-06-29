@@ -5,7 +5,7 @@ const commentSchema = new Schema({
     commentId: String,
     date: Date,
     comment: String,
-    upVotes: Number,
+    upvotes: Number,
     comenter: String,
     avatar: String,
     comenterId: String,
@@ -27,7 +27,7 @@ const imageSchema = new Schema({
     title: String,
     caption: String,
     paymentRequest: String,
-    upVotes: Number,
+    upvotes: Number,
     sats: Number,
     numberOfComments: Number,
     fileType: String,
@@ -50,7 +50,7 @@ const accountSchema = new Schema({
     paidSats: Number,
     views: Number,
     userName: String,
-    upVotes: Number,
+    upvotes: Number,
     avatar: String,
     images: [imageSchema]
 });
