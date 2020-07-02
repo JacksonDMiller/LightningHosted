@@ -4,6 +4,7 @@ import ImageCard from './ImageCard';
 import Masonry from 'react-masonry-css'
 import { Redirect } from 'react-router-dom'
 import Navbar from './Navbar';
+import AvatarUploader from './AvatarUploader';
 
 export default function Profile() {
     const [images, setImages] = useState([])
@@ -11,16 +12,20 @@ export default function Profile() {
     const [loggedIn, setLoggedIn] = useState(true)
     const [user, setUser] = useState({})
 
+    document.addEventListener('DOMContentLoaded', function () {
+        var elems = document.querySelectorAll('.modal');
+        var instances = M.Modal.init(elems);
+    });
+
     useEffect(() => {
         const fetchData = async () => {
             const res = await fetch('/api/profileinfo/');
             if (res.status === 401) {
-                console.log('not authorezed');
+                return <Redirect to='/'></Redirect>
                 setLoggedIn(false);
             }
             else {
                 const data = await res.json();
-                console.log(data)
                 const sortedImages = data.images.sort((a, b) => new Date(b.date) - new Date(a.date))
                 setImages(sortedImages);
                 setUser(data)
@@ -33,13 +38,10 @@ export default function Profile() {
         e.preventDefault()
         const res = await fetch('/api/payinvoice/' + invoice);
         const data = await res.json();
-        console.log(data);
     }
 
     const deleteImage = async (imageId) => {
         const res = await fetch('/api/deleteimage/' + imageId);
-        // const data = await res.json();
-        // console.log(res)
         if (res.status === 200) {
             console.log(images)
             const newImages = images.filter((image) => {
@@ -47,7 +49,6 @@ export default function Profile() {
                     return image
                 }
             })
-            console.log(newImages)
             setImages(newImages)
         }
     }
@@ -55,19 +56,24 @@ export default function Profile() {
 
     const addImage = (image) => {
         const newImages = [image, ...images]
-        console.log(newImages)
         setImages(newImages)
+    }
+
+    const updateAvatar = (user) => {
+        setUser(user)
     }
     return (
         <div className='' >
             {!loggedIn ? <Redirect to='/' /> : null}
             <Navbar auth={true} />
             <div>
-                <img src={user.avatar} style={{ width: '100px' }}></img>
+                {user.avatar ? <img className='circle' src={'/api/avatar/' + user.avatar} style={{ width: '100px' }}></img> : null}
                 <p>{user.userName}</p>
                 <p>Sats: {user.earnedSats} </p>
                 <p>Views: {user.views} </p>
                 <p>Upvotes: {user.upvotes} </p>
+                <a className="waves-effect waves-light btn modal-trigger" href="#modal1">Edit</a>
+
             </div>
             <form className="col s12">
                 <div className="row">
@@ -96,6 +102,17 @@ export default function Profile() {
                 }) : null}
 
             </Masonry>
+
+
+            <div id="modal1" className="modal">
+                <div className="modal-content">
+                    <h4>Choose a new avatar</h4>
+                    <AvatarUploader updateAvatar={updateAvatar} />
+                </div>
+                <div className="modal-footer">
+                    <a href="#!" className="modal-close waves-effect waves-green btn-flat">Agree</a>
+                </div>
+            </div>
         </div >
     )
 }

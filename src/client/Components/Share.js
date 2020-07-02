@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 import CommentSection from './CommentSection'
-
+import Navbar from './Navbar'
 
 export default function Share(props) {
     const [imageData, setImageData] = useState({});
@@ -10,16 +10,14 @@ export default function Share(props) {
     useEffect(() => {
 
         const getImageInfo = async () => {
-            var res = await fetch('/api/ii/' + imageId)
-            res = await res.json();
-            setImageData(res)
+            const res = await fetch('/api/ii/' + imageId)
+            const imageData = await res.json();
+            setImageData(imageData)
             if (!localStorage.getItem(res.imageId)) {
                 localStorage.setItem(res.imageId, true);
                 fetch('/api/incrementPageView/' + res.imageId)
                 console.log('itsnew')
             }
-
-
         }
         getImageInfo();
     }, [])
@@ -29,6 +27,7 @@ export default function Share(props) {
     }
     return (
         <div>
+            <Navbar />
             <div className='container row'>
                 {imageData.imageId ?
                     <div className="col s8 offset-s2">

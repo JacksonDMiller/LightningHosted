@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 export default function CommentSection({ comments, imageId }) {
-    console.log(comments)
     const [newComment, setnewComment] = useState('')
+
     const submitComment = async (e) => {
         e.preventDefault();
         const requestOptions = {
@@ -15,8 +15,8 @@ export default function CommentSection({ comments, imageId }) {
         };
 
         const response = await fetch('/api/newcomment/', requestOptions);
-        const data = await response.json();
         // append new comment
+        console.log(comments)
 
     }
 

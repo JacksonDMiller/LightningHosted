@@ -40,6 +40,11 @@ module.exports = function (app) {
         res.sendFile('/src/server/uploads/thumbnails/' + req.params.fileName, { root: './' });
     });
 
+    // get an avatar from the server  t = thumbnail
+    app.get('/api/avatar/:fileName', (req, res) => {
+        res.sendFile('/src/server/uploads/avatars/' + req.params.fileName, { root: './' });
+    });
+
     // get an image's record from the DB ii = image info
     app.get('/api/ii/:imageId', (req, res) => {
         Users.findOne({ 'images.imageId': req.params.imageId }).then((user, err) => {

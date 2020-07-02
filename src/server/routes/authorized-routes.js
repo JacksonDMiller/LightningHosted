@@ -13,11 +13,11 @@ const getVideoDimensions = require('get-video-dimensions');
 
 
 //seting up multer
-const acceptedMimeTypes = ["image/jpeg", "video/mp4", "image/gif", "image/png"]
-var upload = multer({
+var uploadImage = multer({
     dest: 'src/server/uploads/compressed',
     // filter uploaded files using molter
     fileFilter: function fileFilter(req, file, cb) {
+        const acceptedMimeTypes = ["image/jpeg", "video/mp4", "image/gif", "image/png"]
         let error = null;
         if (!req.user) {
             error = 'Please log in first';
@@ -36,11 +36,48 @@ var upload = multer({
     },
 })
 
+var uploadAvatar = multer({
+    dest: 'src/server/uploads/avatars',
+    // filter uploaded files using molter
+    fileFilter: function fileFilter(req, file, cb) {
+        const acceptedMimeTypes = ["image/jpeg", "image/png"]
+        let error = null;
+        if (!req.user) {
+            error = 'Please log in first';
+        }
+        if (!acceptedMimeTypes.includes(file.mimetype)) {
+            error = 'Unsported file type';
+        }
+        if (error) {
+            // console.log('Rejected');
+
+            cb(error, false);
+        }
+        else {
+            cb(null, true);
+        }
+    },
+}
+)
+
 
 module.exports = function (app) {
 
 
-    app.post('/api/upload', upload.single("filepond"), async function (req, res) {
+    app.post('/api/avatar', uploadAvatar.single("avatar"), async function (req, res) {
+        var avatarFileName = 'A' + crypto.randomBytes(8).toString('hex') + '.jpeg'
+        await sharp(req.file.path).jpeg({ quality: 50, force: true })
+            .rotate()
+            .toFile('src/server/uploads/avatars/' + avatarFileName)
+        fsPromises.unlink(req.file.path);
+        fsPromises.unlink('src/server/uploads/avatars/' + req.user.avatar)
+        req.user.avatar = avatarFileName;
+        req.user.save();
+        res.status(200).send({ avatar: avatarFileName });
+    })
+
+
+    app.post('/api/upload', uploadImage.single("filepond"), async function (req, res) {
         if (Object.keys(req.file).length === 0) {
             return res.status(400).send('No files were uploaded.');
         }
