@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 import CommentSection from './CommentSection'
-import Navbar from './Navbar'
 
 export default function Share(props) {
     const [imageData, setImageData] = useState({});
@@ -27,7 +26,6 @@ export default function Share(props) {
     }
     return (
         <div>
-            <Navbar />
             <div className='container row'>
                 {imageData.imageId ?
                     <div className="col s8 offset-s2">

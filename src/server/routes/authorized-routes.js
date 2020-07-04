@@ -9,13 +9,16 @@ const keys = require('../config/keys')
 const { lnd } = authenticatedLndGrpc(keys.lnd);
 const fsPromises = require('fs').promises;
 const getVideoDimensions = require('get-video-dimensions');
+const { MulterError } = require('multer');
 
 
 
 //seting up multer
 var uploadImage = multer({
     dest: 'src/server/uploads/compressed',
-    // filter uploaded files using molter
+    limits: { fileSize: 1024 * 1024 * 1024 * 5 },
+
+    // filter uploaded files based on MimeType
     fileFilter: function fileFilter(req, file, cb) {
         const acceptedMimeTypes = ["image/jpeg", "video/mp4", "image/gif", "image/png"]
         let error = null;
@@ -26,11 +29,11 @@ var uploadImage = multer({
             error = 'Unsported file type';
         }
         if (error) {
-            // console.log('Rejected');
-
+            // reject the file and return error
             cb(error, false);
         }
         else {
+            // if no error accept the file
             cb(null, true);
         }
     },
@@ -38,7 +41,7 @@ var uploadImage = multer({
 
 var uploadAvatar = multer({
     dest: 'src/server/uploads/avatars',
-    // filter uploaded files using molter
+    // filter uploaded files using molter based on MimeType
     fileFilter: function fileFilter(req, file, cb) {
         const acceptedMimeTypes = ["image/jpeg", "image/png"]
         let error = null;
@@ -49,11 +52,11 @@ var uploadAvatar = multer({
             error = 'Unsported file type';
         }
         if (error) {
-            // console.log('Rejected');
-
+            // return error and reject the file
             cb(error, false);
         }
         else {
+            // accept the file
             cb(null, true);
         }
     },
@@ -64,7 +67,7 @@ var uploadAvatar = multer({
 module.exports = function (app) {
 
 
-    app.post('/api/avatar', uploadAvatar.single("avatar"), async function (req, res) {
+    app.post('/api/avatar', uploadAvatar.single("avatar", (err) => { console.log(err) }), async function (req, res) {
         var avatarFileName = 'A' + crypto.randomBytes(8).toString('hex') + '.jpeg'
         await sharp(req.file.path).jpeg({ quality: 50, force: true })
             .rotate()
@@ -82,121 +85,128 @@ module.exports = function (app) {
             return res.status(400).send('No files were uploaded.');
         }
         else {
-            var imageFileName = crypto.randomBytes(8).toString('hex')
-            var imageExtension = ''
-            var imageInvoice = createInvoice({ lnd, description: 'LightningHosted deposit', tokens: '100' })
+            const imageFileName = crypto.randomBytes(8).toString('hex')
+            let imageExtension = ''
+            try {
+                let imageInvoice = createInvoice({ lnd, description: 'LightningHosted deposit', tokens: '100' })
 
-            const processedImage = new Promise(async (resolve, reject) => {
-                // console.log('starting image proccessing')
-                //this error hanlding does not work :( try to fix it
-                if (req.file.mimetype === 'image/gif') {
-                    await fsPromises.rename(req.file.path, 'src/server/uploads/compressed/' + imageFileName + '.gif')
-                    resolve('gif')
-                }
+                const processedImage = new Promise(async (resolve, reject) => {
+                    // console.log('starting image proccessing')
+                    //this error hanlding does not work :( try to fix it
+                    if (req.file.mimetype === 'image/gif') {
+                        await fsPromises.rename(req.file.path, 'src/server/uploads/compressed/' + imageFileName + '.gif')
+                        resolve('gif')
+                    }
 
-                if (req.file.mimetype === 'image/jpeg' || req.file.mimetype === 'image/png') {
-                    await sharp(req.file.path).jpeg({ quality: 75, force: true })
-                        .rotate()
-                        .toFile('src/server/uploads/compressed/' + imageFileName + '.' + 'jpeg')
-                    fsPromises.unlink(req.file.path);
-                    resolve('jpeg')
-                }
+                    if (req.file.mimetype === 'image/jpeg' || req.file.mimetype === 'image/png') {
+                        await sharp(req.file.path).jpeg({ quality: 75, force: true })
+                            .rotate()
+                            .toFile('src/server/uploads/compressed/' + imageFileName + '.' + 'jpeg').catch(err => { return err })
+                        fsPromises.unlink(req.file.path);
+                        resolve('jpeg')
 
-                if (req.file.mimetype === 'video/mp4') {
-                    await fsPromises.rename(req.file.path, 'src/server/uploads/compressed/' + imageFileName + '.mp4')
-                    resolve('mp4')
-                }
+                    }
 
-            })
-            await processedImage.then(ext => imageExtension = ext).catch((err) => console.log(err));
-            // console.log('image has been proccesed')
+                    if (req.file.mimetype === 'video/mp4') {
+                        await fsPromises.rename(req.file.path, 'src/server/uploads/compressed/' + imageFileName + '.mp4')
+                        resolve('mp4')
+                    }
 
-
-            const getDimensions = new Promise(async (resolve, reject) => {
-                // console.log('getting dimensions')
-                if (imageExtension === 'mp4') {
-                    result = await getVideoDimensions('src/server/uploads/compressed/' + imageFileName + '.mp4')
-                    resolve(result)
-
-                }
-                else {
-                    result = await imageSize('src/server/uploads/compressed/' + imageFileName + '.' + imageExtension)
-                    resolve(result)
-                }
-
-            })
-
-            var dimensions = await getDimensions.then((d) => dimensions = d);
-            // console.log(dimensions, 'got dimensions')
+                })
+                // await processedImage.then(ext => imageExtension = ext).catch((err) => console.log(err));
+                // // console.log('image has been proccesed')
 
 
-            const generateThumbnail = new Promise(async (resolve, reject) => {
-                // console.log('begining thumbnail creation')
-                if (imageExtension === 'mp4') {
-                    const tg = new ThumbnailGenerator({
-                        sourcePath: 'src/server/uploads/compressed/' + imageFileName + '.mp4',
-                        thumbnailPath: 'src/server/uploads/thumbnails/',
-                    });
-                    let result = await tg.generateOneByPercent(1, { size: dimensions.width + 'x' + dimensions.height })
-                    await sharp('src/server/uploads/thumbnails/' + result).jpeg({ quality: 80, force: true }).toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg')
-                    fsPromises.unlink('src/server/uploads/thumbnails/' + result)
-                    resolve(true)
-                }
-                else {
-                    await sharp('src/server/uploads/compressed/' + imageFileName + '.' + imageExtension)
-                        .jpeg({ quality: 40, force: true })
-                        .rotate()
-                        .toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg')
-                    resolve("true")
-                }
-            })
+                // const getDimensions = new Promise(async (resolve, reject) => {
+                //     // console.log('getting dimensions')
+                //     if (imageExtension === 'mp4') {
+                //         result = await getVideoDimensions('src/server/uploads/compressed/' + imageFileName + '.mp4')
+                //         resolve(result)
+
+                //     }
+                //     else {
+                //         result = await imageSize('src/server/uploads/compressed/' + imageFileName + '.' + imageExtension)
+                //         resolve(result)
+                //     }
+
+                // })
+
+                // var dimensions = await getDimensions.then((d) => dimensions = d);
+                // // console.log(dimensions, 'got dimensions')
 
 
-            await generateThumbnail
-            // console.log('the thumbnail is done')
+                // const generateThumbnail = new Promise(async (resolve, reject) => {
+                //     // console.log('begining thumbnail creation')
+                //     if (imageExtension === 'mp4') {
+                //         const tg = new ThumbnailGenerator({
+                //             sourcePath: 'src/server/uploads/compressed/' + imageFileName + '.mp4',
+                //             thumbnailPath: 'src/server/uploads/thumbnails/',
+                //         });
+                //         let result = await tg.generateOneByPercent(1, { size: dimensions.width + 'x' + dimensions.height })
+                //         await sharp('src/server/uploads/thumbnails/' + result).jpeg({ quality: 80, force: true }).toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg')
+                //         fsPromises.unlink('src/server/uploads/thumbnails/' + result)
+                //         resolve(true)
+                //     }
+                //     else {
+                //         await sharp('src/server/uploads/compressed/' + imageFileName + '.' + imageExtension)
+                //             .jpeg({ quality: 40, force: true })
+                //             .rotate()
+                //             .toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg')
+                //         resolve("true")
+                //     }
+                // })
+
+
+                // await generateThumbnail
+                // // console.log('the thumbnail is done')
 
 
 
 
-            await imageInvoice.then((invoice) => {
-                imageInvoice = invoice;
-                // console.log(invoice)
-            })
-            let imageOrientation = 'horizontal'
-            if (dimensions.height > dimensions.width) {
-                imageOrientation = 'vertical';
-            };
+                // await imageInvoice.then((invoice) => {
+                //     imageInvoice = invoice;
+                //     // console.log(invoice)
+                // })
+                // let imageOrientation = 'horizontal'
+                // if (dimensions.height > dimensions.width) {
+                //     imageOrientation = 'vertical';
+                // };
 
-            imageData = {
-                recentViews: [],
-                posterId: req.user._id,
-                orientation: imageOrientation,
-                imageId: imageFileName,
-                reviewStatus: false,
-                payStatus: false,
-                deleted: false,
-                views: 0,
-                reports: 0,
-                fileName: imageFileName + '.' + imageExtension,
-                thumbNail: imageFileName + '.jpeg',
-                width: dimensions.width,
-                height: dimensions.height,
-                date: new (Date),
-                title: req.body.title,
-                caption: req.body.caption,
-                paymentRequest: imageInvoice.request,
-                upvotes: 0,
-                sats: 0,
-                numberOfComments: 0,
-                fileType: imageExtension,
-                ogType: 'ogType',
-                twitterCard: 'twitterCard',
-                suppressed: false,
+                // imageData = {
+                //     recentViews: [],
+                //     posterId: req.user._id,
+                //     orientation: imageOrientation,
+                //     imageId: imageFileName,
+                //     reviewStatus: false,
+                //     payStatus: false,
+                //     deleted: false,
+                //     views: 0,
+                //     reports: 0,
+                //     fileName: imageFileName + '.' + imageExtension,
+                //     thumbNail: imageFileName + '.jpeg',
+                //     width: dimensions.width,
+                //     height: dimensions.height,
+                //     date: new (Date),
+                //     title: req.body.title,
+                //     caption: req.body.caption,
+                //     paymentRequest: imageInvoice.request,
+                //     upvotes: 0,
+                //     sats: 0,
+                //     numberOfComments: 0,
+                //     fileType: imageExtension,
+                //     ogType: 'ogType',
+                //     twitterCard: 'twitterCard',
+                //     suppressed: false,
+                // }
+                // await req.user.images.push(imageData);
+                // req.user.save();
+
+                // res.send(imageData);
+            } catch (err) {
+                console.log(err)
+                res.status(400).send('err')
+                new Error('lnd wont connect')
             }
-            await req.user.images.push(imageData);
-            req.user.save();
-
-            res.send(imageData);
         }
         //there is a random false console log in this function no idea why
     })
@@ -278,6 +288,17 @@ module.exports = function (app) {
             req.user.images[index].deleted = true;
             req.user.save()
             res.status(200).send({ message: 'deleted' })
+        }
+        else {
+            res.send({ message: 'please login' })
+        }
+    })
+
+    app.get('/api/changeusername/:username', (req, res) => {
+        if (req.user) {
+            req.user.userName = req.params.username;
+            req.user.save()
+            res.status(200).send({ message: 'updated' })
         }
         else {
             res.send({ message: 'please login' })

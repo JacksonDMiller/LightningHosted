@@ -20,11 +20,11 @@ export default function AvatarUploader(props) {
 
     const handleScale = e => {
         const scale = parseFloat(e.target.value)
-        setScale({ scale })
+        setScale(scale)
     }
 
     const handlePositionChange = position => {
-        setPosition({ position })
+        setPosition(position)
     }
 
     const onClickSave = async () => {

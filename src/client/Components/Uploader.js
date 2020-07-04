@@ -77,13 +77,15 @@ function Uploader({ addImage }) {
                         },
                         url: "/api/upload",
                         onload: (res) => {
-                            res = JSON.parse(res)
-                            addImage(res)
-                            setInvoice(res.paymentRequest);
-                            checkForPayment(res.paymentRequest);
-                            setCaption('');
-                            setTitle('');
-                            setFile([]);
+                            if (res.status = 200) {
+                                res = JSON.parse(res)
+                                addImage(res)
+                                setInvoice(res.paymentRequest);
+                                checkForPayment(res.paymentRequest);
+                                setCaption('');
+                                setTitle('');
+                                setFile([]);
+                            }
                         },
 
                     },

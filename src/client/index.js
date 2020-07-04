@@ -1,18 +1,11 @@
-import React from 'react';
+
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import Home from './Components/Home'
-import "materialize-css/dist/css/materialize.min.css";
-import Profile from './Components/Profile';
-import Share from './Components/Share';
+import App from './Components/App';
+import React from 'react'
+import { StateProvider } from './Context/Store';
 
 ReactDOM.render(
-    <BrowserRouter>
-        <Switch>
-            <Route exact path='/' component={Home} />
-            <Route path='/profile' component={Profile} />
-            <Route path="/s/:imageId" component={Share} />
-        </Switch>
-
-    </BrowserRouter >
+    <StateProvider>
+        <App />
+    </StateProvider>
     , document.getElementById('root'));

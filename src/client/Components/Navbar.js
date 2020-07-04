@@ -1,15 +1,18 @@
-import React from 'react'
+import React, { useContext } from 'react';
 import M from 'materialize-css/dist/js/materialize.min.js';
 import { Link } from 'react-router-dom';
 import '../app.css';
 import "materialize-css/dist/css/materialize.min.css";
+import { store } from '../Context/Store';
 
-const Navbar = ({ auth }) => {
+const Navbar = () => {
     document.addEventListener('DOMContentLoaded', function () {
         var elems = document.querySelectorAll('.sidenav');
         var instances = M.Sidenav.init(elems, { closeOnClick: true });
     });
 
+    const globalState = useContext(store);
+    const auth = globalState.state.auth
     return (
         <div>
             <nav>

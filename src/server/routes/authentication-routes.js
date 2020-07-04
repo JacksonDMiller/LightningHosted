@@ -1,7 +1,8 @@
 const Users = require('../models/user-model')
 var passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20');
+const logger = require('winston')
 
+// console.log(logger)
 
 
 module.exports = function (app) {

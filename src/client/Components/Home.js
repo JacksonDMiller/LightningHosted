@@ -1,10 +1,10 @@
 
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import ImageCard from './ImageCard';
 import InfiniteScroll from "react-infinite-scroll-component";
 import Masonry from 'react-masonry-css'
-import Navbar from './Navbar';
+import { store } from '../Context/Store';
 
 import React from 'react'
 
@@ -14,9 +14,15 @@ export default function Home() {
     const [hasMore, setHasMore] = useState(true);
     const [auth, setAuth] = useState(false);
 
+    const globalState = useContext(store);
+    const { dispatch } = globalState;
+
     const isLoggedIn = async () => {
         const res = await fetch('/api/checkifauthorized/');
-        setAuth(await res.json());
+        if (await res.json() === true) {
+            dispatch({ type: 'LOGIN' })
+        }
+        else { dispatch({ type: 'LOGOUT' }) }
     };
 
     const getMoreImages = async () => {
@@ -34,9 +40,10 @@ export default function Home() {
         isLoggedIn();
     }, [])
 
+
+
     return (
         <div className=''>
-            <Navbar auth={auth} />
             <InfiniteScroll
                 dataLength={images.length}
                 next={getMoreImages}

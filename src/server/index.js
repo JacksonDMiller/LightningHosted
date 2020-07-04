@@ -4,7 +4,7 @@ var passport = require('passport');
 const passportSetup = require('./config/passport-setup');
 const cookieSession = require('cookie-session');
 const keys = require('./config/keys')
-const Users = require('./models/user-model');
+var logger = require('./log.js');
 
 
 // setting up express
@@ -38,7 +38,4 @@ require('./routes/authorized-routes')(app);
 
 
 app.listen(process.env.PORT || 8080, () => console.log(`YipYip app is listening on port ${process.env.PORT || 8080}!`));
-
-
-
 

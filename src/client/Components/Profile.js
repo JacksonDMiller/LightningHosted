@@ -3,7 +3,6 @@ import Uploader from './Uploader';
 import ImageCard from './ImageCard';
 import Masonry from 'react-masonry-css'
 import { Redirect } from 'react-router-dom'
-import Navbar from './Navbar';
 import AvatarUploader from './AvatarUploader';
 
 export default function Profile() {
@@ -11,6 +10,7 @@ export default function Profile() {
     const [invoice, setInvoice] = useState(null)
     const [loggedIn, setLoggedIn] = useState(true)
     const [user, setUser] = useState({})
+    const [newUserName, setNewUserName] = useState(null)
 
     document.addEventListener('DOMContentLoaded', function () {
         var elems = document.querySelectorAll('.modal');
@@ -18,6 +18,9 @@ export default function Profile() {
     });
 
     useEffect(() => {
+
+
+
         const fetchData = async () => {
             const res = await fetch('/api/profileinfo/');
             if (res.status === 401) {
@@ -62,10 +65,20 @@ export default function Profile() {
     const updateAvatar = (user) => {
         setUser(user)
     }
+
+    const updateUserName = async () => {
+        const res = await fetch('/api/changeusername/' + newUserName);
+        const result = await res.json();
+        console.log(res)
+        if (res.status === 200) {
+            setUser({ ...user, userName: newUserName })
+        }
+
+    }
+
     return (
         <div className='' >
             {!loggedIn ? <Redirect to='/' /> : null}
-            <Navbar auth={true} />
             <div>
                 {user.avatar ? <img className='circle' src={'/api/avatar/' + user.avatar} style={{ width: '100px' }}></img> : null}
                 <p>{user.userName}</p>
@@ -109,8 +122,13 @@ export default function Profile() {
                     <h4>Choose a new avatar</h4>
                     <AvatarUploader updateAvatar={updateAvatar} />
                 </div>
-                <div className="modal-footer">
-                    <a href="#!" className="modal-close waves-effect waves-green btn-flat">Agree</a>
+                <div className="input-field col s10">
+                    <i className="material-icons prefix">mode_edit</i>
+                    <textarea id="icon_prefix5" className="materialize-textarea" onChange={(e) => {
+                        setNewUserName(e.target.value)
+                    }}></textarea>
+                    <label htmlFor="icon_prefix5">New Username</label>
+                    <button onClick={updateUserName}>Submit</button>
                 </div>
             </div>
         </div >
