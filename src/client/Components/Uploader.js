@@ -77,8 +77,8 @@ function Uploader({ addImage }) {
                         },
                         url: "/api/upload",
                         onload: (res) => {
-                            if (res.status = 200) {
-                                res = JSON.parse(res)
+                            res = JSON.parse(res)
+                            if (!res.errror) {
                                 addImage(res)
                                 setInvoice(res.paymentRequest);
                                 checkForPayment(res.paymentRequest);
