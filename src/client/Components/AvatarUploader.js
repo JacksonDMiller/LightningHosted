@@ -42,7 +42,10 @@ export default function AvatarUploader(props) {
                     body: formData
                 });
                 let result = await response.json();
-                props.updateAvatar(result)
+                if (!result.error) {
+                    props.updateAvatar(result)
+                }
+                else { alert(result.error) }
             });
         }
     }

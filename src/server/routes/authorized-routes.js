@@ -9,11 +9,11 @@ const keys = require('../config/keys')
 const { lnd } = authenticatedLndGrpc(keys.lnd);
 const fsPromises = require('fs').promises;
 const getVideoDimensions = require('get-video-dimensions');
-const { MulterError } = require('multer');
 const logger = require('winston')
 
 
 //seting up multer
+// multer for image uploads
 var uploadImage = multer({
     dest: 'src/server/uploads/compressed',
     limits: { fileSize: 1024 * 1024 * 1024 * 5 },
@@ -38,8 +38,9 @@ var uploadImage = multer({
         }
     },
 })
-
+// multer for avatar uploads 
 var uploadAvatar = multer({
+    limits: { fileSize: 1024 * 1024 * 1024 * 2 },
     dest: 'src/server/uploads/avatars',
     // filter uploaded files using molter based on MimeType
     fileFilter: function fileFilter(req, file, cb) {
@@ -68,15 +69,23 @@ module.exports = function (app) {
 
 
     app.post('/api/avatar', uploadAvatar.single("avatar", (err) => { console.log(err) }), async function (req, res) {
-        var avatarFileName = 'A' + crypto.randomBytes(8).toString('hex') + '.jpeg'
-        await sharp(req.file.path).jpeg({ quality: 50, force: true })
-            .rotate()
-            .toFile('src/server/uploads/avatars/' + avatarFileName)
-        fsPromises.unlink(req.file.path);
-        fsPromises.unlink('src/server/uploads/avatars/' + req.user.avatar)
-        req.user.avatar = avatarFileName;
-        req.user.save();
-        res.status(200).send({ avatar: avatarFileName });
+        try {
+            var avatarFileName = 'A' + crypto.randomBytes(8).toString('hex') + '.jpeg'
+            await sharp(req.file.path).jpeg({ quality: 50, force: true })
+                .rotate()
+                .toFile('src/server/uploads/avatars/' + avatarFileName)
+            fsPromises.unlink(req.file.path);
+            fsPromises.unlink('src/server/uploads/avatars/' + req.user.avatar)
+            req.user.avatar = avatarFileName;
+            req.user.save();
+            res.status(200).send({ avatar: avatarFileName });
+        } catch (err) {
+            logger.log({
+                level: 'error',
+                message: 'avatar creation error' + err
+            })
+            res.status(500).send({ error: `Sorry something went wrong.` })
+        }
     })
 
 
@@ -226,8 +235,10 @@ module.exports = function (app) {
         //there is a random false console log in this function no idea why
     })
 
+    // send profile info 
     app.get('/api/profileinfo/', async (req, res) => {
         if (req.user) {
+            // remove previously deleted records 
             fillteredImages = req.user.images.filter((image) => {
                 if (image.deleted === false) {
                     return image;
@@ -238,85 +249,136 @@ module.exports = function (app) {
             res.send(req.user)
         }
         else {
-            res.status(401).send()
+            res.status(401).send({ error: `Please log in` })
         }
     })
 
     app.get('/api/upvote/:imageId', async (req, res) => {
-
         if (req.user) {
-            const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
-
-            const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
-            doc.images[index].upvotes = doc.images[index].upvotes + 1;
-            doc.save()
-            res.status(200).send()
+            try {
+                const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
+                const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
+                doc.images[index].upvotes = doc.images[index].upvotes + 1;
+                doc.save()
+                res.status(200).send()
+            } catch (error) {
+                logger.log({
+                    level: 'error',
+                    message: 'upvote error: ' + error
+                })
+                res.status(404).send('Oops something went wrong')
+            }
         }
         else {
-            res.send('please login')
+            res.status(401).send({ error: `Please log in` })
         }
     })
 
     app.get('/api/report/:imageId', async (req, res) => {
         if (req.user) {
-            const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
-            const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
-            doc.images[index].reports = doc.images[index].reports + 1;
-            doc.save()
-            res.status(200).send()
+            try {
+                const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
+                const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
+                doc.images[index].reports = doc.images[index].reports + 1;
+                doc.save()
+                res.status(200).send()
+            } catch (error) {
+                logger.log({
+                    level: 'error',
+                    message: 'Image reporting error: ' + error
+                })
+                res.status(404).send('Oops something went wrong')
+            }
         }
         else {
-            res.send('please login')
+            res.status(401).send({ error: `Please log in` })
         }
     })
 
+    // need to think more about how to sanatiaze this input
     app.post('/api/newcomment', async (req, res) => {
+
+        function sanitizeString(str) {
+            str = str.replace(/[^a-z0-9áéíóúñü \.""₿()$#@&,_-]/gim, "");
+            return str.trim();
+        }
+
         var { imageId, comment } = req.body
         if (req.user) {
-            var newComment = {
-                commentId: 'CI' + crypto.randomBytes(8).toString('hex'),
-                date: new Date,
-                comment: comment,
-                upvotes: 0,
-                comenterId: req.user._id,
-                comenter: req.user.userName,
-                avatar: req.user.avatar,
+            try {
+                const sanatizedComment = sanitizeString(comment)
+                var newComment = {
+                    commentId: 'CI' + crypto.randomBytes(8).toString('hex'),
+                    date: new Date,
+                    comment: sanatizedComment,
+                    upvotes: 0,
+                    comenterId: req.user._id,
+                    comenter: req.user.userName,
+                    avatar: req.user.avatar,
+                }
+                const doc = await Users.findOne({ 'images.imageId': imageId })
+                const index = await doc.images.findIndex(image => image.imageId === imageId)
+                console.log(doc.images[index])
+                doc.images[index].comments.push(newComment)
+                doc.save()
+                res.status(200).send()
+            } catch (error) {
+                logger.log({
+                    level: 'error',
+                    message: `Comment Error` + error
+                })
+                res.status(404).send(`Oops something went wrong`)
             }
-            const doc = await Users.findOne({ 'images.imageId': imageId })
-            const index = await doc.images.findIndex(image => image.imageId === imageId)
-            console.log(doc.images[index])
-            doc.images[index].comments.push(newComment)
-            doc.save()
-            res.status(200).send()
 
         }
         else {
-            res.send('please login')
+            res.status(401).send({ error: `Please log in` })
         }
     })
 
     // im kind of suprised this works but i guess req.user pulls the datbase everytime 
     app.get('/api/deleteimage/:imageId', async (req, res) => {
+
         if (req.user) {
-            const index = await req.user.images
-                .findIndex(image => image.imageId === req.params.imageId)
-            req.user.images[index].deleted = true;
-            req.user.save()
-            res.status(200).send({ message: 'deleted' })
+            try {
+                const index = await req.user.images
+                    .findIndex(image => image.imageId === req.params.imageId)
+                req.user.images[index].deleted = true;
+                req.user.save()
+                res.status(200).send({ message: 'deleted' })
+            }
+            catch (error) {
+                logger.log({
+                    level: 'error',
+                    message: `Delete image Error` + error
+                })
+                res.status(404).send(`Oops something went wrong`)
+            }
         }
         else {
-            res.send({ message: 'please login' })
+            res.status(401).send({ error: `Please log in` })
         }
     })
 
     app.get('/api/changeusername/:username', (req, res) => {
+
         if (req.user) {
-            req.user.userName = req.params.username;
-            req.user.save()
-            res.status(200).send({ message: 'updated' })
+            try {
+                if (/^[a-zA-Z0-9_-]{3,16}$/.test(req.params.username)) {
+                    req.user.userName = req.params.username;
+                    req.user.save()
+                    res.status(200).send({ message: 'updated' })
+                }
+                else { res.status(400).send({ error: `Invalid Username` }) }
+            } catch (error) {
+                logger.log({
+                    level: `error`,
+                    message: `username change error: ` + error
+                })
+            }
         }
         else {
-            res.send({ message: 'please login' })
+            res.status(401).send({ error: `Please log in` })
         }
     })
 
