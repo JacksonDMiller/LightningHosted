@@ -67,18 +67,21 @@ var uploadAvatar = multer({
 
 module.exports = function (app) {
 
-
-    app.post('/api/avatar', uploadAvatar.single("avatar", (err) => { console.log(err) }), async function (req, res) {
+    // change a user avatar 
+    app.post('/api/uploadavatar', uploadAvatar.single("avatar", (err) => { console.log(err) }), async function (req, res) {
         try {
-            var avatarFileName = 'A' + crypto.randomBytes(8).toString('hex') + '.jpeg'
+            var newAvatarFileName = 'A' + crypto.randomBytes(8).toString('hex') + '.jpeg'
             await sharp(req.file.path).jpeg({ quality: 50, force: true })
                 .rotate()
-                .toFile('src/server/uploads/avatars/' + avatarFileName)
+                .toFile('src/server/uploads/avatars/' + newAvatarFileName)
             fsPromises.unlink(req.file.path);
-            fsPromises.unlink('src/server/uploads/avatars/' + req.user.avatar)
-            req.user.avatar = avatarFileName;
+            if (req.user.avatarFileName) {
+                fsPromises.unlink('src/server/uploads/avatars/' + req.user.avatarFileName)
+            }
+            req.user.avatarFileName = newAvatarFileName;
+            req.user.avatarUrl = '/api/avatar/' + newAvatarFileName
             req.user.save();
-            res.status(200).send({ avatar: avatarFileName });
+            res.status(200).send({ avatarUrl: req.user.avatarUrl });
         } catch (err) {
             logger.log({
                 level: 'error',
@@ -88,7 +91,8 @@ module.exports = function (app) {
         }
     })
 
-
+    // Upload a new image, process it, add it to the datbase, create an invoice to pay
+    // the deposit
     app.post('/api/upload', uploadImage.single("filepond"), async function (req, res) {
         if (Object.keys(req.file).length === 0) {
             return res.status(400).send('No files were uploaded.');
@@ -124,11 +128,7 @@ module.exports = function (app) {
                     }
                 })
                 await processedImage.then(ext => imageExtension = ext)
-                // console.log('image has been proccesed')
-
-
                 const getDimensions = new Promise(async (resolve, reject) => {
-                    // console.log('getting dimensions')
                     try {
 
 
@@ -146,11 +146,8 @@ module.exports = function (app) {
                     }
                 })
                 var dimensions = await getDimensions.then((d) => dimensions = d)
-                // console.log(dimensions, 'got dimensions')
-
 
                 const generateThumbnail = new Promise(async (resolve, reject) => {
-                    // console.log('begining thumbnail creation')
                     try {
                         if (imageExtension === 'mp4') {
                             const tg = new ThumbnailGenerator({
@@ -172,8 +169,6 @@ module.exports = function (app) {
                                 .toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg')
                         }
                     } catch (err) {
-
-                        // console.log(err)
                         reject('Thumbnail generation error' + err)
                     }
                     resolve(true)
@@ -183,7 +178,6 @@ module.exports = function (app) {
 
                 await imageInvoice.then((invoice) => {
                     imageInvoice = invoice;
-                    // console.log(invoice)
                 }).catch(err => {
                     throw err[2].err.details
                 })
@@ -232,7 +226,6 @@ module.exports = function (app) {
                 res.status(400).send({ error: err })
             }
         }
-        //there is a random false console log in this function no idea why
     })
 
     // send profile info 
@@ -253,49 +246,60 @@ module.exports = function (app) {
         }
     })
 
+    // upvote an image and record that that the user has updated the image
+    // if it has not been upvoted by that user before. 
     app.get('/api/upvote/:imageId', async (req, res) => {
-        if (req.user) {
+        if (req.user && !req.user.upvoted.includes(req.params.imageId)) {
             try {
                 const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
-                const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
+                const index = await doc.images
+                    .findIndex(image => image.imageId === req.params.imageId)
                 doc.images[index].upvotes = doc.images[index].upvotes + 1;
-                doc.save()
+                doc.save();
+                req.user.upvoted.push(req.params.imageId);
+                req.user.save();
                 res.status(200).send()
             } catch (error) {
                 logger.log({
                     level: 'error',
                     message: 'upvote error: ' + error
                 })
-                res.status(404).send('Oops something went wrong')
+                res.status(404).send('Oops something went wrong');
             }
         }
         else {
-            res.status(401).send({ error: `Please log in` })
+            res.status(401).send({ error: `Please log in` });
         }
     })
 
+    // collect a report from a user. record that they have reported the image.
     app.get('/api/report/:imageId', async (req, res) => {
-        if (req.user) {
+        if (req.user && !req.user.reported.includes(req.params.imageId)) {
             try {
                 const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
-                const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
+                const index = await doc.images
+                    .findIndex(image => image.imageId === req.params.imageId)
                 doc.images[index].reports = doc.images[index].reports + 1;
-                doc.save()
-                res.status(200).send()
+                doc.save();
+                req.user.reported.push(req.params.imageId);
+                req.user.save();
+                res.status(200).send();
             } catch (error) {
                 logger.log({
                     level: 'error',
                     message: 'Image reporting error: ' + error
                 })
-                res.status(404).send('Oops something went wrong')
+                res.status(404).send('Oops something went wrong');
             }
         }
         else {
-            res.status(401).send({ error: `Please log in` })
+            res.status(401).send({ error: `Please log in` });
         }
     })
 
     // need to think more about how to sanatiaze this input
+    // need to think of an appropriate way to throttle comments for bad actors
+    // add a new comment
     app.post('/api/newcomment', async (req, res) => {
 
         function sanitizeString(str) {
@@ -306,7 +310,7 @@ module.exports = function (app) {
         var { imageId, comment } = req.body
         if (req.user) {
             try {
-                const sanatizedComment = sanitizeString(comment)
+                const sanatizedComment = sanitizeString(comment);
                 var newComment = {
                     commentId: 'CI' + crypto.randomBytes(8).toString('hex'),
                     date: new Date,
@@ -314,14 +318,15 @@ module.exports = function (app) {
                     upvotes: 0,
                     comenterId: req.user._id,
                     comenter: req.user.userName,
-                    avatar: req.user.avatar,
+                    avatar: req.user.avatarUrl,
+                    deleted: false,
+                    suppressed: false,
                 }
-                const doc = await Users.findOne({ 'images.imageId': imageId })
-                const index = await doc.images.findIndex(image => image.imageId === imageId)
-                console.log(doc.images[index])
-                doc.images[index].comments.push(newComment)
-                doc.save()
-                res.status(200).send()
+                const doc = await Users.findOne({ 'images.imageId': imageId });
+                const index = await doc.images.findIndex(image => image.imageId === imageId);
+                doc.images[index].comments.push(newComment);
+                doc.save();
+                res.status(200).send();
             } catch (error) {
                 logger.log({
                     level: 'error',
@@ -332,20 +337,19 @@ module.exports = function (app) {
 
         }
         else {
-            res.status(401).send({ error: `Please log in` })
+            res.status(401).send({ error: `Please log in` });
         }
     })
 
-    // im kind of suprised this works but i guess req.user pulls the datbase everytime 
+    // delete an image if you are the owner of the image
     app.get('/api/deleteimage/:imageId', async (req, res) => {
-
         if (req.user) {
             try {
                 const index = await req.user.images
-                    .findIndex(image => image.imageId === req.params.imageId)
+                    .findIndex(image => image.imageId === req.params.imageId);
                 req.user.images[index].deleted = true;
-                req.user.save()
-                res.status(200).send({ message: 'deleted' })
+                req.user.save();
+                res.status(200).send({ message: 'deleted' });
             }
             catch (error) {
                 logger.log({
@@ -360,14 +364,19 @@ module.exports = function (app) {
         }
     })
 
-    app.get('/api/changeusername/:username', (req, res) => {
-
+    //change your user name to a username that is not already taken
+    app.get('/api/changeusername/:username', async (req, res) => {
         if (req.user) {
             try {
                 if (/^[a-zA-Z0-9_-]{3,16}$/.test(req.params.username)) {
-                    req.user.userName = req.params.username;
-                    req.user.save()
-                    res.status(200).send({ message: 'updated' })
+                    const doc = await Users.findOne({ 'userName': req.params.username })
+                    if (doc === null) {
+                        req.user.userName = req.params.username;
+                        req.user.save()
+                        res.status(200).send({ message: 'updated' })
+                    }
+                    else { res.status(400).send({ error: `That username is already taken` }) }
+
                 }
                 else { res.status(400).send({ error: `Invalid Username` }) }
             } catch (error) {
@@ -379,6 +388,33 @@ module.exports = function (app) {
         }
         else {
             res.status(401).send({ error: `Please log in` })
+        }
+    })
+
+    // delete a comment if you own it 
+    app.get('/api/deletecomment/:commentId', async (req, res) => {
+        try {
+            if (req.user) {
+                let index = 0;
+                const doc = await Users.findOne({ 'images.comments.commentId': req.params.commentId })
+                doc.images.forEach(image => {
+                    index = image.comments.findIndex(
+                        comment => comment.commentId === req.params.commentId)
+                    if (index !== -1) {
+                        // only allow deleting if you made the comment
+                        if (image.comments[index].comenterId == req.user._id) {
+                            image.comments[index].deleted = true;
+                            doc.save()
+                        }
+                        else { res.status(404).send('Oops something went wrong') }
+                    }
+                })
+
+                res.send(doc)
+            }
+            else { res.status(401).send({ error: `Please log in` }) }
+        } catch (error) {
+            res.status(404).send('Oops something went wrong')
         }
     })
 

@@ -2,13 +2,19 @@ const Users = require('../models/user-model');
 
 // a list of the top 100 images
 var topPostsList = [];
-var f = [];
+var recentViewsList = [];
 
 //refreshing the top posts list periodically
 setInterval(function () {
     // console.log('top ten updated');
     updateTopTenList();
 }, 1000);
+
+// cleaning up the rcentviews list every hour I don't mind double counting views
+// I just dont want to count views multiple views in a short amount of time.
+setInterval(function () {
+    recentViewsList = [];
+}, 1000 * 60 * 60);
 
 updateTopTenList = async () => {
     topPostsList = [];
@@ -17,14 +23,17 @@ updateTopTenList = async () => {
         //sort the images here
         for (image in element.images) {
             if (element.images[image].deleted !== true && element.images[image].suppressed !== true) {
+                let hoursSincePosting = Math.round((new Date - element.images[image].date) / 1000 / 60 / 60)
+                element.images[image].score = element.images[image].views + element.images[image].upvotes - hoursSincePosting
                 topPostsList.push(element.images[image])
             }
         }
-
+        topPostsList.sort((a, b) => b.score - a.score)
     })
 }
 // initail server start update 
 updateTopTenList();
+
 
 
 module.exports = function (app) {
@@ -40,18 +49,18 @@ module.exports = function (app) {
         res.sendFile('/src/server/uploads/thumbnails/' + req.params.fileName, { root: './' });
     });
 
-    // get an avatar from the server  t = thumbnail
+    // get an avatar from the server
     app.get('/api/avatar/:fileName', (req, res) => {
         res.sendFile('/src/server/uploads/avatars/' + req.params.fileName, { root: './' });
     });
 
-    // get an image's record from the DB ii = image info
-    app.get('/api/ii/:imageId', (req, res) => {
+    // get an image's record from the DB
+    app.get('/api/imageinfo/:imageId', (req, res) => {
         Users.findOne({ 'images.imageId': req.params.imageId }).then((user, err) => {
             if (err) { res.send('oops') }
-            for (n in user.images) {
-                if (user.images[n].imageId === req.params.imageId) {
-                    res.send(user.images[n])
+            for (image in user.images) {
+                if (user.images[image].imageId === req.params.imageId) {
+                    res.send(user.images[image])
                     break;
                 }
             }
@@ -60,25 +69,22 @@ module.exports = function (app) {
         })
     });
 
-    // get the top ten images tt = top ten
+    // get the next ten images from top images list 
     app.get('/api/recomendedimages/:page', (req, res) => {
         let start = 0 + (req.params.page * 10)
         let end = 15 + (req.params.page * 10)
         res.send(topPostsList.slice(start, end))
     })
 
-    // incrment page view and store ip address if ip address has not already been seen
+    // incrment page view and store ip address if ip address has not already been seen recently
     app.get('/api/incrementPageView/:imageId', async (req, res) => {
         const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
         const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
-        if (!doc.images[index].recentViews.includes(req.connection.remoteAddress)) {
+        if (!recentViewsList.includes(req.connection.remoteAddress + req.params.imageId)) {
             doc.images[index].views = doc.images[index].views + 1;
-            let arr = doc.images[index].recentViews
-            arr.push(req.connection.remoteAddress)
-            doc.images[index].recentViews = arr
-            console.log(doc.images[index].recentViews)
+            recentViewsList.push(req.connection.remoteAddress + req.params.imageId)
             doc.save()
-
+            console.log(recentViewsList)
         }
         res.status(200).send()
     })

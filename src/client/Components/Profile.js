@@ -24,8 +24,8 @@ export default function Profile() {
         const fetchData = async () => {
             const res = await fetch('/api/profileinfo/');
             if (res.status === 401) {
-                return <Redirect to='/'></Redirect>
                 setLoggedIn(false);
+                return <Redirect to='/'></Redirect>
             }
             else {
                 const data = await res.json();
@@ -76,11 +76,15 @@ export default function Profile() {
 
     }
 
+    // needs to handle avatar file name or avatar url
     return (
         <div className='' >
             {!loggedIn ? <Redirect to='/' /> : null}
             <div>
-                {user.avatar ? <img className='circle' src={'/api/avatar/' + user.avatar} style={{ width: '100px' }}></img> : null}
+                {user.avatarUrl ?
+                    <img className='circle' src={user.avatarUrl}
+                        style={{ width: '100px' }}></img>
+                    : null}
                 <p>{user.userName}</p>
                 <p>Sats: {user.earnedSats} </p>
                 <p>Views: {user.views} </p>

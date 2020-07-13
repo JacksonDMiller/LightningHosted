@@ -1,9 +1,8 @@
 const keys = require('../config/keys')
-const { pay, createInvoice, authenticatedLndGrpc, subscribeToInvoices } = require('ln-service');
+const { pay, createInvoice, authenticatedLndGrpc,
+    subscribeToInvoices, decodePaymentRequest } = require('ln-service');
 const Users = require('../models/user-model');
 const { lnd } = authenticatedLndGrpc(keys.lnd);
-
-// const { once } = require('events');  might be unneeded
 const sub = subscribeToInvoices({ lnd });
 
 
@@ -17,21 +16,24 @@ sub.on('invoice_updated', async invoice => {
     }
 })
 
-// listenForInvoices()
-
 module.exports = function (app) {
-    //pay an lnd invoice
+    //pay a lightning invoice if the user has earned enough sats.
     app.get('/api/payinvoice/:invoice', async (req, res) => {
         try {
-            const lndRes = await pay({ lnd, request: req.params.invoice })
-            console.log(lndRes)
-            res.send({ message: 'Paid!' })
+            const details = await decodePaymentRequest({ lnd, request: req.params.invoice });
+            // console.log(details.tokens)
+            if (req.user.sats <= details.tokens) {
+                const lndRes = await pay({ lnd, request: req.params.invoice })
+                res.send({ message: 'Paid!' })
+            }
+            else { res.status(400).send({ error: `You don't have enough sats` }) }
         }
         catch (err) {
             res.send(err)
         }
     })
 
+    // check if a payment has been made
     app.get('/api/checkpayment/:invoice', async (req, res) => {
         const doc = await Users.findOne({ 'images.paymentRequest': req.params.invoice })
         const index = await doc.images.findIndex(image => image.paymentRequest === req.params.invoice)

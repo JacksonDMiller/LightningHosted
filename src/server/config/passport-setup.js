@@ -23,7 +23,8 @@ passport.use(
                 //if not creat user in our db
                 console.log(profile._json.picture)
                 new Users({
-                    avatar: profile._json.picture,
+                    avatarUrl: profile._json.picture,
+                    avatarFileName: null,
                     email: profile._json.email,
                     thirdPartyId: profile.id,
                     estimatedSats: 0,
@@ -33,6 +34,8 @@ passport.use(
                     views: 0,
                     userName: profile.displayName,
                     upvotes: 0,
+                    upvoted: [],
+                    reported: []
                 }).save().then((newUser) => {
                     done(null, newUser);
                 });

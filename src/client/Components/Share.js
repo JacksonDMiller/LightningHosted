@@ -9,12 +9,13 @@ export default function Share(props) {
     useEffect(() => {
 
         const getImageInfo = async () => {
-            const res = await fetch('/api/ii/' + imageId)
+            const res = await fetch('/api/imageinfo/' + imageId)
             const imageData = await res.json();
+            console.log(imageData)
             setImageData(imageData)
-            if (!localStorage.getItem(res.imageId)) {
-                localStorage.setItem(res.imageId, true);
-                fetch('/api/incrementPageView/' + res.imageId)
+            if (!localStorage.getItem(imageData.imageId)) {
+                localStorage.setItem(imageData.imageId, true);
+                fetch('/api/incrementPageView/' + imageData.imageId)
                 console.log('itsnew')
             }
         }

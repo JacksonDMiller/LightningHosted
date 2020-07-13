@@ -9,6 +9,8 @@ const commentSchema = new Schema({
     comenter: String,
     avatar: String,
     comenterId: String,
+    deleted: Boolean,
+    suppressed: Boolean,
 })
 
 const imageSchema = new Schema({
@@ -36,7 +38,6 @@ const imageSchema = new Schema({
     twitterCard: String,
     suppressed: Boolean,
     comments: [commentSchema],
-    recentViews: [{ type: String }]
 
 });
 
@@ -51,7 +52,10 @@ const accountSchema = new Schema({
     views: Number,
     userName: String,
     upvotes: Number,
-    avatar: String,
+    avatarUrl: String,
+    avatarFileName: String,
+    upvoted: [String],
+    reported: [String],
     images: [imageSchema]
 });
 

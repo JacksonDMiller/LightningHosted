@@ -37,7 +37,7 @@ export default function AvatarUploader(props) {
                 formData.append("avatar", blob, "filename.png");
 
 
-                let response = await fetch('/api/avatar', {
+                let response = await fetch('/api/uploadavatar', {
                     method: 'POST',
                     body: formData
                 });
