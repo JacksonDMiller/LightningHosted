@@ -24,7 +24,7 @@ module.exports = {
       use: ['style-loader', 'css-loader']
     },
     {
-      test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+      test: /\.(png|woff|woff2|eot|ttf|svg|jpg|JPG|jpeg)$/,
       loader: 'url-loader?limit=100000'
     }
     ]

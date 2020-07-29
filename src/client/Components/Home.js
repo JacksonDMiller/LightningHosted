@@ -1,10 +1,9 @@
 
 
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, } from 'react'
 import ImageCard from './ImageCard';
 import InfiniteScroll from "react-infinite-scroll-component";
 import Masonry from 'react-masonry-css'
-import { store } from '../Context/Store';
 
 import React from 'react'
 
@@ -12,32 +11,28 @@ export default function Home() {
     const [images, setImages] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const [auth, setAuth] = useState(false);
 
-    const globalState = useContext(store);
-    const { dispatch } = globalState;
-
-    const isLoggedIn = async () => {
-        const res = await fetch('/api/checkifauthorized/');
-        if (await res.json() === true) {
-            dispatch({ type: 'LOGIN' })
-        }
-        else { dispatch({ type: 'LOGOUT' }) }
-    };
-
-    const getMoreImages = async () => {
+    const getMoreImages = async (position) => {
+        console.log('id')
         const res = await fetch('/api/recomendedimages/' + page);
         const imageData = await res.json();
         if (imageData.length === 0) {
             setHasMore(false);
         }
-        setImages(images.concat(imageData));
         setPage(page + 1);
+        console.log(imageData)
+        if (position === 'top') {
+            let arr = [...imageData, ...images]
+            console.log(arr)
+            setImages([...imageData, ...images]);
+        }
+        else {
+            setImages(images.concat(imageData));
+        }
     }
 
     useEffect(() => {
         getMoreImages();
-        isLoggedIn();
     }, [])
 
 
@@ -54,13 +49,23 @@ export default function Home() {
                         <b>Yay! You have seen it all</b>
                     </p>
                 }
+                refreshFunction={() => getMoreImages('top')}
+                pullDownToRefresh={true}
+                pullDownToRefreshContent={
+                    <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
+                }
+                releaseToRefreshContent={
+                    <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
+                }
+                pullDownToRefreshThreshold={100}
             >
 
                 <Masonry
                     breakpointCols={
                         {
-                            default: 4,
-                            1100: 3,
+                            default: 6,
+                            1200: 4,
+                            900: 3,
                             700: 2,
                             500: 1
                         }}

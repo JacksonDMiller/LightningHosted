@@ -84,7 +84,7 @@ export default function AvatarUploader(props) {
                 defaultValue="1"
                 style={{ width: '250px' }}
             />
-            <button onClick={onClickSave}>Save</button>
+            <button className='btn modal-close' onClick={onClickSave}>Save</button>
         </div>
     )
 }

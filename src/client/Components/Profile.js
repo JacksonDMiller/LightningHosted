@@ -11,16 +11,14 @@ export default function Profile() {
     const [loggedIn, setLoggedIn] = useState(true)
     const [user, setUser] = useState({})
     const [newUserName, setNewUserName] = useState(null)
+    const [imageToDelete, setImageToDelete] = useState('')
+    const [editUsername, setEditUsername] = useState(false)
 
-    document.addEventListener('DOMContentLoaded', function () {
-        var elems = document.querySelectorAll('.modal');
-        var instances = M.Modal.init(elems);
-    });
+
 
     useEffect(() => {
-
-
-
+        const elems = document.querySelectorAll('.modal');
+        const instances = M.Modal.init(elems);
         const fetchData = async () => {
             const res = await fetch('/api/profileinfo/');
             if (res.status === 401) {
@@ -29,7 +27,9 @@ export default function Profile() {
             }
             else {
                 const data = await res.json();
-                const sortedImages = data.images.sort((a, b) => new Date(b.date) - new Date(a.date))
+                const sortedImages = data.images.sort(
+                    (a, b) => new Date(b.date) - new Date(a.date)
+                )
                 setImages(sortedImages);
                 setUser(data)
             }
@@ -43,16 +43,21 @@ export default function Profile() {
         const data = await res.json();
     }
 
-    const deleteImage = async (imageId) => {
-        const res = await fetch('/api/deleteimage/' + imageId);
+    const openDeleteImage = async (imageId) => {
+        setImageToDelete(imageId);
+    }
+
+    const deleteImage = async () => {
+        const res = await fetch('/api/deleteimage/' + imageToDelete);
         if (res.status === 200) {
             console.log(images)
             const newImages = images.filter((image) => {
-                if (image.imageId !== imageId) {
+                if (image.imageId !== imageToDelete) {
                     return image
                 }
             })
             setImages(newImages)
+            setImageToDelete('');
         }
     }
 
@@ -62,66 +67,85 @@ export default function Profile() {
         setImages(newImages)
     }
 
-    const updateAvatar = (user) => {
-        setUser(user)
+    const updateAvatar = (data) => {
+        setUser({ ...user, avatarUrl: data.avatarUrl })
     }
 
-    const updateUserName = async () => {
+    const updateUserName = async (e) => {
+        e.preventDefault();
         const res = await fetch('/api/changeusername/' + newUserName);
         const result = await res.json();
-        console.log(res)
         if (res.status === 200) {
-            setUser({ ...user, userName: newUserName })
+            setUser({ ...user, userName: newUserName });
+            setEditUsername(false);
         }
+        else { M.toast({ html: result.error }); }
 
     }
 
-    // needs to handle avatar file name or avatar url
     return (
-        <div className='' >
+        <div className='row' >
             {!loggedIn ? <Redirect to='/' /> : null}
-            <div>
+            <div className='row profile-info'>
                 {user.avatarUrl ?
-                    <img className='circle' src={user.avatarUrl}
-                        style={{ width: '100px' }}></img>
-                    : null}
-                <p>{user.userName}</p>
-                <p>Sats: {user.earnedSats} </p>
-                <p>Views: {user.views} </p>
-                <p>Upvotes: {user.upvotes} </p>
-                <a className="waves-effect waves-light btn modal-trigger" href="#modal1">Edit</a>
-
-            </div>
-            <form className="col s12">
-                <div className="row">
-                    <div className="input-field col s10">
-                        <i className="material-icons prefix">mode_edit</i>
-                        <textarea id="icon_prefix2" className="materialize-textarea" onChange={(e) => {
-                            setInvoice(e.target.value)
-                        }}></textarea>
-                        <label htmlFor="icon_prefix2">Lightning Invoice</label>
+                    <div className='col s6 l2 avatar-img-div center-align' >
+                        <img className='avatar-image circle responsive-img col  ' src={user.avatarUrl}>
+                        </img>
+                        <a className="modal-trigger avatar-edit-button" href="#editModal">
+                            <i className="material-icons black-text">edit</i>
+                        </a>
                     </div>
-                    <button onClick={withdraw} className='btn col s2'>Withdraw</button>
-                </div>
-            </form>
+                    : null}
 
-            <Uploader addImage={addImage} />
+                {editUsername ?
+                    <form className="col s6 l10'">
+                        <div className="input-field">
+                            <input onChange={e => setNewUserName(e.target.value)}
+                                id="username-login" className="validate" type="text" />
+                            <label htmlFor="username-login">Username</label>
+                        </div>
+                        <button className='btn' onClick={updateUserName}>Submit</button>
+                    </form>
+                    : <h5 className='col s6 l10'>{user.userName}
+                        <i onClick={() => setEditUsername(true)} className="material-icons black-text">edit</i>
+                    </h5>
+                }
 
+
+                <p className='col s4 l10'>Views: {user.views} </p>
+                <p className='col s4 l10'>Upvotes: {user.upvotes} </p>
+                <p className='col s4 l2'>Sats: {user.earnedSats} </p>
+                <a className=" withdraw-button col s12 l2 waves-effect waves-light btn modal-trigger"
+                    href="#withdrawModal">
+                    Withdraw
+                    </a>
+
+            </div >
+
+            <div className='align-center'>
+                <Uploader addImage={addImage} />
+            </div>
             <Masonry
-                breakpointCols={4}
+                breakpointCols={
+                    {
+                        default: 4,
+                        1100: 3,
+                        700: 2,
+                        505: 1
+                    }}
                 className="my-masonry-grid"
                 columnClassName="my-masonry-grid_column">
 
                 {images ? images.map((image) => {
-                    return <div key={image.imageId}> <ImageCard imageData={image} />
-                        <button onClick={() => { deleteImage(image.imageId) }}>Delete</button>
+                    return <div key={image.imageId}>
+                        <ImageCard profile={true} deleteImage={openDeleteImage} imageData={image} />
                     </div>
                 }) : null}
 
             </Masonry>
 
 
-            <div id="modal1" className="modal">
+            <div id="editModal" className="modal">
                 <div className="modal-content">
                     <h4>Choose a new avatar</h4>
                     <AvatarUploader updateAvatar={updateAvatar} />
@@ -132,7 +156,39 @@ export default function Profile() {
                         setNewUserName(e.target.value)
                     }}></textarea>
                     <label htmlFor="icon_prefix5">New Username</label>
-                    <button onClick={updateUserName}>Submit</button>
+                    <button className='btn modal-close' onClick={updateUserName}>Submit</button>
+                </div>
+            </div>
+
+            <div id="withdrawModal" className="modal">
+                <div className="modal-content">
+                    <h4>Withdraw</h4>
+                </div>
+                <div className="input-field col s10">
+                    <form className="col s12">
+                        <div className="row">
+                            <div className="input-field col s10">
+                                <i className="material-icons prefix">mode_edit</i>
+                                <textarea id="icon_prefix2" className="materialize-textarea" onChange={(e) => {
+                                    setInvoice(e.target.value)
+                                }}></textarea>
+                                <label htmlFor="icon_prefix2">Lightning Invoice</label>
+                            </div>
+                            <button onClick={withdraw} className='btn col s2'>Withdraw</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="deleteModal" className="modal">
+                <div className="modal-content">
+                    <h4>Are you sure you want to delete this image?</h4>
+                </div>
+                <div className="modal-footer">
+                    <a href="#!" onClick={() => {
+                        deleteImage()
+                    }} className="modal-close waves-effect waves-green btn-flat">Confirm</a>
+                    <a href="#!" className="modal-close waves-effect waves-green btn-flat">Cancel</a>
                 </div>
             </div>
         </div >

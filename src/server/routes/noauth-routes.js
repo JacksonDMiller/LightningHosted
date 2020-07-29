@@ -56,15 +56,25 @@ module.exports = function (app) {
 
     // get an image's record from the DB
     app.get('/api/imageinfo/:imageId', (req, res) => {
-        Users.findOne({ 'images.imageId': req.params.imageId }).then((user, err) => {
+        // find the image data in the database
+        Users.findOne({ 'images.imageId': req.params.imageId }).then(async (user, err) => {
             if (err) { res.send('oops') }
+            let imageData = {}
             for (image in user.images) {
                 if (user.images[image].imageId === req.params.imageId) {
-                    res.send(user.images[image])
+                    imageData = user.images[image]
                     break;
                 }
             }
+            // update the comments list with current usernames and avatars
+            for (comment in imageData.comments) {
+                let user = await Users.findOne({ '_id': imageData.comments[comment].comenterId })
+                imageData.comments[comment].avatar = user.avatarUrl;
+                imageData.comments[comment].comenter = user.userName;
+            }
+            res.send(imageData);
         }).catch(err => {
+            console.log(err)
             res.send("We couldn't find that image")
         })
     });
@@ -83,17 +93,16 @@ module.exports = function (app) {
         if (!recentViewsList.includes(req.connection.remoteAddress + req.params.imageId)) {
             doc.images[index].views = doc.images[index].views + 1;
             recentViewsList.push(req.connection.remoteAddress + req.params.imageId)
-            doc.save()
-            console.log(recentViewsList)
+            doc.save();
         }
-        res.status(200).send()
+        res.status(200).send();
     })
 
 
     app.get('/api/checkifauthorized/', (req, res) => {
         if (req.user) {
-            res.send(true)
+            res.send(req.user);
         }
-        else { res.send(false) }
+        else { res.send(false); }
     })
 }

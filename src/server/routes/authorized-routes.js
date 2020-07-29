@@ -202,7 +202,6 @@ module.exports = function (app) {
                     width: dimensions.width,
                     height: dimensions.height,
                     date: new (Date),
-                    title: req.body.title,
                     caption: req.body.caption,
                     paymentRequest: imageInvoice.request,
                     upvotes: 0,
@@ -247,24 +246,45 @@ module.exports = function (app) {
     })
 
     // upvote an image and record that that the user has updated the image
-    // if it has not been upvoted by that user before. 
+    // or remove the upvote if it has previously been upvoted
     app.get('/api/upvote/:imageId', async (req, res) => {
-        if (req.user && !req.user.upvoted.includes(req.params.imageId)) {
-            try {
-                const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
-                const index = await doc.images
-                    .findIndex(image => image.imageId === req.params.imageId)
-                doc.images[index].upvotes = doc.images[index].upvotes + 1;
-                doc.save();
-                req.user.upvoted.push(req.params.imageId);
-                req.user.save();
-                res.status(200).send()
-            } catch (error) {
-                logger.log({
-                    level: 'error',
-                    message: 'upvote error: ' + error
-                })
-                res.status(404).send('Oops something went wrong');
+        if (req.user) {
+            if (!req.user.upvoted.includes(req.params.imageId)) {
+                try {
+                    const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
+                    const index = await doc.images
+                        .findIndex(image => image.imageId === req.params.imageId)
+                    doc.images[index].upvotes = doc.images[index].upvotes + 1;
+                    doc.save();
+                    req.user.upvoted.push(req.params.imageId);
+                    req.user.save();
+                    res.status(200).send({ message: `upvoted`, user: req.user })
+                } catch (error) {
+                    logger.log({
+                        level: 'error',
+                        message: 'upvote error: ' + error
+                    })
+                    res.status(404).send({ error: 'Oops something went wrong' });
+                }
+            }
+            else {
+                try {
+                    const doc = await Users.findOne({ 'images.imageId': req.params.imageId })
+                    const index = await doc.images
+                        .findIndex(image => image.imageId === req.params.imageId)
+                    doc.images[index].upvotes = doc.images[index].upvotes - 1;
+                    doc.save();
+                    let filtered = req.user.upvoted.filter(id => id !== req.params.imageId);
+                    req.user.upvoted = filtered;
+                    req.user.save();
+                    res.status(200).send({ message: `upvoted`, user: req.user })
+                } catch (error) {
+                    logger.log({
+                        level: 'error',
+                        message: 'upvote error: ' + error
+                    })
+                    res.status(404).send({ error: 'Oops something went wrong' });
+                }
             }
         }
         else {
@@ -325,8 +345,9 @@ module.exports = function (app) {
                 const doc = await Users.findOne({ 'images.imageId': imageId });
                 const index = await doc.images.findIndex(image => image.imageId === imageId);
                 doc.images[index].comments.push(newComment);
+                doc.images[index].numberOfComments = doc.images[index].numberOfComments + 1
                 doc.save();
-                res.status(200).send();
+                res.status(200).send({ newComment: newComment });
             } catch (error) {
                 logger.log({
                     level: 'error',
@@ -369,9 +390,11 @@ module.exports = function (app) {
         if (req.user) {
             try {
                 if (/^[a-zA-Z0-9_-]{3,16}$/.test(req.params.username)) {
-                    const doc = await Users.findOne({ 'userName': req.params.username })
+                    const newUsernameLowerCase = req.params.username.toLowerCase();
+                    const doc = await Users.findOne({ 'lowerCaseUserName': newUsernameLowerCase })
                     if (doc === null) {
                         req.user.userName = req.params.username;
+                        req.user.lowerCaseUserName = req.params.username.toLowerCase();
                         req.user.save()
                         res.status(200).send({ message: 'updated' })
                     }

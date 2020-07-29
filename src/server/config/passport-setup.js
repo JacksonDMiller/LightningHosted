@@ -3,25 +3,25 @@ const keys = require('./keys')
 var passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20');
 const Users = require('../models/user-model')
+const bcrypt = require('bcrypt');
+const LocalStrategy = require('passport-local');
 
 passport.use(
     new GoogleStrategy({
         //options for the google strat
+        // callbackURL: 'http://192.168.0.33.xip.io:8080/api/google/redirect',
         callbackURL: 'http://localhost:3000/api/google/redirect',
         clientID: keys.google.clientID,
         clientSecret: keys.google.clientSecret
     }, (accessToken, refreshToken, profile, done) => {
-        console.log(profile)
 
         Users.findOne({ thirdPartyId: profile.id }).then((currentUser) => {
             if (currentUser) {
-                console.log('already signed up')
                 //already have the user
                 done(null, currentUser);
 
             } else {
                 //if not creat user in our db
-                console.log(profile._json.picture)
                 new Users({
                     avatarUrl: profile._json.picture,
                     avatarFileName: null,
@@ -44,6 +44,29 @@ passport.use(
     })
 );
 
+// login with username and password
+passport.use(new LocalStrategy(
+    function (username, password, done) {
+        username = username.toLowerCase();
+        Users.findOne({ lowerCaseUserName: username }, function (err, user) {
+            if (err) { return done(err); }
+            if (!user) {
+                return done(null, false, { message: 'Username not found' });
+            }
+            bcrypt.compare(password, user.password, (bcryptErr, res) => {
+                if (bcryptErr) { return done(bcryptErr); }
+                if (!res) {
+                    { return done(null, false, { message: 'Incorect Password' }); }
+                }
+                return done(null, user);
+            })
+        })
+    }
+
+));
+
+
+
 passport.serializeUser((user, done) => {
     done(null, user.id)
 });
@@ -52,6 +75,7 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((id, done) => {
     Users.findById(id).then((user) => {
         done(null, user);
+
         // done(null, id)
     });
 });

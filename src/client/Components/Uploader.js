@@ -25,7 +25,6 @@ function Uploader({ addImage }) {
     const [invoice, setInvoice] = useState(null)
     const [paid, setPaid] = useState(false)
     const [caption, setCaption] = useState('')
-    const [title, setTitle] = useState('')
 
     const checkForPayment = (invoice) => {
         var counter = 0
@@ -53,15 +52,6 @@ function Uploader({ addImage }) {
         <div>
             {invoice ? <QRCode value={invoice} /> : null}
             <span>{paid === true ? 'Paid' : null} </span>
-            {file.length !== 0 ?
-                <div className="row">
-                    <div className="input-field col s12">
-                        <i className="material-icons prefix">mode_edit</i>
-                        <textarea onChange={(e) => { setTitle(e.target.value) }} id="icon_prefix3" className="materialize-textarea"></textarea>
-                        <label htmlFor="icon_prefix3">Title</label>
-                    </div>
-                </div>
-                : null}
             <FilePond
                 acceptedFileTypes={['image/png', 'image/jpeg', 'image/gif', 'video/mp4']}
                 ref={pond}
@@ -71,7 +61,6 @@ function Uploader({ addImage }) {
                 server={{
                     process: {
                         ondata: (formData) => {
-                            formData.append('title', title);
                             formData.append('caption', caption);
                             return formData;
                         },
@@ -83,7 +72,6 @@ function Uploader({ addImage }) {
                                 setInvoice(res.paymentRequest);
                                 checkForPayment(res.paymentRequest);
                                 setCaption('');
-                                setTitle('');
                                 setFile([]);
                             }
                         },
