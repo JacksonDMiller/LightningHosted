@@ -46,7 +46,7 @@ export default function ImageCard(props) {
 
                 </div>
                 {caption ? <div>
-                    <p className="flow-text black-text">{caption.substring(0, 60) + '...'}</p>
+                    <p className="flow-text black-text">{caption.length > 60 ? caption.substring(0, 60) + '...' : caption}</p>
                 </div> : null}
             </Link>
             {profile ?

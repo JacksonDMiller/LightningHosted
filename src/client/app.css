@@ -102,3 +102,27 @@ body {
 .parallax-container {
     height: 500px;
 }
+
+.login-container {
+    padding: 20px;
+}
+
+.btn {
+    background-color: #800080;
+}
+
+.btn:hover {
+    background-color: #800080;
+}
+
+.about-card a {
+    margin-right: 5px;
+}
+
+.login-container .btn {
+    margin-bottom: 10px;
+}
+
+.login-container img {
+    margin: 10px;
+}

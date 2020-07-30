@@ -21,15 +21,18 @@ module.exports = function (app) {
     app.get('/api/payinvoice/:invoice', async (req, res) => {
         try {
             const details = await decodePaymentRequest({ lnd, request: req.params.invoice });
-            // console.log(details.tokens)
-            if (req.user.sats <= details.tokens) {
+            if (req.user.sats >= details.tokens) {
                 const lndRes = await pay({ lnd, request: req.params.invoice })
-                res.send({ message: 'Paid!' })
+                // update the users balance
+                req.user.sats = req.user.sats - details.tokens;
+                req.user.paidSats = req.user.paidSats + details.tokens;
+                req.user.save();
+                res.send({ message: 'Paid!', user: req.user })
             }
             else { res.status(400).send({ error: `You don't have enough sats` }) }
         }
         catch (err) {
-            res.send(err)
+            res.send({ error: 'Oops something went wrong please try again' })
         }
     })
 

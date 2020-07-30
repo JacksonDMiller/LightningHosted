@@ -41,33 +41,36 @@ module.exports = function (app) {
 
     // create new user with username and password. 
     app.post('/api/register', async (req, res) => {
-        // if (usernameFormat.test(req.body.username)) {
-        //     req.flash("error", "Invalid Username. The characters allowed are A-Z 0-9 and _ ")
-        //     res.redirect('/noauth/register')
+        if (/^[a-zA-Z0-9_-]{3,16}$/.test(req.body.username)) {
+            let newUsernameLowerCase = req.body.username.toLowerCase()
+            const doc = await Users.findOne({ 'lowerCaseUserName': newUsernameLowerCase })
+            if (doc === null) {
+                const hashedPassword = await bcrypt.hash(req.body.password, 10)
+                new Users({
+                    password: hashedPassword,
+                    email: req.body.email,
+                    thirdPartyId: undefined,
+                    estimatedSats: 0,
+                    earnedSats: 0,
+                    sats: 0,
+                    paidSats: 0,
+                    views: 0,
+                    username: req.body.username,
+                    lowerCaseUserName: newUsernameLowerCase,
+                    upvotes: 0,
+                    avatarUrl: '/api/avatar/Default.jpg',
+                    avatarFileName: 'Default.jpg',
+                    upvoted: [],
+                    reported: [],
 
-        // }
-        const hashedPassword = await bcrypt.hash(req.body.password, 10)
-        new Users({
-            password: hashedPassword,
-            email: undefined,
-            thirdPartyId: undefined,
-            estimatedSats: 0,
-            earnedSats: 0,
-            sats: 0,
-            paidSats: 0,
-            views: 0,
-            userName: req.body.username,
-            lowerCaseUserName: req.body.username.toLowerCase(),
-            upvotes: 0,
-            avatarUrl: '/api/avatar/Default.jpg',
-            avatarFileName: 'Default.jpg',
-            upvoted: [],
-            reported: [],
-
-        }).save()
-            .then(newuser => res.send({ user: newuser }))
-        // req.flash("error", "Welcome Please Log in")
-        // res.send()
+                }).save()
+                    .then(newuser => res.send({ user: newuser }))
+            }
+            else { res.status(400).send({ error: `That username is already taken` }) }
+        }
+        else {
+            res.send({ error: 'Invalid Username' })
+        }
     });
 
 

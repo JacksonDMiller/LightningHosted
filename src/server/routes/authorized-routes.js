@@ -155,10 +155,10 @@ module.exports = function (app) {
                                 thumbnailPath: 'src/server/uploads/thumbnails/',
                             });
                             let result = await tg.generateOneByPercent(1, { size: dimensions.width + 'x' + dimensions.height })
-                            sharp('src/server/uploads/thumbnails/' + result)
+                            sharp('src/server/uploads/thumbnails/' + await result)
                                 .jpeg({ quality: 80, force: true })
-                                .toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg')
-                            fsPromises.unlink('src/server/uploads/thumbnails/' + result)
+                                .toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg').catch(err => console.log(err))
+                            // fsPromises.unlink('src/server/uploads/thumbnails/' + result)
                             resolve(true)
                         }
                         else {
@@ -255,6 +255,7 @@ module.exports = function (app) {
                     const index = await doc.images
                         .findIndex(image => image.imageId === req.params.imageId)
                     doc.images[index].upvotes = doc.images[index].upvotes + 1;
+                    doc.upvotes = doc.upvotes + 1
                     doc.save();
                     req.user.upvoted.push(req.params.imageId);
                     req.user.save();
@@ -337,7 +338,7 @@ module.exports = function (app) {
                     comment: sanatizedComment,
                     upvotes: 0,
                     comenterId: req.user._id,
-                    comenter: req.user.userName,
+                    comenter: req.user.username,
                     avatar: req.user.avatarUrl,
                     deleted: false,
                     suppressed: false,
@@ -393,7 +394,7 @@ module.exports = function (app) {
                     const newUsernameLowerCase = req.params.username.toLowerCase();
                     const doc = await Users.findOne({ 'lowerCaseUserName': newUsernameLowerCase })
                     if (doc === null) {
-                        req.user.userName = req.params.username;
+                        req.user.username = req.params.username;
                         req.user.lowerCaseUserName = req.params.username.toLowerCase();
                         req.user.save()
                         res.status(200).send({ message: 'updated' })

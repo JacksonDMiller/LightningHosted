@@ -44,13 +44,11 @@ export default function CommentSection(props) {
     )
 
 
-    const MONTH_NAMES = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-
-
     function getFormattedDate(date, prefomattedDate = false, hideYear = false) {
+        const MONTH_NAMES = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
         const day = date.getDate();
         const month = MONTH_NAMES[date.getMonth()];
         const year = date.getFullYear();

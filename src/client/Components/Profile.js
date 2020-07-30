@@ -15,7 +15,6 @@ export default function Profile() {
     const [editUsername, setEditUsername] = useState(false)
 
 
-
     useEffect(() => {
         const elems = document.querySelectorAll('.modal');
         const instances = M.Modal.init(elems);
@@ -41,6 +40,13 @@ export default function Profile() {
         e.preventDefault()
         const res = await fetch('/api/payinvoice/' + invoice);
         const data = await res.json();
+        if (data.error) {
+            M.toast({ html: data.error })
+        }
+        else {
+            M.toast({ html: "You just stacked sats for sharing an image. How cool is that?" })
+            setUser(data.user)
+        }
     }
 
     const openDeleteImage = async (imageId) => {
@@ -76,7 +82,7 @@ export default function Profile() {
         const res = await fetch('/api/changeusername/' + newUserName);
         const result = await res.json();
         if (res.status === 200) {
-            setUser({ ...user, userName: newUserName });
+            setUser({ ...user, username: newUserName });
             setEditUsername(false);
         }
         else { M.toast({ html: result.error }); }
@@ -106,7 +112,7 @@ export default function Profile() {
                         </div>
                         <button className='btn' onClick={updateUserName}>Submit</button>
                     </form>
-                    : <h5 className='col s6 l10'>{user.userName}
+                    : <h5 className='col s6 l10'>{user.username}
                         <i onClick={() => setEditUsername(true)} className="material-icons black-text">edit</i>
                     </h5>
                 }
@@ -114,7 +120,7 @@ export default function Profile() {
 
                 <p className='col s4 l10'>Views: {user.views} </p>
                 <p className='col s4 l10'>Upvotes: {user.upvotes} </p>
-                <p className='col s4 l2'>Sats: {user.earnedSats} </p>
+                <p className='col s4 l2'>Sats: {user.sats} </p>
                 <a className=" withdraw-button col s12 l2 waves-effect waves-light btn modal-trigger"
                     href="#withdrawModal">
                     Withdraw
@@ -174,7 +180,7 @@ export default function Profile() {
                                 }}></textarea>
                                 <label htmlFor="icon_prefix2">Lightning Invoice</label>
                             </div>
-                            <button onClick={withdraw} className='btn col s2'>Withdraw</button>
+                            <button onClick={withdraw} className='btn col s2  modal-close'>Withdraw</button>
                         </div>
                     </form>
                 </div>

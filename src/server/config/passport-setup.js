@@ -32,7 +32,7 @@ passport.use(
                     sats: 0,
                     paidSats: 0,
                     views: 0,
-                    userName: profile.displayName,
+                    username: profile.displayName,
                     upvotes: 0,
                     upvoted: [],
                     reported: []

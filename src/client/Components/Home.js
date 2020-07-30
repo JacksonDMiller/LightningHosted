@@ -13,14 +13,12 @@ export default function Home() {
     const [hasMore, setHasMore] = useState(true);
 
     const getMoreImages = async (position) => {
-        console.log('id')
         const res = await fetch('/api/recomendedimages/' + page);
         const imageData = await res.json();
         if (imageData.length === 0) {
             setHasMore(false);
         }
         setPage(page + 1);
-        console.log(imageData)
         if (position === 'top') {
             let arr = [...imageData, ...images]
             console.log(arr)

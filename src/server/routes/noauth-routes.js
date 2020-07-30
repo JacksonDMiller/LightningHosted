@@ -70,7 +70,7 @@ module.exports = function (app) {
             for (comment in imageData.comments) {
                 let user = await Users.findOne({ '_id': imageData.comments[comment].comenterId })
                 imageData.comments[comment].avatar = user.avatarUrl;
-                imageData.comments[comment].comenter = user.userName;
+                imageData.comments[comment].comenter = user.username;
             }
             res.send(imageData);
         }).catch(err => {
@@ -92,6 +92,7 @@ module.exports = function (app) {
         const index = await doc.images.findIndex(image => image.imageId === req.params.imageId)
         if (!recentViewsList.includes(req.connection.remoteAddress + req.params.imageId)) {
             doc.images[index].views = doc.images[index].views + 1;
+            doc.views = doc.views + 1;
             recentViewsList.push(req.connection.remoteAddress + req.params.imageId)
             doc.save();
         }

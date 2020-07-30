@@ -1,6 +1,7 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, } from 'react';
 import { store } from '../Context/Store';
 import googlebtn from '../../assets/googlebtn.png'
+import { Redirect } from 'react-router-dom'
 
 export default function Login() {
 
@@ -33,13 +34,14 @@ export default function Login() {
             M.toast({ html: res.error })
         }
         else {
-            dispatch({ type: 'LOGIN', payload: res.user })
-            alert('yay')
+            submitCredentialsLogin();
         }
     }
 
     const submitCredentialsLogin = async (e) => {
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -57,73 +59,72 @@ export default function Login() {
         else {
             let data = await res.json()
             dispatch({ type: 'LOGIN', payload: data.user })
-            alert('yay')
         }
     }
 
     return (
 
 
-        <div className="row">
-
-            <div className="col s12">
-                <ul className="tabs">
-                    <li className="tab col s3"><a className="active" href="#login">Log in</a></li>
-                    <li className="tab col s3"><a href="#signup">Sign Up</a></li>
-                </ul>
-            </div>
-            <div id="login" className="col s12">
-                <a href='/api/google'><img src={googlebtn} alt="" /></a>
-                <form className="col s12">
-                    <div className="row">
-                        <div className="input-field col s12">
-                            <input onChange={e => setUsername(e.target.value)}
-                                id="username-login" className="validate" type="text" />
-                            <label htmlFor="username-login">Username</label>
+        <div className="row container">
+            <div className='login-container'>
+                {globalState.state.auth ? <Redirect to='/profile' /> : null}
+                <div className="">
+                    <ul className="tabs">
+                        <li className="tab col s3"><a className="active" href="#login">Log in</a></li>
+                        <li className="tab col s3"><a href="#signup">Sign Up</a></li>
+                    </ul>
+                </div>
+                <div id="login" className="col s12 blue-grey darken-1">
+                    <a href='/api/google'><img className='responsive-img' src={googlebtn} alt="Login With Google" /></a>
+                    <form className="col s12">
+                        <div className="row">
+                            <div className="input-field col s12">
+                                <input onChange={e => setUsername(e.target.value)}
+                                    id="username-login" className="validate" type="text" />
+                                <label htmlFor="username-login">Username</label>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="row">
-                        <div className="input-field col s12">
-                            <input onChange={e => setPassword(e.target.value)}
-                                id="password-login" type="password" className="validate" />
-                            <label htmlFor="password-login">Password</label>
+                        <div className="row">
+                            <div className="input-field col s12">
+                                <input onChange={e => setPassword(e.target.value)}
+                                    id="password-login" type="password" className="validate" />
+                                <label htmlFor="password-login">Password</label>
+                            </div>
                         </div>
-                    </div>
-                    <button className='btn' onClick={submitCredentialsLogin}>Login</button>
-                </form>
+                        <button className='btn' onClick={submitCredentialsLogin}>Login</button>
+                    </form>
 
-            </div>
-            <div id="signup" className="col s12">
-
-
-                <form className="col s12">
-                    <div className="row">
-                        <div className="input-field col s12">
-                            <input onChange={e => setEmail(e.target.value)}
-                                id="email" type="email" className="validate" />
-                            <label htmlFor="email">Email</label>
+                </div>
+                <div id="signup" className="col s12 blue-grey darken-1">
+                    <form className="col s12">
+                        <div className="row">
+                            <div className="input-field col s12">
+                                <input onChange={e => setEmail(e.target.value)}
+                                    id="email" type="email" className="validate" />
+                                <label htmlFor="email">Email</label>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="row">
-                        <div className="input-field col s12">
-                            <input onChange={e => setUsername(e.target.value)}
-                                id="username-signup" className="validate" type="text" />
-                            <label htmlFor="username-signup">Username</label>
+                        <div className="row">
+                            <div className="input-field col s12">
+                                <input onChange={e => setUsername(e.target.value)}
+                                    id="username-signup" className="validate" type="text" />
+                                <label htmlFor="username-signup">Username</label>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="row">
-                        <div className="input-field col s12">
-                            <input onChange={e => setPassword(e.target.value)}
-                                id="password-signup" type="password" className="validate" />
-                            <label htmlFor="password-signup">Password</label>
+                        <div className="row">
+                            <div className="input-field col s12">
+                                <input onChange={e => setPassword(e.target.value)}
+                                    id="password-signup" type="password" className="validate" />
+                                <label htmlFor="password-signup">Password</label>
+                            </div>
                         </div>
-                    </div>
-                    <button className='btn' onClick={submitCredentials}>Submit</button>
-                </form>
+                        <button className='btn' onClick={submitCredentials}>Submit</button>
+                    </form>
 
+                </div>
             </div>
         </div>
 

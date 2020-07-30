@@ -95,7 +95,7 @@ function Uploader({ addImage }) {
                         <textarea onChange={(e) => { setCaption(e.target.value) }} id="icon_prefix4" className="materialize-textarea"></textarea>
                         <label htmlFor="icon_prefix4">Caption</label>
                     </div>
-                    <button onClick={upload}><i className="material-icons prefix col s2">arrow_upward</i> Upload</button>
+                    <button className="btn" onClick={upload}><i className="material-icons prefix col s2">arrow_upward</i> Upload</button>
 
                 </div>
                 : null}

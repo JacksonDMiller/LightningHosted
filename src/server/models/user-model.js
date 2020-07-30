@@ -49,7 +49,7 @@ const accountSchema = new Schema({
     sats: Number,
     paidSats: Number,
     views: Number,
-    userName: String,
+    username: String,
     lowerCaseUserName: String,
     upvotes: Number,
     avatarUrl: String,
