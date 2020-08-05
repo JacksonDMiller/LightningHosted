@@ -29,7 +29,7 @@
     "crypto": "^1.0.1",
     "ejs": "^2.6.2",
     "express": "^4.17.1",
-    "express-fileupload": "^1.1.5",
+    "express-fileupload": "^1.1.9",
     "express-flash": "0.0.2",
     "fs": "0.0.1-security",
     "get-video-dimensions": "^1.0.0",
