@@ -9,7 +9,7 @@ export default function CommentSection(props) {
     const submitComment = async (e) => {
         e.preventDefault();
         if (globalState.state.auth === false) {
-            M.toast({ html: 'Please log in first' })
+            M.toast({ html: "<a href='/login'>Please Login First</a>" })
         }
         else {
 
@@ -117,7 +117,7 @@ export default function CommentSection(props) {
             <div className="row">
                 <form className="col s12">
                     <div className="row">
-                        <div className="input-field col s12">
+                        <div className="input-field col s11">
                             <i className="material-icons prefix">mode_edit</i>
                             <textarea id="icon_prefix2" className="materialize-textarea" onChange={
                                 e => setnewComment(e.target.value)} value={newComment}>

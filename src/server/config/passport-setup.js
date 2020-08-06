@@ -9,8 +9,8 @@ const LocalStrategy = require('passport-local');
 passport.use(
     new GoogleStrategy({
         //options for the google strat
-        // callbackURL: 'http://192.168.0.33.xip.io:8080/api/google/redirect',
-        callbackURL: 'http://localhost:3000/api/google/redirect',
+        callbackURL: 'http://192.168.0.33.xip.io:8080/api/google/redirect',
+        // callbackURL: 'http://localhost:3000/api/google/redirect',
         clientID: keys.google.clientID,
         clientSecret: keys.google.clientSecret
     }, (accessToken, refreshToken, profile, done) => {
@@ -48,7 +48,16 @@ passport.use(
 passport.use(new LocalStrategy(
     function (username, password, done) {
         username = username.toLowerCase();
-        Users.findOne({ lowerCaseUserName: username }, function (err, user) {
+        Users.findOne({
+            $or: [
+                {
+                    lowerCaseUserName: username
+                },
+                {
+                    email: username
+                }
+            ]
+        }, function (err, user) {
             if (err) { return done(err); }
             if (!user) {
                 return done(null, false, { message: 'Username not found' });
@@ -64,6 +73,32 @@ passport.use(new LocalStrategy(
     }
 
 ));
+
+
+
+
+
+
+
+// passport.use(new LocalStrategy(
+//     function (username, password, done) {
+//         username = username.toLowerCase();
+//         Users.findOne({ lowerCaseUserName: username }, function (err, user) {
+//             if (err) { return done(err); }
+//             if (!user) {
+//                 return done(null, false, { message: 'Username not found' });
+//             }
+//             bcrypt.compare(password, user.password, (bcryptErr, res) => {
+//                 if (bcryptErr) { return done(bcryptErr); }
+//                 if (!res) {
+//                     { return done(null, false, { message: 'Incorect Password' }); }
+//                 }
+//                 return done(null, user);
+//             })
+//         })
+//     }
+
+// ));
 
 
 

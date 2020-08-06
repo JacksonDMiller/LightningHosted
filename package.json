@@ -21,6 +21,7 @@
     "events": "^3.1.0",
     "express": "^4.16.3",
     "express-fileupload": "^1.1.7-alpha.3",
+    "express-history-api-fallback": "^2.2.1",
     "ffmpeg": "0.0.4",
     "filepond": "^4.17.1",
     "filepond-plugin-file-validate-size": "^2.2.1",

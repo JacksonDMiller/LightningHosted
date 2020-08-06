@@ -10,7 +10,7 @@ export default function AvatarUploader(props) {
     const editor = useRef(editor)
 
     const handleNewImage = e => {
-        if (e.target.files[0].size > 1048576 * 2) {
+        if (e.target.files[0].size > 1048576 * 5) {
             alert('file is to big')
         }
         else {
@@ -50,31 +50,27 @@ export default function AvatarUploader(props) {
         }
     }
 
-    // const setEditorRef = (editor) => editor = editor
-    // const editor = ReactAvatarEditor.createRef()
-
     return (
-        <div className='container'>
+        <div className='avatar-editor'>
             <div>
                 <ReactAvatarEditor
                     ref={editor}
                     scale={parseFloat(scale)}
-                    width={200}
-                    height={200}
+                    width={250}
+                    height={250}
                     position={position}
                     onPositionChange={handlePositionChange}
                     rotate={0}
                     borderRadius={200 / (100 / 300)}
                     image={image}
-                    className="editor-canvas"
+                    className="editor-canvas center"
                 />
             </div>
-            <br />
-          New File:
-            <input accept="image/*" name="newImage" type="file" onChange={handleNewImage} />
-            <br />
-          Zoom:
+
+            <input id='avatar-input' className='hide' accept="image/*" name="newImage" type="file" onChange={handleNewImage} />
+            <button className="btn center"><label className='' htmlFor='avatar-input'>Choose Image</label></button>
             <input
+                className='avatar-input-slider center'
                 name="scale"
                 type="range"
                 onChange={handleScale}
@@ -82,9 +78,9 @@ export default function AvatarUploader(props) {
                 max="2"
                 step="0.01"
                 defaultValue="1"
-                style={{ width: '250px' }}
+                style={{}}
             />
-            <button className='btn modal-close' onClick={onClickSave}>Save</button>
+            <button className='btn modal-close center' onClick={onClickSave}>Save</button>
         </div>
     )
 }

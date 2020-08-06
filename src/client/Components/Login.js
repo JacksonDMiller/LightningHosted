@@ -81,7 +81,7 @@ export default function Login() {
                             <div className="input-field col s12">
                                 <input onChange={e => setUsername(e.target.value)}
                                     id="username-login" className="validate" type="text" />
-                                <label htmlFor="username-login">Username</label>
+                                <label htmlFor="username-login">Username or Email</label>
                             </div>
                         </div>
 

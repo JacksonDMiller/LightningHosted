@@ -18,6 +18,7 @@ const imageSchema = new Schema({
     imageId: String,
     reviewStatus: Boolean,
     payStatus: Boolean,
+    paymentRequired: Boolean,
     deleted: Boolean,
     views: Number,
     reports: Number,

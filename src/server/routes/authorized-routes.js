@@ -75,7 +75,7 @@ module.exports = function (app) {
                 .rotate()
                 .toFile('src/server/uploads/avatars/' + newAvatarFileName)
             fsPromises.unlink(req.file.path);
-            if (req.user.avatarFileName) {
+            if (req.user.avatarFileName && req.user.avatarFileName != 'Default.jpg') {
                 fsPromises.unlink('src/server/uploads/avatars/' + req.user.avatarFileName)
             }
             req.user.avatarFileName = newAvatarFileName;
@@ -204,6 +204,7 @@ module.exports = function (app) {
                     date: new (Date),
                     caption: req.body.caption,
                     paymentRequest: imageInvoice.request,
+                    paymentRequired: paymentRequired,
                     upvotes: 0,
                     sats: 0,
                     numberOfComments: 0,

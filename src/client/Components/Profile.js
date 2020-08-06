@@ -94,8 +94,8 @@ export default function Profile() {
             {!loggedIn ? <Redirect to='/' /> : null}
             <div className='row profile-info'>
                 {user.avatarUrl ?
-                    <div className='col s6 l2 avatar-img-div center-align' >
-                        <img className='avatar-image circle responsive-img col  ' src={user.avatarUrl}>
+                    <div className='col s12 m2 avatar-img-div right-align' >
+                        <img className='circle responsive-img avatar-image' src={user.avatarUrl}>
                         </img>
                         <a className="modal-trigger avatar-edit-button" href="#editModal">
                             <i className="material-icons black-text">edit</i>
@@ -104,31 +104,53 @@ export default function Profile() {
                     : null}
 
                 {editUsername ?
-                    <form className="col s6 l10'">
+                    <form className="col s12 m10 hide-on-med-and-up">
                         <div className="input-field">
                             <input onChange={e => setNewUserName(e.target.value)}
-                                id="username-login" className="validate" type="text" />
-                            <label htmlFor="username-login">Username</label>
+                                id="username-login-small" className="validate" type="text" />
+                            <label htmlFor="username-login">New Username</label>
                         </div>
-                        <button className='btn' onClick={updateUserName}>Submit</button>
+                        <button className='btn social-icon' onClick={updateUserName}>Submit</button>
+                        <button className='btn social-icon' onClick={() => setEditUsername(false)}>Cancle</button>
+
                     </form>
-                    : <h5 className='col s6 l10'>{user.username}
+                    : <h5 className='col s12 m10 center-align hide-on-med-and-up'>{user.username + ' '}
+                        <i onClick={() => setEditUsername(true)} className="material-icons black-text">edit</i>
+                    </h5>
+                }
+
+                {editUsername ?
+                    <form className="col s12 m10 hide-on-small-only">
+                        <div className="input-field new-username">
+                            <input onChange={e => setNewUserName(e.target.value)}
+                                id="username-login" className="validate" type="text" />
+                            <label htmlFor="username-login">New Username</label>
+                        </div>
+                        <button className='btn social-icon' onClick={updateUserName}>Submit</button>
+                        <button className='btn social-icon' onClick={() => setEditUsername(false)}>Cancle</button>
+                    </form>
+                    : <h5 className='col s12 m10 left-align hide-on-small-only'>{user.username + ' '}
                         <i onClick={() => setEditUsername(true)} className="material-icons black-text">edit</i>
                     </h5>
                 }
 
 
-                <p className='col s4 l10'>Views: {user.views} </p>
-                <p className='col s4 l10'>Upvotes: {user.upvotes} </p>
-                <p className='col s4 l2'>Sats: {user.sats} </p>
-                <a className=" withdraw-button col s12 l2 waves-effect waves-light btn modal-trigger"
+                <p className='col s4 m10 hide-on-small-only'>Views: {user.views} </p>
+                <p className='col s4 m10 hide-on-small-only'>Upvotes: {user.upvotes} </p>
+                <p className='col s4 m2 hide-on-small-only'>Sats: {user.sats} </p>
+
+                <p className='col s4 m10 center-align hide-on-med-and-up'>Views: {user.views} </p>
+                <p className='col s4 m10 center-align hide-on-med-and-up'>Upvotes: {user.upvotes} </p>
+                <p className='col s4 m2 center-align hide-on-med-and-up'>Sats: {user.sats} </p>
+
+                <a className=" withdraw-button col s12 m2 waves-effect waves-light btn modal-trigger"
                     href="#withdrawModal">
                     Withdraw
                     </a>
 
             </div >
 
-            <div className='align-center'>
+            <div className=''>
                 <Uploader addImage={addImage} />
             </div>
             <Masonry
@@ -152,35 +174,27 @@ export default function Profile() {
 
 
             <div id="editModal" className="modal">
-                <div className="modal-content">
-                    <h4>Choose a new avatar</h4>
+                <div className="modal-content row">
+                    <h4 className='center-align'>Choose a new avatar</h4>
                     <AvatarUploader updateAvatar={updateAvatar} />
-                </div>
-                <div className="input-field col s10">
-                    <i className="material-icons prefix">mode_edit</i>
-                    <textarea id="icon_prefix5" className="materialize-textarea" onChange={(e) => {
-                        setNewUserName(e.target.value)
-                    }}></textarea>
-                    <label htmlFor="icon_prefix5">New Username</label>
-                    <button className='btn modal-close' onClick={updateUserName}>Submit</button>
                 </div>
             </div>
 
             <div id="withdrawModal" className="modal">
                 <div className="modal-content">
-                    <h4>Withdraw</h4>
+                    <h4 className='center-align'>Withdraw</h4>
                 </div>
-                <div className="input-field col s10">
-                    <form className="col s12">
-                        <div className="row">
-                            <div className="input-field col s10">
+                <div className="input-field">
+                    <form className="">
+                        <div className="row container">
+                            <div className="input-field col m10 s12">
                                 <i className="material-icons prefix">mode_edit</i>
                                 <textarea id="icon_prefix2" className="materialize-textarea" onChange={(e) => {
                                     setInvoice(e.target.value)
                                 }}></textarea>
                                 <label htmlFor="icon_prefix2">Lightning Invoice</label>
                             </div>
-                            <button onClick={withdraw} className='btn col s2  modal-close'>Withdraw</button>
+                            <button onClick={withdraw} className='btn col m2 s12  modal-close'>Withdraw</button>
                         </div>
                     </form>
                 </div>

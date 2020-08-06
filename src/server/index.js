@@ -5,7 +5,7 @@ const passportSetup = require('./config/passport-setup');
 const cookieSession = require('cookie-session');
 const keys = require('./config/keys')
 var logger = require('./log.js');
-
+const fallback = require('express-history-api-fallback');
 
 // setting up express
 const app = express();
@@ -17,9 +17,10 @@ app.use(cookieSession({
     keys: [keys.session.cookieKey]
 }));
 
+
+
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 //setting up mongodb
 var mongoose = require('mongoose');
@@ -36,6 +37,9 @@ require('./routes/authentication-routes')(app);
 require('./routes/payment-routes')(app);
 require('./routes/authorized-routes')(app);
 
+app.use(fallback('index.html', { root: './dist' }))
+
+
 
 app.listen(process.env.PORT || 8080, () => console.log(`YipYip app is listening on port ${process.env.PORT || 8080}!`));
-
+ 

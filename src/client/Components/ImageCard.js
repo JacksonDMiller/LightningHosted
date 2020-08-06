@@ -14,11 +14,14 @@ export default function ImageCard(props) {
         caption,
         views,
         numberOfComments,
+        orientation,
     } = props.imageData
+
+
     const { profile, share } = props
     const upvote = async (imageId) => {
         if (globalState.state.auth === false) {
-            M.toast({ html: 'Please Login First' })
+            M.toast({ html: "<a href='/login'>Please Login First</a>" })
         }
         else {
             if (!globalState.state.upvoted.includes(imageId)) {
@@ -33,22 +36,42 @@ export default function ImageCard(props) {
             dispatch({ type: 'UPDATE', payload: data.user });
         }
     }
-    return (
-        <div className="imageCard card hoverable">
-            <Link to={'/s/' + imageId}>
-                <div className="card-image">
-                    {fileType === 'mp4' ?
-                        <video autoPlay muted loop className='responsive-mp4'>
-                            <source src={"/api/i/" + fileName} type="video/mp4" />
-                        </video>
-                        : fileType === 'gif' ? < img src={"/api/i/" + fileName} alt="image" />
-                            : <img src={"/api/t/" + fileName} alt="image" />}
 
-                </div>
-                {caption ? <div>
-                    <p className="flow-text black-text">{caption.length > 60 ? caption.substring(0, 60) + '...' : caption}</p>
-                </div> : null}
-            </Link>
+    const media = () => {
+        if (fileType === 'mp4') {
+            return <video autoPlay muted loop className="responsive-mp4">
+                <source src={"/api/i/" + fileName} type="video/mp4" />
+            </video>
+        }
+        if (fileType === 'gif') {
+            return < img src={"/api/i/" + fileName} alt="image" ></img>
+        }
+        return <img src={"/api/t/" + fileName} alt="image"></img>
+    }
+
+    return (
+        <div className={share ? "card center " + orientation + '-own' : 'card card-hover'}>
+
+            {share ?
+                <div>
+                    <div className="card-image">
+
+                        {media()}
+                    </div>
+                    {caption ? <div>
+                        <p className="flow-text black-text">{caption.length > 60 ? caption.substring(0, 60) + '...' : caption}</p>
+                    </div> : null}
+                </div> :
+                <Link to={'/s/' + imageId}>
+                    <div className="card-image">
+
+                        {media()}
+                    </div>
+                    {caption ? <div>
+                        <p className="flow-text black-text">{caption.length > 60 ? caption.substring(0, 60) + '...' : caption}</p>
+                    </div> : null}
+                </Link>}
+
             {profile ?
                 <div className="card-content row profile-image-stats">
                     <span className="center-align col s3 ">

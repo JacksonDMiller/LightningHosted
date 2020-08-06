@@ -42,13 +42,14 @@ module.exports = function (app) {
     // create new user with username and password. 
     app.post('/api/register', async (req, res) => {
         if (/^[a-zA-Z0-9_-]{3,16}$/.test(req.body.username)) {
-            let newUsernameLowerCase = req.body.username.toLowerCase()
+            let newUsernameLowerCase = req.body.username.toLowerCase();
+            let newUserEmailAddress = req.body.email.toLowerCase();
             const doc = await Users.findOne({ 'lowerCaseUserName': newUsernameLowerCase })
             if (doc === null) {
                 const hashedPassword = await bcrypt.hash(req.body.password, 10)
                 new Users({
                     password: hashedPassword,
-                    email: req.body.email,
+                    email: newUserEmailAddress,
                     thirdPartyId: undefined,
                     estimatedSats: 0,
                     earnedSats: 0,
