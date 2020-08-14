@@ -22,10 +22,12 @@ updateTopTenList = async () => {
     record.forEach(element => {
         //sort the images here
         for (image in element.images) {
-            if (element.images[image].deleted !== true && element.images[image].suppressed !== true) {
-                let hoursSincePosting = Math.round((new Date - element.images[image].date) / 1000 / 60 / 60)
-                element.images[image].score = element.images[image].views + element.images[image].upvotes - hoursSincePosting
-                topPostsList.push(element.images[image])
+            if (!element.images[image].deleted && !element.images[image].suppressed || true) {
+                if (!element.images[image].paymentRequired || element.images[image].payStatus || true) {
+                    let hoursSincePosting = Math.round((new Date - element.images[image].date) / 1000 / 60 / 60)
+                    element.images[image].score = element.images[image].views + element.images[image].upvotes - hoursSincePosting
+                    topPostsList.push(element.images[image])
+                }
             }
         }
         topPostsList.sort((a, b) => b.score - a.score)
@@ -81,8 +83,8 @@ module.exports = function (app) {
 
     // get the next ten images from top images list 
     app.get('/api/recomendedimages/:page', (req, res) => {
-        let start = 0 + (req.params.page * 10)
-        let end = 15 + (req.params.page * 10)
+        let start = 0 + (req.params.page * 20)
+        let end = 20 + (req.params.page * 20)
         res.send(topPostsList.slice(start, end))
     })
 

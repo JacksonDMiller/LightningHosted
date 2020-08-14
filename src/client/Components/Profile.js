@@ -110,11 +110,11 @@ export default function Profile() {
                                 id="username-login-small" className="validate" type="text" />
                             <label htmlFor="username-login">New Username</label>
                         </div>
-                        <button className='btn social-icon' onClick={updateUserName}>Submit</button>
-                        <button className='btn social-icon' onClick={() => setEditUsername(false)}>Cancle</button>
+                        <button className='btn' onClick={updateUserName}>Submit</button>
+                        <button className='btn' onClick={() => setEditUsername(false)}>Cancle</button>
 
                     </form>
-                    : <h5 className='col s12 m10 center-align hide-on-med-and-up'>{user.username + ' '}
+                    : <h5 className='col s12 m10 center-align hide-on-med-and-up'>{user.username ? user.username : null}
                         <i onClick={() => setEditUsername(true)} className="material-icons black-text">edit</i>
                     </h5>
                 }
@@ -126,10 +126,10 @@ export default function Profile() {
                                 id="username-login" className="validate" type="text" />
                             <label htmlFor="username-login">New Username</label>
                         </div>
-                        <button className='btn social-icon' onClick={updateUserName}>Submit</button>
-                        <button className='btn social-icon' onClick={() => setEditUsername(false)}>Cancle</button>
+                        <button className='btn' onClick={updateUserName}>Submit</button>
+                        <button className='btn' onClick={() => setEditUsername(false)}>Cancle</button>
                     </form>
-                    : <h5 className='col s12 m10 left-align hide-on-small-only'>{user.username + ' '}
+                    : <h5 className='col s12 m10 left-align hide-on-small-only'>{user.username ? user.username : null}
                         <i onClick={() => setEditUsername(true)} className="material-icons black-text">edit</i>
                     </h5>
                 }

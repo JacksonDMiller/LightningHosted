@@ -1,11 +1,27 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import { store } from '../Context/Store';
+import { viewportContext } from '../Context/GetWindowDimensions'
 
 
 export default function ImageCard(props) {
+
+    useEffect(() => {
+        var elems = document.querySelectorAll('.tooltipped');
+        var instances = M.Tooltip.init(elems,);
+        return () => {
+            if (instances.length) {
+                instances.forEach(instance => instance.destroy());
+            }
+        }
+    }, [])
+
+
+
     const [upvotes, setUpovotes] = useState(props.imageData.upvotes)
     const globalState = useContext(store);
+    const { width } = useContext(viewportContext);
+
     const { dispatch } = globalState;
 
     const { imageId,
@@ -15,6 +31,8 @@ export default function ImageCard(props) {
         views,
         numberOfComments,
         orientation,
+        paymentRequired,
+        payStatus
     } = props.imageData
 
 
@@ -38,20 +56,53 @@ export default function ImageCard(props) {
     }
 
     const media = () => {
+        let lock = ''
+        if (paymentRequired && profile && payStatus === false) {
+            lock = <div
+                className="lock valign-wrapper tooltipped"
+                data-position="bottom"
+                data-tooltip="This image requires a payment click to learn more">
+                <span className='center-align center'>
+                    <i className="material-icons large">lock</i>
+                </span>
+            </div>
+        }
+
+
         if (fileType === 'mp4') {
-            return <video autoPlay muted loop className="responsive-mp4">
+            return <span><video autoPlay muted loop className="responsive-mp4">
                 <source src={"/api/i/" + fileName} type="video/mp4" />
             </video>
+                {lock}
+            </span>
         }
         if (fileType === 'gif') {
-            return < img src={"/api/i/" + fileName} alt="image" ></img>
+            return <span>< img src={"/api/i/" + fileName} alt="image" ></img>
+                {lock}
+            </span>
         }
-        return <img src={"/api/t/" + fileName} alt="image"></img>
+        if (share) {
+            return <span><img className='img-payment-required' src={"/api/i/" + fileName} alt="image"></img>
+                {lock}
+            </span>
+        }
+        return <span><img className='img-payment-required' src={"/api/t/" + fileName} alt="image"></img>
+            {lock}
+        </span>
+    }
+
+    const containerClasses = () => {
+        if (share) {
+            return "card center " + orientation + '-own'
+        }
+        if (width < 500) {
+            return 'card'
+        }
+        else { return 'card card-hover' }
     }
 
     return (
-        <div className={share ? "card center " + orientation + '-own' : 'card card-hover'}>
-
+        <div className={containerClasses()}>
             {share ?
                 <div>
                     <div className="card-image">
@@ -59,7 +110,7 @@ export default function ImageCard(props) {
                         {media()}
                     </div>
                     {caption ? <div>
-                        <p className="flow-text black-text">{caption.length > 60 ? caption.substring(0, 60) + '...' : caption}</p>
+                        <p className="flow-text black-text caption-text">{caption}</p>
                     </div> : null}
                 </div> :
                 <Link to={'/s/' + imageId}>
@@ -67,9 +118,10 @@ export default function ImageCard(props) {
 
                         {media()}
                     </div>
-                    {caption ? <div>
-                        <p className="flow-text black-text">{caption.length > 60 ? caption.substring(0, 60) + '...' : caption}</p>
-                    </div> : null}
+                    {caption ?
+                        <div>
+                            <p className="flow-text black-text caption-text">{caption.length > 60 ? caption.substring(0, 60) + '...' : caption}</p>
+                        </div> : null}
                 </Link>}
 
             {profile ?
@@ -111,9 +163,16 @@ export default function ImageCard(props) {
                         {upvotes}
                     </span>
                     <Link to={'/s/' + imageId}>
-                        <span className="center-align col s4 ">
-                            <i className="material-icons image-icon">remove_red_eye</i> {views}
-                        </span>
+                        {/* avoid showing 0 views when you are the first viewer */}
+                        {share ?
+                            <span className="center-align col s4 ">
+                                <i className="material-icons image-icon">remove_red_eye</i> {views + 1}
+                            </span> :
+                            <span className="center-align col s4 ">
+                                <i className="material-icons image-icon">remove_red_eye</i> {views}
+                            </span>
+                        }
+
                     </Link>
                     <Link to={'/s/' + imageId}>
                         <span className="center-align col s4 ">

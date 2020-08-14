@@ -94,6 +94,27 @@ module.exports = function (app) {
     // Upload a new image, process it, add it to the datbase, create an invoice to pay
     // the deposit
     app.post('/api/upload', uploadImage.single("filepond"), async function (req, res) {
+        let imagesUploadeToday = 0;
+        let paymentRequired = false;
+        let imageInvoice = '';
+
+
+        for await (image of req.user.images) {
+            if (new Date - image.date <= 86400000) {
+                imagesUploadeToday = imagesUploadeToday + 1
+                console.log(imagesUploadeToday)
+            }
+        }
+
+        console.log(imagesUploadeToday);
+        if (imagesUploadeToday > 0) {
+            paymentRequired = true
+            console.log('set to true')
+        }
+        console.log(paymentRequired);
+        console.log(imagesUploadeToday);
+
+
         if (Object.keys(req.file).length === 0) {
             return res.status(400).send('No files were uploaded.');
         }
@@ -101,10 +122,10 @@ module.exports = function (app) {
             const imageFileName = crypto.randomBytes(8).toString('hex')
             let imageExtension = ''
             try {
-                let imageInvoice = createInvoice({ lnd, description: 'LightningHosted deposit', tokens: '100' })
-
+                // if (paymentRequired === true) {
+                imageInvoice = createInvoice({ lnd, description: 'LightningHosted deposit', tokens: '100' })
+                // }
                 const processedImage = new Promise(async (resolve, reject) => {
-                    // console.log('starting image proccessing')
                     try {
                         if (req.file.mimetype === 'image/gif') {
                             await fsPromises.rename(req.file.path, 'src/server/uploads/compressed/' + imageFileName + '.gif')
@@ -176,11 +197,14 @@ module.exports = function (app) {
 
                 await generateThumbnail
 
+                // if (paymentRequired === true) {
                 await imageInvoice.then((invoice) => {
-                    imageInvoice = invoice;
+                    imageInvoice = invoice.request;
                 }).catch(err => {
-                    throw err[2].err.details
+                    throw err[2].err.details + 'its here'
                 })
+                // }
+                // else { imageInvoice = null; }
 
                 let imageOrientation = 'horizontal'
                 if (dimensions.height > dimensions.width) {
@@ -203,7 +227,7 @@ module.exports = function (app) {
                     height: dimensions.height,
                     date: new (Date),
                     caption: req.body.caption,
-                    paymentRequest: imageInvoice.request,
+                    paymentRequest: imageInvoice,
                     paymentRequired: paymentRequired,
                     upvotes: 0,
                     sats: 0,
@@ -213,6 +237,7 @@ module.exports = function (app) {
                     twitterCard: 'twitterCard',
                     suppressed: false,
                 }
+                console.log(imageData)
                 await req.user.images.push(imageData);
                 req.user.save();
 
@@ -325,7 +350,7 @@ module.exports = function (app) {
     app.post('/api/newcomment', async (req, res) => {
 
         function sanitizeString(str) {
-            str = str.replace(/[^a-z0-9áéíóúñü \.""₿()$#@&,_-]/gim, "");
+            str = str.replace(/[^a-z0-9áéíóúñü \.?!""₿()$#@&,_-]/gim, "");
             return str.trim();
         }
 

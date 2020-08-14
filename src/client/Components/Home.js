@@ -1,23 +1,24 @@
 
 
-import { useState, useEffect, useContext, } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import ImageCard from './ImageCard';
 import InfiniteScroll from "react-infinite-scroll-component";
 import Masonry from 'react-masonry-css'
 import React from 'react'
+import { HorizontalAd } from '../Components/HorizontalAd'
 import { viewportContext } from '../Context/GetWindowDimensions'
 
+
 export default function Home() {
-
-
+    const { width } = useContext(viewportContext);
     const [images, setImages] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const { width } = useContext(viewportContext);
 
     const getMoreImages = async (position) => {
         const res = await fetch('/api/recomendedimages/' + page);
         const imageData = await res.json();
+        console.log(imageData)
         if (imageData.length === 0) {
             setHasMore(false);
         }
@@ -32,50 +33,21 @@ export default function Home() {
         }
     }
 
+    const isMobile = () => {
+        if (width < 600) {
+            return true;
+        }
+        else { return false; }
+    }
+
     useEffect(() => {
         getMoreImages();
     }, [])
 
-    const ad = () => {
-        if (width >= 1000) {
-            return <iframe className='center ad'
-                data-aa="1259137" src="//ad.a-ads.com/1259137?size=728x90"
-                scrolling="no"
-                style={{ width: '728px', height: '90px', border: '0px', padding: 0, overflow: 'hidden' }}
-                allowtransparency="true">
-
-            </iframe>
-        }
-        if (width >= 800) {
-            return <iframe className='center ad'
-                data-aa="1259139" src="//ad.a-ads.com/1259139?size=468x60"
-                scrolling="no"
-                style={{ width: '468px', height: '60px', border: '0px', padding: 0, overflow: "hidden" }}
-                allowtransparency="true">
-
-            </iframe>
-        }
-        else {
-            return <iframe
-                className='center ad'
-                data-aa="1443703"
-                src="//ad.a-ads.com/1443703?size=320x50"
-                scrolling="no"
-                style={{ width: '320px', height: '50px', border: '0px', padding: 0, overflow: 'hidden' }}
-                allowtransparency="true"></iframe>
-        }
-    }
 
     return (
-        <div className=''>
-            {ad()}
-
-            {/* 
-          
-
-
-
-           */}
+        <div className='home'>
+            <HorizontalAd />
             <InfiniteScroll
                 dataLength={images.length}
                 next={getMoreImages}
@@ -87,7 +59,7 @@ export default function Home() {
                     </p>
                 }
                 refreshFunction={() => getMoreImages('top')}
-                pullDownToRefresh={true}
+                pullDownToRefresh={isMobile()}
                 pullDownToRefreshContent={
                     <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
                 }
@@ -95,6 +67,7 @@ export default function Home() {
                     <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
                 }
                 pullDownToRefreshThreshold={100}
+                className='infinite-scroll'
             >
 
                 <Masonry

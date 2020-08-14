@@ -9,7 +9,7 @@ const LocalStrategy = require('passport-local');
 passport.use(
     new GoogleStrategy({
         //options for the google strat
-        callbackURL: 'http://192.168.0.33.xip.io:8080/api/google/redirect',
+        callbackURL: 'http://192.168.0.33.xip.io:3000/api/google/redirect',
         // callbackURL: 'http://localhost:3000/api/google/redirect',
         clientID: keys.google.clientID,
         clientSecret: keys.google.clientSecret

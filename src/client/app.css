@@ -84,11 +84,12 @@ body {
 }
 
 .btn {
-    background-color: #800080;
+    background-color: #800080 !important;
+    margin: 10px;
 }
 
 .btn:hover {
-    background-color: #800080;
+    background-color: #800080 !important;
 }
 
 .social-icon {
@@ -142,6 +143,15 @@ body {
 
 .horizontal-own {
     max-width: 50vw;
+}
+
+@media only screen and (max-width: 600px) {
+    .vertical-own {
+        max-width: 90%;
+    }
+    .horizontal-own {
+        max-width: 100%;
+    }
 }
 
 .avatar-input-slider:-webkit-slider-thumb {
@@ -247,15 +257,62 @@ input[type=range]:focus::-ms-fill-upper {
     background: #3071A9;
 }
 
-/* .editor-canvas {
-    height: auto !important;
-    width: 100% !important;
-} */
-
 .avatar-editor .btn {
     max-width: 200px;
 }
 
 .avatar-input-slider {
     max-width: 250px !important;
+}
+
+.qr-code {
+    padding: 20px;
+    height: 228px !important;
+    width: 228px !important;
+    background: white;
+}
+
+.img-payment-required {
+    position: relative;
+}
+
+.lock {
+    position: absolute;
+    top: 40%;
+    left: 35%;
+    /* background-color: white; */
+    width: 20%;
+    height: 20%;
+}
+
+/* label focus color */
+
+.input-field input[type=text]:focus+label, .materialize-textarea:focus:not([readonly])+label {
+    color: #800080 !important;
+}
+
+.input-field .prefix.active {
+    color: #800080 !important;
+}
+
+/* label underline focus color */
+
+.input-field input[type=text]:focus, .materialize-textarea:focus:not([readonly]) {
+    border-bottom: 1px solid #800080 !important;
+    box-shadow: 0 1px 0 0 #800080 !important;
+}
+
+.avatar-input {
+    color: inherit !important;
+    font-size: inherit !important;
+}
+
+body {
+    /* Disables pull-to-refresh but allows overscroll glow effects. */
+    overscroll-behavior-y: contain;
+}
+
+.caption-text {
+    padding-left: 5%;
+    padding-right: 5%;
 }

@@ -56,8 +56,8 @@ export default function AvatarUploader(props) {
                 <ReactAvatarEditor
                     ref={editor}
                     scale={parseFloat(scale)}
-                    width={250}
-                    height={250}
+                    width={150}
+                    height={150}
                     position={position}
                     onPositionChange={handlePositionChange}
                     rotate={0}
@@ -68,7 +68,7 @@ export default function AvatarUploader(props) {
             </div>
 
             <input id='avatar-input' className='hide' accept="image/*" name="newImage" type="file" onChange={handleNewImage} />
-            <button className="btn center"><label className='' htmlFor='avatar-input'>Choose Image</label></button>
+            <button className="btn center"><label className='avatar-input' htmlFor='avatar-input'>Choose Image</label></button>
             <input
                 className='avatar-input-slider center'
                 name="scale"

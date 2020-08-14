@@ -24,6 +24,7 @@ module.exports = function (app) {
             if (req.user.sats >= details.tokens) {
                 const lndRes = await pay({ lnd, request: req.params.invoice })
                 // update the users balance
+                console.log(lndRes)
                 req.user.sats = req.user.sats - details.tokens;
                 req.user.paidSats = req.user.paidSats + details.tokens;
                 req.user.save();
@@ -32,20 +33,33 @@ module.exports = function (app) {
             else { res.status(400).send({ error: `You don't have enough sats` }) }
         }
         catch (err) {
+            console.log(err)
             res.send({ error: 'Oops something went wrong please try again' })
         }
     })
 
+    // calling this with undefined crashes the whole server... 
     // check if a payment has been made
     app.get('/api/checkpayment/:invoice', async (req, res) => {
-        const doc = await Users.findOne({ 'images.paymentRequest': req.params.invoice })
-        const index = await doc.images.findIndex(image => image.paymentRequest === req.params.invoice)
-        if (doc.images[index].payStatus === true) {
-            res.send(doc.images[index].payStatus);
-        }
-        else { res.status(402).send() }
+        if (req.params.invoice) {
+            try {
+                const doc = await Users.findOne({ 'images.paymentRequest': req.params.invoice })
+                if (doc) {
+                    const index = await doc.images.findIndex(image => image.paymentRequest === req.params.invoice)
 
+                    if (doc.images[index].payStatus === true) {
+                        res.send(doc.images[index].payStatus);
+                    }
+                }
+                else { res.status(402).send() }
+            }
+            catch (err) { console.log(err) }
+        }
+        else {
+            res.status(400).send({ error: 'oops something went wrong' })
+        }
     })
 }
+
 
 

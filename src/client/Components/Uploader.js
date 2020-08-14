@@ -21,37 +21,15 @@ registerPlugin(FilePondPluginFileValidateType, FilePondPluginImageExifOrientatio
 
 
 function Uploader({ addImage }) {
-    const [file, setFile] = useState([])
-    const [invoice, setInvoice] = useState(null)
-    const [paid, setPaid] = useState(false)
-    const [caption, setCaption] = useState('')
-
-    const checkForPayment = (invoice) => {
-        var counter = 0
-        var cp = setInterval(async () => {
-            counter = counter + 1
-            if (counter === 300) {
-                clearInterval(cp)
-            }
-            let res = await fetch('/api/checkpayment/' + invoice)
-            if (res.status === 200) {
-                setPaid(true)
-                clearInterval(cp)
-            }
-
-        }, 1000);
-    }
-
-    const pond = React.createRef()
+    const [file, setFile] = useState([]);
+    const [caption, setCaption] = useState('');
+    const pond = React.createRef();
     const upload = () => {
-        pond.current.processFiles()
+        pond.current.processFiles();
     }
-
 
     return (
         <div>
-            {invoice ? <QRCode value={invoice} /> : null}
-            <span>{paid === true ? 'Paid' : null} </span>
             <FilePond
                 acceptedFileTypes={['image/png', 'image/jpeg', 'image/gif', 'video/mp4']}
                 ref={pond}
@@ -69,8 +47,6 @@ function Uploader({ addImage }) {
                             res = JSON.parse(res)
                             if (!res.errror) {
                                 addImage(res)
-                                setInvoice(res.paymentRequest);
-                                checkForPayment(res.paymentRequest);
                                 setCaption('');
                                 setFile([]);
                             }

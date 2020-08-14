@@ -1,79 +1,110 @@
+// image Data wont stay saved in the state for some reason 
+
+
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom'
 import CommentSection from './CommentSection'
 import ImageCard from './ImageCard'
 import { viewportContext } from '../Context/GetWindowDimensions'
+var QRCode = require('qrcode.react');
+import { HorizontalAd } from '../Components/HorizontalAd'
 
-export default function Share(props) {
+
+export default function Share() {
     const [imageData, setImageData] = useState({});
     let { imageId } = useParams();
     const { width } = useContext(viewportContext);
+    var checkPaymentInterval = null;
+
+    const getImageInfo = async () => {
+        const newImageData = await (await fetch('/api/imageinfo/' + imageId)).json()
+        await newImageData
+        setImageData(newImageData)
+        if (newImageData.paymentRequired && newImageData.payStatus === false) {
+            checkForPayment(newImageData.paymentRequest)
+        }
+        // attempt to record a view if the the localStorage does not indicate they
+        // have seen this image before
+        if (!localStorage.getItem(newImageData.imageId)) {
+            localStorage.setItem(newImageData.imageId, true);
+            fetch('/api/incrementPageView/' + newImageData.imageId)
+        }
+
+    }
 
     useEffect(() => {
         // grab the image and image info
-        const getImageInfo = async () => {
-            const res = await fetch('/api/imageinfo/' + imageId)
-            const imageData = await res.json();
-            setImageData(imageData)
-            // attempt to record a view if the the localStorage does not indicate they
-            // have seen this image before
-            if (!localStorage.getItem(imageData.imageId)) {
-                localStorage.setItem(imageData.imageId, true);
-                fetch('/api/incrementPageView/' + imageData.imageId)
-            }
-        }
+
         getImageInfo();
+        return () => {
+            clearInterval(checkPaymentInterval);
+        }
     }, [])
 
+    const checkForPayment = (paymentRequest) => {
+
+        var counter = 0
+        checkPaymentInterval = setInterval(async () => {
+            console.log('checked')
+            counter = counter + 1
+            if (counter === 300) {
+                clearInterval(checkPaymentInterval)
+            }
+            let res = await fetch('/api/checkpayment/' + paymentRequest)
+            if (res.status === 200) {
+                setImageData({ ...imageData, payStatus: true });
+                clearInterval(checkPaymentInterval);
+                M.toast({ html: 'Paid!' });
+            }
+            if (res.status === 400) {
+                clearInterval(checkPaymentInterval);
+
+            }
+
+        }, 5000);
+    }
+
+    // has not been hooked up yet
     const reportImage = async (imageId) => {
         const res = await fetch('/api/report/' + imageId)
     }
+
     const incrementComments = () => {
         let incrementedComments = imageData.numberOfComments + 1
         setImageData({ ...imageData, numberOfComments: incrementedComments })
     }
 
-    const ad = () => {
-        if (width >= 1000) {
-            return <iframe className='center ad'
-                data-aa="1259137" src="//ad.a-ads.com/1259137?size=728x90"
-                scrolling="no"
-                style={{ width: '728px', height: '90px', border: '0px', padding: 0, overflow: 'hidden' }}
-                allowtransparency="true">
-
-            </iframe>
-        }
-        if (width >= 800) {
-            return <iframe className='center ad'
-                data-aa="1259139" src="//ad.a-ads.com/1259139?size=468x60"
-                scrolling="no"
-                style={{ width: '468px', height: '60px', border: '0px', padding: 0, overflow: "hidden" }}
-                allowtransparency="true">
-
-            </iframe>
-        }
-        else {
-            return <iframe
-                className='center ad'
-                data-aa="1443703"
-                src="//ad.a-ads.com/1443703?size=320x50"
-                scrolling="no"
-                style={{ width: '320px', height: '50px', border: '0px', padding: 0, overflow: 'hidden' }}
-                allowtransparency="true"></iframe>
-        }
-    }
-
     return (
+
         <div className=''>
-            {ad()}
-            <div className=''>
-                {imageData.imageId ?
-                    <ImageCard share={true} imageData={imageData} />
-                    : null}
-            </div>
-            {imageData.comments
-                ? <CommentSection imageId={imageData.imageId} comments={imageData.comments} incrementComments={incrementComments} />
-                : null}
-        </div>
+            <HorizontalAd />
+            {imageData.paymentRequired && imageData.payStatus === false ?
+
+                < div className="container">
+                    <h3 className="center-align">100 Sats</h3>
+                    <QRCode onLoad={() => checkForPayment()} className='qr-code center' value={imageData.paymentRequest} />
+                    <a href={"lightning:" + imageData.paymentRequest}><button className="btn center">Pay</button></a>
+                    <p className="center-align">This image requires a deposit.</p>
+                    <p className="center-align">We use a small lightning network payment as a deterrent to people abusing the service.
+                    After the image recevies 100 views the satoshis are credited to the creator of the image for withdrawal.</p>
+
+
+
+                </div>
+
+                :
+                <span>
+
+                    <div className=''>
+                        {imageData.imageId ?
+                            <ImageCard share={true} imageData={imageData} />
+                            : null}
+                    </div>
+                    {imageData.comments
+                        ? <CommentSection imageId={imageData.imageId} comments={imageData.comments} incrementComments={incrementComments} />
+                        : null}
+                </span>
+            }
+        </div >
     )
 }
