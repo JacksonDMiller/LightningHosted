@@ -102,18 +102,12 @@ module.exports = function (app) {
         for await (image of req.user.images) {
             if (new Date - image.date <= 86400000) {
                 imagesUploadeToday = imagesUploadeToday + 1
-                console.log(imagesUploadeToday)
             }
         }
 
-        console.log(imagesUploadeToday);
         if (imagesUploadeToday > 0) {
             paymentRequired = true
-            console.log('set to true')
         }
-        console.log(paymentRequired);
-        console.log(imagesUploadeToday);
-
 
         if (Object.keys(req.file).length === 0) {
             return res.status(400).send('No files were uploaded.');
@@ -237,7 +231,6 @@ module.exports = function (app) {
                     twitterCard: 'twitterCard',
                     suppressed: false,
                 }
-                console.log(imageData)
                 await req.user.images.push(imageData);
                 req.user.save();
 

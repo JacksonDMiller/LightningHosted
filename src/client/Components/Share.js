@@ -52,7 +52,9 @@ export default function Share() {
             }
             let res = await fetch('/api/checkpayment/' + paymentRequest)
             if (res.status === 200) {
-                setImageData({ ...imageData, payStatus: true });
+                console.log('it was 2002222222222')
+                const paidImageData = await res.json();
+                setImageData(paidImageData.imageData);
                 clearInterval(checkPaymentInterval);
                 M.toast({ html: 'Paid!' });
             }
@@ -61,7 +63,7 @@ export default function Share() {
 
             }
 
-        }, 5000);
+        }, 1000);
     }
 
     // has not been hooked up yet

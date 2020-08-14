@@ -42,21 +42,29 @@ module.exports = function (app) {
     // check if a payment has been made
     app.get('/api/checkpayment/:invoice', async (req, res) => {
         if (req.params.invoice) {
+            console.log('received')
             try {
                 const doc = await Users.findOne({ 'images.paymentRequest': req.params.invoice })
                 if (doc) {
+                    console.log('found doc')
                     const index = await doc.images.findIndex(image => image.paymentRequest === req.params.invoice)
 
                     if (doc.images[index].payStatus === true) {
-                        res.send(doc.images[index].payStatus);
+                        console.log('sent this one')
+                        res.status(200).send({payStatus: true, imageData: doc.images[index]});
                     }
+                    else { res.status(402).send({ error: 'Payment Required' }) }
                 }
-                else { res.status(402).send() }
+                else {
+                    res.status(400).send({ error: 'oops something went wrong 1' })
+                }                
             }
-            catch (err) { console.log(err) }
+            catch (err) { 
+                console.log(err);
+                res.status(400).send({ error: 'oops something went wrong 2' }) }
         }
         else {
-            res.status(400).send({ error: 'oops something went wrong' })
+            res.status(400).send({ error: 'oops something went wrong 3' })
         }
     })
 }
