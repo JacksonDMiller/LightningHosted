@@ -4,6 +4,7 @@ const { pay, createInvoice, authenticatedLndGrpc,
 const Users = require('../models/user-model');
 const { lnd } = authenticatedLndGrpc(keys.lnd);
 const sub = subscribeToInvoices({ lnd });
+const logger = require('winston')
 
 
 //listen for payments and mark invoices as paid in the database
@@ -42,29 +43,29 @@ module.exports = function (app) {
     // check if a payment has been made
     app.get('/api/checkpayment/:invoice', async (req, res) => {
         if (req.params.invoice) {
-            console.log('received')
             try {
+                // look for the user assinged to the payment request in the database
                 const doc = await Users.findOne({ 'images.paymentRequest': req.params.invoice })
                 if (doc) {
-                    console.log('found doc')
+                    // find the image assigned to the payment request in the user record
                     const index = await doc.images.findIndex(image => image.paymentRequest === req.params.invoice)
-
                     if (doc.images[index].payStatus === true) {
-                        console.log('sent this one')
-                        res.status(200).send({payStatus: true, imageData: doc.images[index]});
+                        res.status(200).send({ payStatus: true, imageData: doc.images[index] });
                     }
                     else { res.status(402).send({ error: 'Payment Required' }) }
                 }
-                else {
-                    res.status(400).send({ error: 'oops something went wrong 1' })
-                }                
             }
-            catch (err) { 
-                console.log(err);
-                res.status(400).send({ error: 'oops something went wrong 2' }) }
+            catch (err) {
+                logger.log({
+                    level: 'error',
+                    message: 'Payment checking error',
+                    error: err
+                })
+                res.status(400).send({ error: 'oops something went wrong' })
+            }
         }
         else {
-            res.status(400).send({ error: 'oops something went wrong 3' })
+            res.status(400).send({ error: 'oops something went wrong' })
         }
     })
 }

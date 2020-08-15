@@ -316,3 +316,7 @@ body {
     padding-left: 5%;
     padding-right: 5%;
 }
+
+.withdraw-textarea {
+    height: 250px !important;
+}

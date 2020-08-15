@@ -189,7 +189,7 @@ export default function Profile() {
                         <div className="row container">
                             <div className="input-field col m10 s12">
                                 <i className="material-icons prefix">mode_edit</i>
-                                <textarea id="icon_prefix2" className="materialize-textarea" onChange={(e) => {
+                                <textarea id="icon_prefix2" className="materialize-textarea withdraw-textarea" onChange={(e) => {
                                     setInvoice(e.target.value)
                                 }}></textarea>
                                 <label htmlFor="icon_prefix2">Lightning Invoice</label>
