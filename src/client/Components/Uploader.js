@@ -23,6 +23,7 @@ registerPlugin(FilePondPluginFileValidateType, FilePondPluginImageExifOrientatio
 function Uploader({ addImage }) {
     const [file, setFile] = useState([]);
     const [caption, setCaption] = useState('');
+    const [title, setTitle] = useState('');
     const pond = React.createRef();
     const upload = () => {
         pond.current.processFiles();
@@ -30,6 +31,14 @@ function Uploader({ addImage }) {
 
     return (
         <div>
+            {file.length !== 0 ?
+                <div className="row">
+                    <div className="input-field col s10">
+                        <textarea onChange={(e) => { setTitle(e.target.value) }} id="icon_prefix5" className="materialize-textarea"></textarea>
+                        <label htmlFor="icon_prefix5">Title</label>
+                    </div>
+                </div>
+                : null}
             <FilePond
                 acceptedFileTypes={['image/png', 'image/jpeg', 'image/gif', 'video/mp4']}
                 ref={pond}
@@ -40,6 +49,7 @@ function Uploader({ addImage }) {
                     process: {
                         ondata: (formData) => {
                             formData.append('caption', caption);
+                            formData.append('title', title);
                             return formData;
                         },
                         url: "/api/upload",

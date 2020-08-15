@@ -14,6 +14,7 @@ const commentSchema = new Schema({
 })
 
 const imageSchema = new Schema({
+    title: String,
     userId: String,
     imageId: String,
     reviewStatus: Boolean,

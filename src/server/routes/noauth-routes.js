@@ -83,8 +83,8 @@ module.exports = function (app) {
 
     // get the next ten images from top images list 
     app.get('/api/recomendedimages/:page', (req, res) => {
-        let start = 0 + (req.params.page * 20)
-        let end = 20 + (req.params.page * 20)
+        let start = 0 + (req.params.page * 40)
+        let end = 40 + (req.params.page * 40)
         res.send(topPostsList.slice(start, end))
     })
 

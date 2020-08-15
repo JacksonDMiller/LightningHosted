@@ -17,8 +17,6 @@ app.use(cookieSession({
     keys: [keys.session.cookieKey]
 }));
 
-
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -39,7 +37,4 @@ require('./routes/authorized-routes')(app);
 
 app.use(fallback('index.html', { root: './dist' }))
 
-
-
 app.listen(process.env.PORT || 8080, () => console.log(`YipYip app is listening on port ${process.env.PORT || 8080}!`));
- 

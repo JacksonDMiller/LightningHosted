@@ -5,6 +5,20 @@ import { viewportContext } from '../Context/GetWindowDimensions'
 
 
 export default function ImageCard(props) {
+    const globalState = useContext(store);
+    const { dispatch } = globalState;
+
+    const { imageId,
+        fileType,
+        fileName,
+        caption,
+        title,
+        views,
+        numberOfComments,
+        orientation,
+        paymentRequired,
+        payStatus
+    } = props.imageData
 
     useEffect(() => {
         var elems = document.querySelectorAll('.tooltipped');
@@ -19,21 +33,15 @@ export default function ImageCard(props) {
 
 
     const [upvotes, setUpovotes] = useState(props.imageData.upvotes)
-    const globalState = useContext(store);
+
     const { width } = useContext(viewportContext);
+    const [upvoted, setUpvoted] = useState(() => {
+        if (globalState.state.upvoted && globalState.state.upvoted.includes(imageId)) {
+            return 'upvoted';
+        }
+        else { return }
+    })
 
-    const { dispatch } = globalState;
-
-    const { imageId,
-        fileType,
-        fileName,
-        caption,
-        views,
-        numberOfComments,
-        orientation,
-        paymentRequired,
-        payStatus
-    } = props.imageData
 
 
     const { profile, share } = props
@@ -44,13 +52,14 @@ export default function ImageCard(props) {
         else {
             if (!globalState.state.upvoted.includes(imageId)) {
                 setUpovotes(upvotes + 1)
+                setUpvoted('upvoted')
             }
             else {
                 setUpovotes(upvotes - 1)
+                setUpvoted('')
             }
             const res = fetch('/api/upvote/' + imageId);
             const data = await (await res).json();
-            console.log(data);
             dispatch({ type: 'UPDATE', payload: data.user });
         }
     }
@@ -70,11 +79,20 @@ export default function ImageCard(props) {
 
 
         if (fileType === 'mp4') {
-            return <span><video autoPlay muted loop className="responsive-mp4">
-                <source src={"/api/i/" + fileName} type="video/mp4" />
-            </video>
-                {lock}
-            </span>
+            if (share) {
+                return <span><video autoPlay muted loop className="responsive-mp4">
+                    <source src={"/api/i/" + fileName} type="video/mp4" />
+                </video>
+                    {lock}
+                </span>
+            }
+            else {
+                return <span><video disableremoteplayback={'true'} autoPlay muted loop className="responsive-mp4">
+                    <source src={"/api/i/" + fileName} type="video/mp4" />
+                </video>
+                    {lock}
+                </span>
+            }
         }
         if (fileType === 'gif') {
             return <span>< img src={"/api/i/" + fileName} alt="image" ></img>
@@ -103,6 +121,9 @@ export default function ImageCard(props) {
 
     return (
         <div className={containerClasses()}>
+            {title ? <div>
+                <p className="flow-text black-text caption-text">{title}</p>
+            </div> : null}
             {share ?
                 <div>
                     <div className="card-image">
@@ -127,7 +148,7 @@ export default function ImageCard(props) {
             {profile ?
                 <div className="card-content row profile-image-stats">
                     <span className="center-align col s3 ">
-                        {globalState.state.upvoted.includes(imageId) ? < i onClick={() => upvote(imageId)}
+                        {globalState.state.upvoted.includes(imageId) ? < i onClick={(e) => upvote(imageId, e)}
                             className="material-icons image-icon upvoted upvote">keyboard_arrow_up</i> :
                             < i onClick={() => upvote(imageId)}
                                 className="material-icons image-icon upvote">keyboard_arrow_up</i>
@@ -155,11 +176,8 @@ export default function ImageCard(props) {
 
                 <div className="card-content row">
                     <span className="center-align col s4 ">
-                        {globalState.state.upvoted && globalState.state.upvoted.includes(imageId) ? < i onClick={() => upvote(imageId)}
-                            className="material-icons image-icon upvoted upvote">keyboard_arrow_up</i> :
-                            < i onClick={() => upvote(imageId)}
-                                className="material-icons image-icon upvote">keyboard_arrow_up</i>
-                        }
+                        < i onClick={() => upvote(imageId)}
+                            className={"material-icons image-icon upvote " + upvoted}>keyboard_arrow_up</i>
                         {upvotes}
                     </span>
                     <Link to={'/s/' + imageId}>

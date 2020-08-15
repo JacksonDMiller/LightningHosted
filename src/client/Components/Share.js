@@ -8,7 +8,7 @@ import ImageCard from './ImageCard'
 import { viewportContext } from '../Context/GetWindowDimensions'
 var QRCode = require('qrcode.react');
 import { HorizontalAd } from '../Components/HorizontalAd'
-
+import Helmet from 'react-helmet'
 
 export default function Share() {
     const [imageData, setImageData] = useState({});
@@ -76,9 +76,40 @@ export default function Share() {
         setImageData({ ...imageData, numberOfComments: incrementedComments })
     }
 
+    const { views, upvotes, title, fileName, height } = imageData
+
+
     return (
 
         <div className=''>
+
+
+            <Helmet>
+                <title>{'LH - ' + title}</title>
+                <meta name="robots" content="follow, index" />
+                <meta name="keywords" content="images, photos, gif, gifs, memes, pictures, new pictures, reaction gifs, share photos, share images, latest images, funny, cute, visual storytelling, LightningHosted, LH" />
+                <meta name="description" content={views + ' views and ' + upvotes + ' upvotes on LightningHosted.com'} />
+                <link rel="canonical" href="https://LightningHosted.com/s/0690fafd456f2bd3" />
+                <meta property="og:site_name" content="LightningHosted" />
+                <meta name="twitter:site" content="@LightningHosted" />
+                <meta name="twitter:domain" content="LightningHosted.com" />
+                <meta name="twitter:title" content={title} />
+                <meta property="author" content="LightningHosted" />
+                <meta property="article:author" content="LightningHosted" />
+                <meta name="msapplication-TileColor" content="#800080" />
+                <link rel="image_src" href={"https://lightninghosted.com/i/" + fileName} />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta property="og:title" content={title} />
+                <meta property="og:url" content={"https://LightningHosted.com/s/" + imageId} />
+                <meta property="og:image:width" content={imageData.width} />
+                <meta property="og:image:height" content={height} />
+                <meta property="og:description" content={views + ' views and ' + upvotes + ' upvotes on LightningHosted.com'} />
+                <meta name="twitter:description" content={views + ' views and ' + upvotes + ' upvotes on LightningHosted.com'} />
+                <meta name="twitter:image" content={"https://lightninghosted.com/i/" + fileName} />
+                <meta property="og:image" content={"https://lightninghosted.com/i/" + fileName} />
+            </Helmet>
+
+
             <HorizontalAd />
             {imageData.paymentRequired && imageData.payStatus === false ?
 

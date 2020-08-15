@@ -108,7 +108,7 @@ export default function Profile() {
                         <div className="input-field">
                             <input onChange={e => setNewUserName(e.target.value)}
                                 id="username-login-small" className="validate" type="text" />
-                            <label htmlFor="username-login">New Username</label>
+                            <label htmlFor="username-login-small">New Username</label>
                         </div>
                         <button className='btn' onClick={updateUserName}>Submit</button>
                         <button className='btn' onClick={() => setEditUsername(false)}>Cancle</button>
@@ -194,7 +194,7 @@ export default function Profile() {
                                 }}></textarea>
                                 <label htmlFor="icon_prefix2">Lightning Invoice</label>
                             </div>
-                            <button onClick={withdraw} className='btn col m2 s12  modal-close'>Withdraw</button>
+                            <button onClick={withdraw} className='btn col m3 s12  modal-close'>Withdraw</button>
                         </div>
                     </form>
                 </div>

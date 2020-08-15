@@ -45,6 +45,7 @@
     "react-avatar-editor": "^11.0.9",
     "react-dom": "^16.13.1",
     "react-filepond": "^7.0.1",
+    "react-helmet": "^6.1.0",
     "react-infinite-scroll-component": "^5.0.5",
     "react-masonry-css": "^1.0.14",
     "react-router-dom": "^5.2.0",
