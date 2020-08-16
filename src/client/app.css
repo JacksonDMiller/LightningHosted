@@ -278,11 +278,10 @@ input[type=range]:focus::-ms-fill-upper {
 
 .lock {
     position: absolute;
-    top: 40%;
-    left: 35%;
+
     /* background-color: white; */
-    width: 20%;
-    height: 20%;
+    width: 1px;
+    height: 1px;
 }
 
 /* label focus color */
@@ -315,8 +314,67 @@ body {
 .caption-text {
     padding-left: 5%;
     padding-right: 5%;
+    word-break:break-all;
 }
 
 .withdraw-textarea {
     height: 250px !important;
 }
+
+.word-break{
+    word-break:break-all;
+}
+
+
+
+.spinner {
+    --widthSpinner: 20vmin;
+    --colorSpinner: #fff;
+    /* --colorSpinnerBackground: #0003; */
+    width: var(--widthSpinner);
+    height: calc(.2 * var(--widthSpinner));
+    position: relative;
+    overflow: hidden;
+    -webkit-backface-visibility: hidden;
+    background-color: var(--colorSpinnerBackground);
+    box-shadow: 0 0 0 calc(0.1 * var(--widthSpinner)) var(--colorSpinnerBackground);
+  }
+  
+  .block {
+    width: calc(.21 * var(--widthSpinner));
+    height: calc(.21 * var(--widthSpinner));
+    position: absolute;
+    top: calc(.1 * var(--widthSpinner));
+    left: 0;
+    background-color: #0000;
+    box-shadow:
+      calc((0.2 + 0) * var(--widthSpinner)) 0 var(--colorSpinner),
+      calc((0.2 + 0.4) * var(--widthSpinner)) 0 var(--colorSpinner),
+      calc((0.2 + 0.8) * var(--widthSpinner)) 0 var(--colorSpinner),
+      calc((0.2 + 1.2) * var(--widthSpinner)) 0 var(--colorSpinner);
+  
+    transform: translate(calc(-100% - 0 * var(--widthSpinner)), -50%);
+  
+    will-change: transform;
+    animation: moveit ease-in-out 0.5s infinite forwards;
+  }
+  
+  .chain {
+    width: calc(1 * var(--widthSpinner));
+    height: calc(.03 * var(--widthSpinner));
+    background-color: var(--colorSpinner);
+    position: absolute;
+    top: calc(.1 * var(--widthSpinner));
+    left: -1px;
+    transform: translate(0, -50%);
+  }
+  
+  @keyframes moveit {
+    0% {
+      transform: translate(calc(-100% - 0 * var(--widthSpinner)), -50%);
+    }
+  
+    66%, 100% {
+      transform: translate(calc(-100% - .4 * var(--widthSpinner)), -50%);
+    }
+  }
