@@ -65,20 +65,14 @@ export default function ImageCard(props) {
   const media = () => {
     let lock = "";
     if (paymentRequired && profile && payStatus === false) {
-      let top = ((height / 2 - 42) / height) * 100;
-      let nWidth =
-        ((props.imageData.width / 2 + 42) / props.imageData.width) * 100;
-        console.log(height)
-      console.log((height / 2 + 42));
       lock = (
-        <div
-          className="lock tooltipped"
-          data-position="bottom"
-          data-tooltip="This image requires a payment click to learn more"
-          style={{ top: top + "%", left: nWidth + "%" }}
-        >
-            <i className="material-icons large">lock</i>
-        </div>
+          <i
+            className="material-icons large lock tooltipped"
+            data-position="bottom"
+            data-tooltip="This image requires a payment click to learn more"
+          >
+            lock
+          </i>
       );
     }
 
@@ -89,55 +83,54 @@ export default function ImageCard(props) {
             <video autoPlay muted loop className="responsive-mp4">
               <source src={"/api/i/" + fileName} type="video/mp4" />
             </video>
-            {lock}
-          </span>
+            </span>
         );
       } else {
         return (
-          <span>
+            <div className="container1">
             <video
               disableremoteplayback={"true"}
               autoPlay
               muted
               loop
-              className="responsive-mp4"
+              className="responsive-mp4 background"
             >
               <source src={"/api/i/" + fileName} type="video/mp4" />
             </video>
             {lock}
-          </span>
+          </div>
         );
       }
     }
     if (fileType === "gif") {
       return (
-        <span>
-          <img src={"/api/i/" + fileName} alt="image"></img>
+        <div className='container1'>
+          <img className='background' src={"/api/i/" + fileName} alt="image"></img>
           {lock}
-        </span>
+        </div>
       );
     }
     if (share) {
       return (
-        <span>
+        <div className='container1'>
           <img
-            className="img-payment-required"
+            className="img-payment-required background"
             src={"/api/i/" + fileName}
             alt="image"
           ></img>
           {lock}
-        </span>
+        </div>
       );
     }
     return (
-      <span>
+      <div className='container1'>
         <img
           className="img-payment-required"
           src={"/api/t/" + fileName}
           alt="image"
         ></img>
         {lock}
-      </span>
+      </div>
     );
   };
 

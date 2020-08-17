@@ -105,9 +105,9 @@ function Uploader({ addImage }) {
           </div>
           {isUploading ? (
             <button className="btn">
-              <div class="spinner">
-                <div class="block"></div>
-                <div class="chain"></div>
+              <div className="spinner">
+                <div className="block"></div>
+                <div className="chain"></div>
               </div>
             </button>
           ) : (

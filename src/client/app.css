@@ -276,13 +276,6 @@ input[type=range]:focus::-ms-fill-upper {
     position: relative;
 }
 
-.lock {
-    position: absolute;
-
-    /* background-color: white; */
-    width: 1px;
-    height: 1px;
-}
 
 /* label focus color */
 
@@ -377,4 +370,31 @@ body {
     66%, 100% {
       transform: translate(calc(-100% - .4 * var(--widthSpinner)), -50%);
     }
+  }
+
+
+  .container1 {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .container1 .lock {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  
+  /* size of second image */
+  .container1 .lock>i {
+    width: 100px;
+  }
+  
+  .container1 .background {
+    width: 100%;
   }
