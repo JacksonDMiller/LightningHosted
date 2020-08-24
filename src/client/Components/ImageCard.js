@@ -85,9 +85,9 @@ export default function ImageCard(props) {
         condition={!share}
         wrap={children => <Link to={"/s/" + imageId}>{children}</Link>}
       >
-        {title ? <h4 className='title-text flow-text'>
+        {title ? <p className='title-text flow-text'>
           {imageTitle()}
-        </h4> : null}
+        </p> : null}
         <div className="card-image">
           <ImageCardMedia share={share} profile={profile} imageData={props.imageData} />
         </div>

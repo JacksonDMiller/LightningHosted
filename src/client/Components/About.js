@@ -45,7 +45,7 @@ export default function About() {
 
 
             <ul className="collapsible popout col s12">
-                <li>
+                <li className='active'>
                     <div className="collapsible-header">How does it work?</div>
                     <div className="collapsible-body"><span>Upload an image you want to share and we will give you a link. The link will
                     show your image alongside some bitcoin-related ads. You will then receive a portion
