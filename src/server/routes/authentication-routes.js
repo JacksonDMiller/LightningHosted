@@ -8,7 +8,7 @@ module.exports = function (app) {
     app.post('/api/changepassword', (req, res) => {
         bcrypt.compare(req.body.password, req.user.password, async (bcryptErr, bcryptRes) => {
             if (bcryptErr) {
-                res.send('oops something went wrong')
+                res.send({ error: 'oops something went wrong' })
                 return
             }
             if (!bcryptRes) {
@@ -18,7 +18,7 @@ module.exports = function (app) {
             const hashedPassword = await bcrypt.hash(req.body.newPassword, 10)
             req.user.password = hashedPassword
             req.user.save();
-            res.send('goodjob');
+            res.send({ message: 'Password Updated' });
         })
 
     })
