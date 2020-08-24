@@ -221,7 +221,7 @@ module.exports = function (app) {
                     height: dimensions.height,
                     date: new (Date),
                     caption: req.body.caption,
-                    title: req.body.title,
+                    title: req.body.title.substring(0, 40),
                     paymentRequest: imageInvoice,
                     paymentRequired: paymentRequired,
                     upvotes: 0,

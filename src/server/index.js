@@ -34,6 +34,7 @@ require('./routes/noauth-routes')(app);
 require('./routes/authentication-routes')(app);
 require('./routes/payment-routes')(app);
 require('./routes/authorized-routes')(app);
+require('./routes/moderator-routes')(app);
 
 app.use(fallback('index.html', { root: './dist' }))
 

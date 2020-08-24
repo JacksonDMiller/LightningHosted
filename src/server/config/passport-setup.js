@@ -34,6 +34,7 @@ passport.use(
                     views: 0,
                     username: profile.displayName,
                     upvotes: 0,
+                    moderator: false,
                     upvoted: [],
                     reported: []
                 }).save().then((newUser) => {
@@ -73,33 +74,6 @@ passport.use(new LocalStrategy(
     }
 
 ));
-
-
-
-
-
-
-
-// passport.use(new LocalStrategy(
-//     function (username, password, done) {
-//         username = username.toLowerCase();
-//         Users.findOne({ lowerCaseUserName: username }, function (err, user) {
-//             if (err) { return done(err); }
-//             if (!user) {
-//                 return done(null, false, { message: 'Username not found' });
-//             }
-//             bcrypt.compare(password, user.password, (bcryptErr, res) => {
-//                 if (bcryptErr) { return done(bcryptErr); }
-//                 if (!res) {
-//                     { return done(null, false, { message: 'Incorect Password' }); }
-//                 }
-//                 return done(null, user);
-//             })
-//         })
-//     }
-
-// ));
-
 
 
 passport.serializeUser((user, done) => {

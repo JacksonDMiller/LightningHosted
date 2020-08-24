@@ -22,8 +22,8 @@ updateTopTenList = async () => {
     record.forEach(element => {
         //sort the images here
         for (image in element.images) {
-            if (!element.images[image].deleted && !element.images[image].suppressed || true) {
-                if (!element.images[image].paymentRequired || element.images[image].payStatus || true) {
+            if (!element.images[image].deleted && !element.images[image].suppressed) {
+                if (!element.images[image].paymentRequired || element.images[image].payStatus) {
                     let hoursSincePosting = Math.round((new Date - element.images[image].date) / 1000 / 60 / 60)
                     element.images[image].score = element.images[image].views + element.images[image].upvotes - hoursSincePosting
                     topPostsList.push(element.images[image])
@@ -74,6 +74,11 @@ module.exports = function (app) {
                 imageData.comments[comment].avatar = user.avatarUrl;
                 imageData.comments[comment].comenter = user.username;
             }
+            // filter out deleted and suppressed comments 
+            //(there is probably a way to do this in one line but i dont have time right now)
+            imageData.comments = imageData.comments.filter(comment => !comment.suppressed)
+            imageData.comments = imageData.comments.filter(comment => !comment.deleted)
+
             res.send(imageData);
         }).catch(err => {
             console.log(err)

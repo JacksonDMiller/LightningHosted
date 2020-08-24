@@ -3,10 +3,25 @@ var passport = require('passport');
 const logger = require('winston')
 const bcrypt = require('bcrypt');
 
-// console.log(logger)
-
-
 module.exports = function (app) {
+
+    app.post('/api/changepassword', (req, res) => {
+        bcrypt.compare(req.body.password, req.user.password, async (bcryptErr, bcryptRes) => {
+            if (bcryptErr) {
+                res.send('oops something went wrong')
+                return
+            }
+            if (!bcryptRes) {
+                res.send({ error: 'Wrong Password' })
+                return
+            }
+            const hashedPassword = await bcrypt.hash(req.body.newPassword, 10)
+            req.user.password = hashedPassword
+            req.user.save();
+            res.send('goodjob');
+        })
+
+    })
 
 
     app.get('/api/google', passport.authenticate('google', {
@@ -61,6 +76,7 @@ module.exports = function (app) {
                     upvotes: 0,
                     avatarUrl: '/api/avatar/Default.jpg',
                     avatarFileName: 'Default.jpg',
+                    moderator: false,
                     upvoted: [],
                     reported: [],
 

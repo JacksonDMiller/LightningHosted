@@ -10,7 +10,7 @@ import { viewportContext } from '../Context/GetWindowDimensions'
 
 
 export default function Home() {
-    const { width } = useContext(viewportContext);
+    const { screenWidth } = useContext(viewportContext);
     const [images, setImages] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
@@ -18,7 +18,6 @@ export default function Home() {
     const getMoreImages = async (position) => {
         const res = await fetch('/api/recomendedimages/' + page);
         const imageData = await res.json();
-        console.log(imageData)
         if (imageData.length === 0) {
             setHasMore(false);
         }
@@ -34,7 +33,7 @@ export default function Home() {
     }
 
     const isMobile = () => {
-        if (width < 600) {
+        if (screenWidth < 600) {
             return true;
         }
         else { return false; }

@@ -2,18 +2,21 @@
 
 
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom'
-import CommentSection from './CommentSection'
-import ImageCard from './ImageCard'
-import { viewportContext } from '../Context/GetWindowDimensions'
+import { useParams } from 'react-router-dom';
+import CommentSection from './CommentSection';
+import ImageCard from './ImageCard';
+import { viewportContext } from '../Context/GetWindowDimensions';
 var QRCode = require('qrcode.react');
-import { HorizontalAd } from '../Components/HorizontalAd'
-import Helmet from 'react-helmet'
+import { HorizontalAd } from '../Components/HorizontalAd';
+import Helmet from 'react-helmet';
+import { store } from '../Context/Store';
+
 
 export default function Share() {
+    const globalState = useContext(store);
     const [imageData, setImageData] = useState({});
     let { imageId } = useParams();
-    const { width } = useContext(viewportContext);
+    const { screenWidth } = useContext(viewportContext);
     var checkPaymentInterval = null;
 
     const getImageInfo = async () => {
@@ -52,7 +55,6 @@ export default function Share() {
             }
             let res = await fetch('/api/checkpayment/' + paymentRequest)
             if (res.status === 200) {
-                console.log('it was 2002222222222')
                 const paidImageData = await res.json();
                 setImageData(paidImageData.imageData);
                 clearInterval(checkPaymentInterval);
@@ -76,7 +78,7 @@ export default function Share() {
         setImageData({ ...imageData, numberOfComments: incrementedComments })
     }
 
-    const { views, upvotes, title, fileName, height } = imageData
+    const { views, upvotes, title, fileName, height, } = imageData
 
 
     return (
@@ -85,7 +87,9 @@ export default function Share() {
 
 
             <Helmet>
-                <title>{'LH - ' + title}</title>
+                {title ? <title>{'LH - ' + title}</title> :
+                    <title>LightningHosted</title>}
+
                 <meta name="robots" content="follow, index" />
                 <meta name="keywords" content="images, photos, gif, gifs, memes, pictures, new pictures, reaction gifs, share photos, share images, latest images, funny, cute, visual storytelling, LightningHosted, LH" />
                 <meta name="description" content={views + ' views and ' + upvotes + ' upvotes on LightningHosted.com'} />
@@ -131,6 +135,18 @@ export default function Share() {
                     <div className=''>
                         {imageData.imageId ?
                             <ImageCard share={true} imageData={imageData} />
+                            : null}
+                        {console.log()}
+                        {globalState.state.moderator ?
+                            <div className='center'>
+                                <button
+                                    onClick={() => fetch('/api/moderatorsuppressimage/' + imageId)}
+                                    className="btn">Supress</button>
+                                <button
+                                    onClick={() => fetch('/api/moderatordeleteimage/' + imageId)}
+                                    className="btn">Delete
+                                </button>
+                            </div>
                             : null}
                     </div>
                     {imageData.comments

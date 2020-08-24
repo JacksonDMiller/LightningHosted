@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 import { viewportContext } from '../Context/GetWindowDimensions'
 
 export const HorizontalAd = () => {
-    const { width } = useContext(viewportContext);
+    const { screenWidth } = useContext(viewportContext);
 
     const ad = () => {
-        if (width >= 1000) {
+        if (screenWidth >= 1000) {
             return <iframe className='center ad'
                 data-aa="1259137" src="//ad.a-ads.com/1259137?size=728x90"
                 scrolling="no"
@@ -14,7 +14,7 @@ export const HorizontalAd = () => {
 
             </iframe>
         }
-        if (width >= 800) {
+        if (screenWidth >= 800) {
             return <iframe className='center ad'
                 data-aa="1259139" src="//ad.a-ads.com/1259139?size=468x60"
                 scrolling="no"

@@ -40,6 +40,10 @@ export default function CommentSection(props) {
             <h6 className='col s5 l5'>{comment.comenter}</h6>
             <h6 className='col s5 l6'>{timeAgo(comment.date)}</h6>
             <p className='col s10 offset-s2'>{comment.comment}</p>
+            {globalState.state.moderator
+                ? <button onClick={() => fetch('/api/moderatorsuppresscomment/' + comment.commentId + '/' + props.imageId)} className="btn">Delete</button>
+                : null
+            }
         </div>
     )
 

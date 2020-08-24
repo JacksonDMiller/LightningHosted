@@ -39,7 +39,7 @@ function Uploader({ addImage }) {
       {file.length !== 0 ? (
         <div className="row">
           <div className="input-field col s10">
-            <textarea
+            <textarea maxLength="40"
               onChange={(e) => {
                 setTitle(e.target.value);
               }}
@@ -95,6 +95,7 @@ function Uploader({ addImage }) {
         <div className="row">
           <div className="input-field col s10">
             <textarea
+              maxLength="15000"
               onChange={(e) => {
                 setCaption(e.target.value);
               }}
@@ -111,11 +112,11 @@ function Uploader({ addImage }) {
               </div>
             </button>
           ) : (
-            <button className="btn" onClick={upload}>
-              <i className="material-icons prefix col s2">arrow_upward</i>{" "}
+              <button className="btn" onClick={upload}>
+                <i className="material-icons prefix col s2">arrow_upward</i>{" "}
               Upload
-            </button>
-          )}
+              </button>
+            )}
         </div>
       ) : null}
     </div>

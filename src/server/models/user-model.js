@@ -56,6 +56,7 @@ const accountSchema = new Schema({
     upvotes: Number,
     avatarUrl: String,
     avatarFileName: String,
+    moderator: Boolean,
     upvoted: [String],
     reported: [String],
     images: [imageSchema]

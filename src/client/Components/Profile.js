@@ -13,6 +13,10 @@ export default function Profile() {
     const [newUserName, setNewUserName] = useState(null)
     const [imageToDelete, setImageToDelete] = useState('')
     const [editUsername, setEditUsername] = useState(false)
+    const [password, setPassword] = useState('')
+    const [newPassword, setNewPassword] = useState('')
+    const [newPasswordCheck, setNewPasswordCheck] = useState('')
+
 
 
     useEffect(() => {
@@ -56,7 +60,6 @@ export default function Profile() {
     const deleteImage = async () => {
         const res = await fetch('/api/deleteimage/' + imageToDelete);
         if (res.status === 200) {
-            console.log(images)
             const newImages = images.filter((image) => {
                 if (image.imageId !== imageToDelete) {
                     return image
@@ -87,6 +90,32 @@ export default function Profile() {
         }
         else { M.toast({ html: result.error }); }
 
+    }
+
+    const updatePassword = (e) => {
+        e.preventDefault();
+        if (newPassword === newPasswordCheck) {
+            let data = {
+                password: password,
+                newPassword: newPassword,
+            };
+
+            fetch('/api/changepassword', {
+                method: 'POST', // or 'PUT'
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+        else { M.toast({ html: 'New Passwords do not match' }) }
     }
 
     return (
@@ -133,6 +162,9 @@ export default function Profile() {
                         <i onClick={() => setEditUsername(true)} className="material-icons black-text">edit</i>
                     </h5>
                 }
+                <a className="modal-trigger avatar-edit-button" href="#change-password-modal">
+                    Change Password
+                </a>
 
 
                 <p className='col s4 m10 hide-on-small-only'>Views: {user.views} </p>
@@ -178,6 +210,32 @@ export default function Profile() {
                     <h4 className='center-align'>Choose a new avatar</h4>
                     <AvatarUploader updateAvatar={updateAvatar} />
                 </div>
+            </div>
+
+            <div id="change-password-modal" className="modal">
+                <form className="col s12">
+
+                    <div className="row">
+                        <div className="input-field col s12">
+                            <input onChange={e => setPassword(e.target.value)}
+                                id="password-change" type="password" className="validate" />
+                            <label htmlFor="password-change">Old Password</label>
+                        </div>
+
+                        <div className="input-field col s12">
+                            <input onChange={e => setNewPassword(e.target.value)}
+                                id="new-password-change" type="password" className="validate" />
+                            <label htmlFor="password-signup">New Password</label>
+                        </div>
+
+                        <div className="input-field col s12">
+                            <input onChange={e => setNewPasswordCheck(e.target.value)}
+                                id="new-password-check-change" type="password" className="validate" />
+                            <label htmlFor="new-password-check-change">New Password</label>
+                        </div>
+                    </div>
+                    <button className='btn' onClick={updatePassword}>Submit</button>
+                </form>
             </div>
 
             <div id="withdrawModal" className="modal">

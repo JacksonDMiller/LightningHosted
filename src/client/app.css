@@ -276,7 +276,6 @@ input[type=range]:focus::-ms-fill-upper {
     position: relative;
 }
 
-
 /* label focus color */
 
 .input-field input[type=text]:focus+label, .materialize-textarea:focus:not([readonly])+label {
@@ -307,18 +306,13 @@ body {
 .caption-text {
     padding-left: 5%;
     padding-right: 5%;
-    word-break:break-all;
+    word-break: break-word;
+    color: black !important;
 }
 
 .withdraw-textarea {
     height: 250px !important;
 }
-
-.word-break{
-    word-break:break-all;
-}
-
-
 
 .spinner {
     --widthSpinner: 20vmin;
@@ -331,28 +325,22 @@ body {
     -webkit-backface-visibility: hidden;
     background-color: var(--colorSpinnerBackground);
     box-shadow: 0 0 0 calc(0.1 * var(--widthSpinner)) var(--colorSpinnerBackground);
-  }
-  
-  .block {
+}
+
+.block {
     width: calc(.21 * var(--widthSpinner));
     height: calc(.21 * var(--widthSpinner));
     position: absolute;
     top: calc(.1 * var(--widthSpinner));
     left: 0;
     background-color: #0000;
-    box-shadow:
-      calc((0.2 + 0) * var(--widthSpinner)) 0 var(--colorSpinner),
-      calc((0.2 + 0.4) * var(--widthSpinner)) 0 var(--colorSpinner),
-      calc((0.2 + 0.8) * var(--widthSpinner)) 0 var(--colorSpinner),
-      calc((0.2 + 1.2) * var(--widthSpinner)) 0 var(--colorSpinner);
-  
+    box-shadow: calc((0.2 + 0) * var(--widthSpinner)) 0 var(--colorSpinner), calc((0.2 + 0.4) * var(--widthSpinner)) 0 var(--colorSpinner), calc((0.2 + 0.8) * var(--widthSpinner)) 0 var(--colorSpinner), calc((0.2 + 1.2) * var(--widthSpinner)) 0 var(--colorSpinner);
     transform: translate(calc(-100% - 0 * var(--widthSpinner)), -50%);
-  
     will-change: transform;
     animation: moveit ease-in-out 0.5s infinite forwards;
-  }
-  
-  .chain {
+}
+
+.chain {
     width: calc(1 * var(--widthSpinner));
     height: calc(.03 * var(--widthSpinner));
     background-color: var(--colorSpinner);
@@ -360,41 +348,54 @@ body {
     top: calc(.1 * var(--widthSpinner));
     left: -1px;
     transform: translate(0, -50%);
-  }
-  
-  @keyframes moveit {
+}
+
+@keyframes moveit {
     0% {
-      transform: translate(calc(-100% - 0 * var(--widthSpinner)), -50%);
+        transform: translate(calc(-100% - 0 * var(--widthSpinner)), -50%);
     }
-  
     66%, 100% {
-      transform: translate(calc(-100% - .4 * var(--widthSpinner)), -50%);
+        transform: translate(calc(-100% - .4 * var(--widthSpinner)), -50%);
     }
-  }
+}
 
-
-  .container1 {
+.place-holder-container {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+}
 
-  .container1 .lock {
+.place-holder-container .lock {
     position: absolute;
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  
-  /* size of second image */
-  .container1 .lock>i {
+}
+
+/* size of second image */
+
+.place-holder-container .lock>i {
     width: 100px;
-  }
-  
-  .container1 .background {
-    width: 100%;
-  }
+}
+
+.title-text {
+    word-break: break-word;
+    color: black;
+    margin: 10px;
+    text-align: center;
+}
+
+.image-stats span {
+    padding: 0 !important;
+}
+
+.place-holder {
+    border-radius: 2px 2px 0 0;
+}
+
+.card .card-image img {
+    border-radius: 0px;
+}
