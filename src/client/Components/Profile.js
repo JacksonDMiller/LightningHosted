@@ -5,8 +5,8 @@ import Masonry from 'react-masonry-css'
 import { Redirect } from 'react-router-dom'
 import AvatarUploader from './AvatarUploader';
 import ChangePasswordModal from './ChangePasswordModal'
-import EditUsernameInput from './EditUsernameInput'
 import WithdrawModal from './WithdrawModal'
+import ChangeUsernameModal from './ChangeUsernameModal'
 
 export default function Profile() {
     const [images, setImages] = useState([])
@@ -18,6 +18,8 @@ export default function Profile() {
     useEffect(() => {
         const elems = document.querySelectorAll('.modal');
         const modelInstances = M.Modal.init(elems);
+        var dropdownElems = document.querySelectorAll('.dropdown-trigger');
+        var dropdownInstances = M.Dropdown.init(dropdownElems);
         const fetchData = async () => {
             const res = await fetch('/api/profileinfo/');
             if (res.status === 401) {
@@ -49,7 +51,7 @@ export default function Profile() {
         };
 
         const res = await fetch('/api/deleteimage/', {
-            method: 'POST', 
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -85,21 +87,21 @@ export default function Profile() {
                     <div className='col s12 m2 avatar-img-div right-align' >
                         <img className='circle responsive-img avatar-image' src={user.avatarUrl}>
                         </img>
-                        <a className="modal-trigger avatar-edit-button" href="#editModal">
+                        <a
+                            className="dropdown-trigger"
+                            href="#"
+                            data-target="edit-dropdown">
                             <i className="material-icons black-text">edit</i>
                         </a>
                     </div>
                     : null}
 
-                {user.username ? <EditUsernameInput setUser={setUser} user={user} /> : null}
+                <h5 className='col s12 m10 center-align'>
+                    {user.username}
+                </h5>
 
 
-                {user.thirdPartyId
-                    ? null
-                    : <a className="modal-trigger avatar-edit-button" href="#change-password-modal">
-                        Change Password
-            </a>
-                }
+
 
                 <p className='col s4 m10 hide-on-small-only'>Views: {user.views} </p>
                 <p className='col s4 m10 hide-on-small-only'>Upvotes: {user.upvotes} </p>
@@ -150,6 +152,10 @@ export default function Profile() {
                 <ChangePasswordModal />
             </div>
 
+            <div id="change-username-modal" className="modal">
+                <ChangeUsernameModal setUser={setUser} user={user} />
+            </div>
+
             <div id="withdrawModal" className="modal">
                 <WithdrawModal />
             </div>
@@ -165,6 +171,24 @@ export default function Profile() {
                     <a href="#!" className="modal-close waves-effect waves-green btn-flat">Cancel</a>
                 </div>
             </div>
+            <ul id='edit-dropdown' className='dropdown-content'>
+                {user.thirdPartyId
+                    ? null
+                    : <li>  <a className="modal-trigger" href="#change-password-modal">
+                        Change Password
+            </a></li>
+                }
+                <li>
+                    <a className="modal-trigger" href="#change-username-modal">
+                        Change Username
+                        </a>
+                </li>
+                <li>
+                    <a className="modal-trigger" href="#editModal">
+                        Change Avatar
+                        </a>
+                </li>
+            </ul>
         </div >
     )
 }
