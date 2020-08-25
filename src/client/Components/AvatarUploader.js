@@ -10,7 +10,7 @@ export default function AvatarUploader(props) {
     const editor = useRef(editor)
 
     const handleNewImage = e => {
-        if (e.target.files[0].size > 1 * 5) {
+        if (e.target.files[0].size > 1048576 * 5) {
             M.toast({html:'Image is to big'})
         }
         else {

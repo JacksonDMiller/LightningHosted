@@ -6,14 +6,14 @@ import { store } from '../Context/Store';
 
 export default function CommentSection(props) {
     const globalState = useContext(store);
-    const [comments, setComments] = useState(props.comments)
+    const [comments, setComments] = useState(
+        props.comments.sort((a, b) => new Date(b.date) - new Date(a.date)))
 
     const commentList = comments.map((comment) =>
         <div key={comment.commentId} className=' row comment-box'>
             <img className='col s2 l1 responsive-img circle' src={comment.avatar} alt="" />
-            <h6 className='col s5 l5'>{comment.comenter}</h6>
-            <h6 className='col s5 l6'>{timeAgo(comment.date)}</h6>
-            <p className='col s10 offset-s2'>{comment.comment}</p>
+    <h6 className='col s10'>{comment.comenter} <span className='comment-timestamp'>{' '+timeAgo(comment.date)}</span></h6>
+            <p className='col s10'>{comment.comment}</p>
             {globalState.state.moderator
                 ? <button onClick={() => fetch('/api/moderatorsuppresscomment/' + comment.commentId + '/' + props.imageId)} className="btn">Delete</button>
                 : null

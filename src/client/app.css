@@ -406,3 +406,7 @@ body {
 .card .card-image img {
   border-radius: 0px;
 }
+
+.comment-timestamp{
+  font-size: .8rem;
+}

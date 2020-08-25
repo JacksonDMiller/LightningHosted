@@ -37,7 +37,7 @@ export default function CommentBox({ imageId, incrementComments, setComments, co
         <div className="row">
             <form className="col s12">
                 <div className="row">
-                    <div className="input-field col s11">
+                    <div className="input-field col l9 s12">
                         <i className="material-icons prefix">mode_edit</i>
                         <textarea id="icon_prefix2" className="materialize-textarea" onChange={
                             e => setnewComment(e.target.value)} value={newComment}>
@@ -45,7 +45,7 @@ export default function CommentBox({ imageId, incrementComments, setComments, co
                         <label htmlFor="icon_prefix2">Write Your Comment</label>
                     </div>
                     <button onClick={submitComment}
-                        className="btn waves-effect waves-light col s4 offset-s8 m3 offset-m9 l2 offset-l10 " type="submit" name="action">
+                        className="btn waves-effect waves-light col s4 offset-s8 m3 offset-m9 l2 " type="submit" name="action">
                         Submit
                     <i className="material-icons right">send</i>
                     </button>

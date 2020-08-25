@@ -44,7 +44,7 @@ export default function About() {
             </div>
 
 
-            <ul className="collapsible popout col s12">
+            <ul className="collapsible col s12">
                 <li className='active'>
                     <div className="collapsible-header">How does it work?</div>
                     <div className="collapsible-body"><span>Upload an image you want to share and we will give you a link. The link will
