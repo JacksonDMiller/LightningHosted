@@ -43,7 +43,19 @@ export default function Profile() {
     }
 
     const deleteImage = async () => {
-        const res = await fetch('/api/deleteimage/' + imageToDelete);
+
+        let data = {
+            imageId: imageToDelete,
+        };
+
+        const res = await fetch('/api/deleteimage/', {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+
         if (res.status === 200) {
             const newImages = images.filter((image) => {
                 if (image.imageId !== imageToDelete) {

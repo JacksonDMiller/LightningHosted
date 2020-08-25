@@ -7,7 +7,19 @@ export default function EditUsernameInput({ user, setUser }) {
 
     const updateUserName = async (e) => {
         e.preventDefault();
-        const res = await fetch('/api/changeusername/' + newUserName);
+
+        let data = {
+            username: newUserName,
+        };
+
+        const res = await fetch('/api/changeusername/', {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+
         const result = await res.json();
         if (res.status === 200) {
             setUser({ ...user, username: newUserName });

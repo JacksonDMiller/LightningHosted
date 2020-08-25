@@ -384,11 +384,11 @@ module.exports = function (app) {
     })
 
     // delete an image if you are the owner of the image
-    app.get('/api/deleteimage/:imageId', async (req, res) => {
+    app.post('/api/deleteimage/', async (req, res) => {
         if (req.user) {
             try {
                 const index = await req.user.images
-                    .findIndex(image => image.imageId === req.params.imageId);
+                    .findIndex(image => image.imageId === req.body.imageId);
                 req.user.images[index].deleted = true;
                 req.user.save();
                 res.status(200).send({ message: 'deleted' });
@@ -407,15 +407,15 @@ module.exports = function (app) {
     })
 
     //change your user name to a username that is not already taken
-    app.get('/api/changeusername/:username', async (req, res) => {
+    app.post('/api/changeusername', async (req, res) => {
         if (req.user) {
             try {
-                if (/^[a-zA-Z0-9_-]{3,16}$/.test(req.params.username)) {
-                    const newUsernameLowerCase = req.params.username.toLowerCase();
+                if (/^[a-zA-Z0-9_-]{3,16}$/.test(req.body.username)) {
+                    const newUsernameLowerCase = req.body.username.toLowerCase();
                     const doc = await Users.findOne({ 'lowerCaseUserName': newUsernameLowerCase })
                     if (doc === null) {
-                        req.user.username = req.params.username;
-                        req.user.lowerCaseUserName = req.params.username.toLowerCase();
+                        req.user.username = req.body.username;
+                        req.user.lowerCaseUserName = req.body.username.toLowerCase();
                         req.user.save()
                         res.status(200).send({ message: 'updated' })
                     }
