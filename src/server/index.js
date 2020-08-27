@@ -38,4 +38,4 @@ require('./routes/moderator-routes')(app);
 
 app.use(fallback('index.html', { root: './dist' }))
 
-app.listen(process.env.PORT || 8080, () => console.log(`YipYip app is listening on port ${process.env.PORT || 8080}!`));
+app.listen(process.env.PORT || 80, () => console.log(`YipYip app is listening on port ${process.env.PORT || 80}!`));
