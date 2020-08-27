@@ -7,6 +7,7 @@ export default function Login() {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [passwordCheck, setPasswordCheck] = useState('')
     const [username, setUsername] = useState('')
 
     const globalState = useContext(store);
@@ -20,6 +21,43 @@ export default function Login() {
 
     const submitCredentials = async (e) => {
         e.preventDefault();
+
+        function validateUsername(username) {
+            const ue = /^[a-zA-Z0-9_]{3,16}$/;
+            return ue.test(String(username).toLowerCase());
+
+        }
+
+        function validateEmail(email) {
+            if (email === '') {
+                return true;
+            }
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+
+        }
+
+        if (!validateUsername(username)) {
+            M.toast({
+                html: `
+                <ul>    
+                    <li>Invalid Username </li>
+                    <li>Must be 3-16 characters long</li>
+                    <li>No spaces</li>
+                    <li>You may use A-Z 0-9 and _ </li>
+                </ul>`
+            })
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            M.toast({ html: 'Invalid Email' });
+            return;
+        }
+        if (password !== passwordCheck) {
+            { M.toast({ html: `Passwords don't match` }) }
+            return;
+        }
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -31,7 +69,7 @@ export default function Login() {
         };
         let res = await (await fetch('/api/register/', requestOptions)).json();
         if (res.error) {
-            M.toast({ html: res.error })
+            M.toast({ html: `Oops something went wrong` })
         }
         else {
             submitCredentialsLogin();
@@ -100,27 +138,36 @@ export default function Login() {
                     <form className="col s12">
                         <div className="row">
                             <div className="input-field col s12">
-                                <input onChange={e => setEmail(e.target.value)}
+                                <input value={email} onChange={e => setEmail(e.target.value)}
                                     id="email" type="email" className="validate" />
-                                <label htmlFor="email">Email</label>
+                                <label htmlFor="email">Email (Not required but recommended for account recovery)</label>
                             </div>
                         </div>
 
                         <div className="row">
                             <div className="input-field col s12">
-                                <input onChange={e => setUsername(e.target.value)}
-                                    id="username-signup" className="validate" type="text" />
+                                <input value={username} onChange={e => setUsername(e.target.value)}
+                                    id="username-signup" type="text" />
                                 <label htmlFor="username-signup">Username</label>
                             </div>
                         </div>
 
                         <div className="row">
                             <div className="input-field col s12">
-                                <input onChange={e => setPassword(e.target.value)}
-                                    id="password-signup" type="password" className="validate" />
+                                <input value={password} onChange={e => setPassword(e.target.value)}
+                                    id="password-signup" type="password" />
                                 <label htmlFor="password-signup">Password</label>
                             </div>
                         </div>
+
+                        <div className="row">
+                            <div className="input-field col s12">
+                                <input onChange={e => setPasswordCheck(e.target.value)}
+                                    id="password-signup-check" type="password" value={passwordCheck} />
+                                <label htmlFor="password-signup-check">Type your password again</label>
+                            </div>
+                        </div>
+
                         <button className='btn' onClick={submitCredentials}>Submit</button>
                     </form>
 

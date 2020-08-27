@@ -83,20 +83,25 @@ export default function Profile() {
         <div className='row' >
             {!loggedIn ? <Redirect to='/' /> : null}
             <div className='row profile-info'>
-                {user.avatarUrl ?
-                    <div className='col s12 m2 avatar-img-div right-align' >
-                        <img className='circle responsive-img avatar-image' src={user.avatarUrl}>
-                        </img>
-                        <a
-                            className="dropdown-trigger"
-                            href="#"
-                            data-target="edit-dropdown">
-                            <i className="material-icons black-text">edit</i>
-                        </a>
-                    </div>
-                    : null}
 
-                <h5 className='col s12 m10 center-align'>
+                <div className='col s12 m2 avatar-img-div right-align' >
+                    {user.avatarUrl ?
+                        <img className='circle responsive-img avatar-image' src={user.avatarUrl}>
+                        </img> : null}
+                    <a
+                        className="dropdown-trigger profile-edit-btn"
+                        href="#"
+                        data-target="edit-dropdown">
+                        <i className="material-icons black-text">edit</i>
+                    </a>
+                </div>
+
+
+                <h5 className='col s12 m10 center-align hide-on-med-and-up'>
+                    {user.username}
+                </h5>
+
+                <h5 className='col s12 m10 left-align hide-on-small-only'>
                     {user.username}
                 </h5>
 
@@ -157,7 +162,7 @@ export default function Profile() {
             </div>
 
             <div id="withdrawModal" className="modal">
-                <WithdrawModal />
+                <WithdrawModal setUser={setUser} />
             </div>
 
             <div id="deleteModal" className="modal">

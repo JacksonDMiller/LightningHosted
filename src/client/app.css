@@ -409,3 +409,33 @@ body {
 .comment-timestamp {
   font-size: .8rem;
 }
+
+.dropdown-content li>a, .dropdown-content li>span {
+  color: #800080;
+}
+
+.profile-edit-btn {
+  position: absolute;
+  right: 5px;
+}
+
+.filepond--label-action {
+  text-decoration: none;
+  color: white;
+}
+
+.filepond--panel-root {
+  background-color: #800080;
+}
+
+.filepond--file-action-button:focus {
+  background-color: #800080;
+}
+
+.filepond--drop-label {
+  cursor: pointer;
+}
+
+.filepond-container {
+  width: 80%;
+}

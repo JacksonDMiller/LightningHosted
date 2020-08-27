@@ -1,12 +1,24 @@
 import React, { useState } from 'react'
 
-export default function WithdrawModal() {
+export default function WithdrawModal({ setUser }) {
 
     const [invoice, setInvoice] = useState(null)
 
     const withdraw = async (e) => {
         e.preventDefault()
-        const res = await fetch('/api/payinvoice/' + invoice);
+        let postData = {
+            invoice: invoice,
+        };
+
+        const res = await fetch('/api/payinvoice/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData),
+        })
+
+
         const data = await res.json();
         if (data.error) {
             M.toast({ html: data.error })

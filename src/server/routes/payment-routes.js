@@ -19,13 +19,12 @@ sub.on('invoice_updated', async invoice => {
 
 module.exports = function (app) {
     //pay a lightning invoice if the user has earned enough sats.
-    app.get('/api/payinvoice/:invoice', async (req, res) => {
+    app.post('/api/payinvoice/', async (req, res) => {
         try {
-            const details = await decodePaymentRequest({ lnd, request: req.params.invoice });
+            const details = await decodePaymentRequest({ lnd, request: req.body.invoice });
             if (req.user.sats >= details.tokens) {
-                const lndRes = await pay({ lnd, request: req.params.invoice })
+                const lndRes = await pay({ lnd, request: req.body.invoice })
                 // update the users balance
-                console.log(lndRes)
                 req.user.sats = req.user.sats - details.tokens;
                 req.user.paidSats = req.user.paidSats + details.tokens;
                 req.user.save();

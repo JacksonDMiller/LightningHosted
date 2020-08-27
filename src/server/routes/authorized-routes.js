@@ -71,7 +71,7 @@ module.exports = function (app) {
     app.post('/api/uploadavatar', uploadAvatar.single("avatar", (err) => { console.log(err) }), async function (req, res) {
         try {
             var newAvatarFileName = 'A' + crypto.randomBytes(8).toString('hex') + '.jpeg'
-            await sharp(req.file.path).jpeg({ quality: 50, force: true })
+            await sharp(req.file.path).jpeg({ quality: 100, force: true })
                 .rotate()
                 .toFile('src/server/uploads/avatars/' + newAvatarFileName)
             fsPromises.unlink(req.file.path);
@@ -179,7 +179,7 @@ module.exports = function (app) {
                         else {
 
                             sharp('src/server/uploads/compressed/' + imageFileName + '.' + imageExtension)
-                                .jpeg({ quality: 40, force: true })
+                                .jpeg({ quality: 20, force: true })
                                 .rotate()
                                 .toFile('src/server/uploads/thumbnails/' + imageFileName + '.' + 'jpeg')
                         }
@@ -410,7 +410,7 @@ module.exports = function (app) {
     app.post('/api/changeusername', async (req, res) => {
         if (req.user) {
             try {
-                if (/^[a-zA-Z0-9_-]{3,16}$/.test(req.body.username)) {
+                if (/^[a-zA-Z0-9_]{3,16}$/.test(req.body.username)) {
                     const newUsernameLowerCase = req.body.username.toLowerCase();
                     const doc = await Users.findOne({ 'lowerCaseUserName': newUsernameLowerCase })
                     if (doc === null) {

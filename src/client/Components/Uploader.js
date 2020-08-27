@@ -35,7 +35,7 @@ function Uploader({ addImage }) {
   };
 
   return (
-    <div>
+    <div class='center filepond-container'>
       {file.length !== 0 ? (
         <div className="row">
           <div className="input-field col s10">
@@ -60,6 +60,8 @@ function Uploader({ addImage }) {
         ref={pond}
         files={file}
         allowMultiple={false}
+        labelIdle={`<span class="filepond--label-action hide-on-large-only">Tap to upload an image and stack sats</span>
+          <span class="filepond--label-action hide-on-small-only hide-on-med-only">Click to upload an image and stack sats</span>`}
         onupdatefiles={(e) => {
           setFile(e);
           setIsUploading(false);
@@ -104,14 +106,11 @@ function Uploader({ addImage }) {
             ></textarea>
             <label htmlFor="icon_prefix4">Caption</label>
           </div>
-          {isUploading ? (
+          {isUploading ?
             <button className="btn">
-              <div className="spinner">
-                <div className="block"></div>
-                <div className="chain"></div>
-              </div>
+              Uploading...
             </button>
-          ) : (
+            : (
               <button className="btn" onClick={upload}>
                 <i className="material-icons prefix col s2">arrow_upward</i>{" "}
               Upload

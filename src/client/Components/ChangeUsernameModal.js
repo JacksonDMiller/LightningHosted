@@ -21,7 +21,9 @@ export default function EditUsernameInput({ user, setUser }) {
         const result = await res.json();
         if (res.status === 200) {
             setUser({ ...user, username: newUserName });
-            setEditUsername(false);
+            let changeUserNameModal = document.querySelectorAll('#change-username-modal')
+            M.Modal.getInstance(changeUserNameModal[0]).close();
+            M.toast({ html: 'Username Changed' })
         }
         else { M.toast({ html: result.error }); }
 
@@ -29,6 +31,11 @@ export default function EditUsernameInput({ user, setUser }) {
     return (
         <span>
             < form className="col s12 m10">
+                <ol>
+                    <li>Must be 3-16 characters long</li>
+                    <li>No spaces</li>
+                    <li>You may use A-Z 0-9 and _ </li>
+                </ol>
                 <div className="input-field">
                     <input onChange={e => setNewUserName(e.target.value)}
                         id="username-login-small" className="validate" type="text" />
