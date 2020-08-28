@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import CommentSection from "./SharePageComponents/CommentBox";
+import CommentSection from "./SharePageComponents/CommentSection";
 import ImageCard from "./ImageCardComponents/ImageCard";
 import HorizontalAd from "./HorizontalAd";
 import { viewportContext } from "../Context/GetWindowDimensions";

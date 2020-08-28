@@ -8,7 +8,6 @@ export default function CommentBox({
   comments,
 }) {
   const globalState = useContext(store);
-
   const submitComment = async (e) => {
     e.preventDefault();
     if (globalState.state.auth === false) {
