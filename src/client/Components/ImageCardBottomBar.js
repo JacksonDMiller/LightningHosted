@@ -21,7 +21,7 @@ export default function ImageCardBottomBar(props) {
         ) {
             return "upvoted";
         } else {
-            return;
+            return "";
         }
     });
     const [upvotes, setUpovotes] = useState(props.imageData.upvotes);

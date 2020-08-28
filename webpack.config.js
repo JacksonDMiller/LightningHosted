@@ -6,7 +6,6 @@ const outputDirectory = 'dist';
 
 module.exports = {
   entry: [
-    'webpack-dev-server/client?http://0.0.0.0:80',
     'babel-polyfill',
     './src/client/index.js',
   ],

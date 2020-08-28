@@ -1,6 +1,5 @@
 import React from 'react'
 import { useState, useEffect, } from 'react'
-import background from '../../assets/bitcoinbackground.jpg'
 export default function About() {
 
     useEffect(() => {
