@@ -56,19 +56,13 @@ module.exports = function (app) {
 
     // create new user with username and password. 
     app.post('/api/register', async (req, res) => {
-        function validateEmail(email) {
-            if (email === '') {
-                return true;
+        if (req.body.email !== '') {
+            if (!/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(req.body.email)) {
+                res.status(400).send({ error: `Improperly formated email address` })
+                return;
             }
-            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return re.test(String(email).toLowerCase());
-
         }
 
-        if (!/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(req.body.email)) {
-            res.status(400).send({ error: `Improperly formated email address` })
-            return;
-        }
         if (/^[a-zA-Z0-9_-]{3,16}$/.test(req.body.username)) {
             let newUsernameLowerCase = req.body.username.toLowerCase();
             let newUserEmailAddress = req.body.email.toLowerCase();

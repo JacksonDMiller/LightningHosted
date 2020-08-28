@@ -35,7 +35,7 @@ function Uploader({ addImage }) {
   };
 
   return (
-    <div class='center filepond-container'>
+    <div className='center filepond-container'>
       {file.length !== 0 ? (
         <div className="row">
           <div className="input-field col s10">

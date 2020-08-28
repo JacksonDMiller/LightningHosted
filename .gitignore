@@ -5,3 +5,4 @@ dist
 yarn.lock
 src/server/uploads/
 src/server/config/keys.js
+!src/server/uploads/avatars/.Default.jpg

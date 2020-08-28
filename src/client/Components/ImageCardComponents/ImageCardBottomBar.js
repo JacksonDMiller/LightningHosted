@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { store } from "../Context/Store";
+import { store } from "../../Context/Store";
 import { Link } from "react-router-dom";
 
 export default function ImageCardBottomBar(props) {

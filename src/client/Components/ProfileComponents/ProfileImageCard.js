@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom'
-import { store } from '../Context/Store';
+import { store } from '../../Context/Store';
 
 
 export default function ProfileImageCard(props) {

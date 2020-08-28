@@ -42,7 +42,6 @@ export default function EditUsernameInput({ user, setUser }) {
                     <label htmlFor="username-login-small">New Username</label>
                 </div>
                 <button className='btn' onClick={updateUserName}>Submit</button>
-                <button className='btn' onClick={() => setEditUsername(false)}>Cancle</button>
             </form>
 
         </span >

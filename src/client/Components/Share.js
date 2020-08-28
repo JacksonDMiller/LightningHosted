@@ -1,159 +1,200 @@
-// image Data wont stay saved in the state for some reason 
+// image Data wont stay saved in the state for some reason
 
-
-import React, { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
-import CommentSection from './CommentSection';
-import ImageCard from './ImageCard';
-import { viewportContext } from '../Context/GetWindowDimensions';
-var QRCode = require('qrcode.react');
-import { HorizontalAd } from '../Components/HorizontalAd';
-import Helmet from 'react-helmet';
-import { store } from '../Context/Store';
-
+import React, { useState, useEffect, useContext } from "react";
+import { useParams } from "react-router-dom";
+import CommentSection from "./SharePageComponents/CommentBox";
+import ImageCard from "./ImageCardComponents/ImageCard";
+import HorizontalAd from "./HorizontalAd";
+import { viewportContext } from "../Context/GetWindowDimensions";
+import { store } from "../Context/Store";
+const QRCode = require("qrcode.react");
+import Helmet from "react-helmet";
 
 export default function Share() {
-    const globalState = useContext(store);
-    const [imageData, setImageData] = useState({});
-    let { imageId } = useParams();
-    const { screenWidth } = useContext(viewportContext);
-    var checkPaymentInterval = null;
+  const globalState = useContext(store);
+  const [imageData, setImageData] = useState({});
+  let { imageId } = useParams();
+  const { screenWidth } = useContext(viewportContext);
+  var checkPaymentInterval = null;
 
-    const getImageInfo = async () => {
-        const newImageData = await (await fetch('/api/imageinfo/' + imageId)).json()
-        await newImageData
-        setImageData(newImageData)
-        if (newImageData.paymentRequired && newImageData.payStatus === false) {
-            checkForPayment(newImageData.paymentRequest)
-        }
-        // attempt to record a view if the the localStorage does not indicate they
-        // have seen this image before
-        if (!localStorage.getItem(newImageData.imageId)) {
-            localStorage.setItem(newImageData.imageId, true);
-            fetch('/api/incrementPageView/' + newImageData.imageId)
-        }
-
+  const getImageInfo = async () => {
+    const newImageData = await (
+      await fetch("/api/imageinfo/" + imageId)
+    ).json();
+    await newImageData;
+    setImageData(newImageData);
+    if (newImageData.paymentRequired && newImageData.payStatus === false) {
+      checkForPayment(newImageData.paymentRequest);
     }
-
-    useEffect(() => {
-        // grab the image and image info
-
-        getImageInfo();
-        return () => {
-            clearInterval(checkPaymentInterval);
-        }
-    }, [])
-
-    const checkForPayment = (paymentRequest) => {
-
-        var counter = 0
-        checkPaymentInterval = setInterval(async () => {
-            console.log('checked')
-            counter = counter + 1
-            if (counter === 300) {
-                clearInterval(checkPaymentInterval)
-            }
-            let res = await fetch('/api/checkpayment/' + paymentRequest)
-            if (res.status === 200) {
-                const paidImageData = await res.json();
-                setImageData(paidImageData.imageData);
-                clearInterval(checkPaymentInterval);
-                M.toast({ html: 'Paid!' });
-            }
-            if (res.status === 400) {
-                clearInterval(checkPaymentInterval);
-
-            }
-
-        }, 1000);
+    // attempt to record a view if the the localStorage does not indicate they
+    // have seen this image before
+    if (!localStorage.getItem(newImageData.imageId)) {
+      localStorage.setItem(newImageData.imageId, true);
+      fetch("/api/incrementPageView/" + newImageData.imageId);
     }
+  };
 
-    // has not been hooked up yet
-    const reportImage = async (imageId) => {
-        const res = await fetch('/api/report/' + imageId)
-    }
+  useEffect(() => {
+    // grab the image and image info
 
-    const incrementComments = () => {
-        let incrementedComments = imageData.numberOfComments + 1
-        setImageData({ ...imageData, numberOfComments: incrementedComments })
-    }
+    getImageInfo();
+    return () => {
+      clearInterval(checkPaymentInterval);
+    };
+  }, []);
 
-    const { views, upvotes, title, fileName, height, } = imageData
+  const checkForPayment = (paymentRequest) => {
+    var counter = 0;
+    checkPaymentInterval = setInterval(async () => {
+      console.log("checked");
+      counter = counter + 1;
+      if (counter === 300) {
+        clearInterval(checkPaymentInterval);
+      }
+      let res = await fetch("/api/checkpayment/" + paymentRequest);
+      if (res.status === 200) {
+        const paidImageData = await res.json();
+        setImageData(paidImageData.imageData);
+        clearInterval(checkPaymentInterval);
+        M.toast({ html: "Paid!" });
+      }
+      if (res.status === 400) {
+        clearInterval(checkPaymentInterval);
+      }
+    }, 1000);
+  };
 
+  // has not been hooked up yet
+  const reportImage = async (imageId) => {
+    const res = await fetch("/api/report/" + imageId);
+  };
 
-    return (
+  const incrementComments = () => {
+    let incrementedComments = imageData.numberOfComments + 1;
+    setImageData({ ...imageData, numberOfComments: incrementedComments });
+  };
 
-        <div className=''>
+  const { views, upvotes, title, fileName, height } = imageData;
 
+  return (
+    <div className="">
+      <Helmet>
+        {title ? (
+          <title>{"LH - " + title}</title>
+        ) : (
+          <title>LightningHosted</title>
+        )}
 
-            <Helmet>
-                {title ? <title>{'LH - ' + title}</title> :
-                    <title>LightningHosted</title>}
+        <meta name="robots" content="follow, index" />
+        <meta
+          name="keywords"
+          content="images, photos, gif, gifs, memes, pictures, new pictures, reaction gifs, share photos, share images, latest images, funny, cute, visual storytelling, LightningHosted, LH"
+        />
+        <meta
+          name="description"
+          content={
+            views + " views and " + upvotes + " upvotes on LightningHosted.com"
+          }
+        />
+        <link
+          rel="canonical"
+          href="https://LightningHosted.com/s/0690fafd456f2bd3"
+        />
+        <meta property="og:site_name" content="LightningHosted" />
+        <meta name="twitter:site" content="@LightningHosted" />
+        <meta name="twitter:domain" content="LightningHosted.com" />
+        <meta name="twitter:title" content={title} />
+        <meta property="author" content="LightningHosted" />
+        <meta property="article:author" content="LightningHosted" />
+        <meta name="msapplication-TileColor" content="#800080" />
+        <link
+          rel="image_src"
+          href={"https://lightninghosted.com/i/" + fileName}
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:title" content={title} />
+        <meta
+          property="og:url"
+          content={"https://LightningHosted.com/s/" + imageId}
+        />
+        <meta property="og:image:width" content={imageData.width} />
+        <meta property="og:image:height" content={height} />
+        <meta
+          property="og:description"
+          content={
+            views + " views and " + upvotes + " upvotes on LightningHosted.com"
+          }
+        />
+        <meta
+          name="twitter:description"
+          content={
+            views + " views and " + upvotes + " upvotes on LightningHosted.com"
+          }
+        />
+        <meta
+          name="twitter:image"
+          content={"https://lightninghosted.com/i/" + fileName}
+        />
+        <meta
+          property="og:image"
+          content={"https://lightninghosted.com/i/" + fileName}
+        />
+      </Helmet>
 
-                <meta name="robots" content="follow, index" />
-                <meta name="keywords" content="images, photos, gif, gifs, memes, pictures, new pictures, reaction gifs, share photos, share images, latest images, funny, cute, visual storytelling, LightningHosted, LH" />
-                <meta name="description" content={views + ' views and ' + upvotes + ' upvotes on LightningHosted.com'} />
-                <link rel="canonical" href="https://LightningHosted.com/s/0690fafd456f2bd3" />
-                <meta property="og:site_name" content="LightningHosted" />
-                <meta name="twitter:site" content="@LightningHosted" />
-                <meta name="twitter:domain" content="LightningHosted.com" />
-                <meta name="twitter:title" content={title} />
-                <meta property="author" content="LightningHosted" />
-                <meta property="article:author" content="LightningHosted" />
-                <meta name="msapplication-TileColor" content="#800080" />
-                <link rel="image_src" href={"https://lightninghosted.com/i/" + fileName} />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta property="og:title" content={title} />
-                <meta property="og:url" content={"https://LightningHosted.com/s/" + imageId} />
-                <meta property="og:image:width" content={imageData.width} />
-                <meta property="og:image:height" content={height} />
-                <meta property="og:description" content={views + ' views and ' + upvotes + ' upvotes on LightningHosted.com'} />
-                <meta name="twitter:description" content={views + ' views and ' + upvotes + ' upvotes on LightningHosted.com'} />
-                <meta name="twitter:image" content={"https://lightninghosted.com/i/" + fileName} />
-                <meta property="og:image" content={"https://lightninghosted.com/i/" + fileName} />
-            </Helmet>
-
-
-            <HorizontalAd />
-            {imageData.paymentRequired && imageData.payStatus === false ?
-
-                < div className="container">
-                    <h3 className="center-align">100 Sats</h3>
-                    <QRCode onLoad={() => checkForPayment()} className='qr-code center' value={imageData.paymentRequest} />
-                    <a href={"lightning:" + imageData.paymentRequest}><button className="btn center">Pay</button></a>
-                    <p className="center-align">This image requires a deposit.</p>
-                    <p className="center-align">We use a small lightning network payment as a deterrent to people abusing the service.
-                    After the image recevies 100 views the satoshis are credited to the creator of the image for withdrawal.</p>
-
-
-
-                </div>
-
-                :
-                <span>
-
-                    <div className=''>
-                        {imageData.imageId ?
-                            <ImageCard share={true} imageData={imageData} />
-                            : null}
-                        {console.log()}
-                        {globalState.state.moderator ?
-                            <div className='center'>
-                                <button
-                                    onClick={() => fetch('/api/moderatorsuppressimage/' + imageId)}
-                                    className="btn">Supress</button>
-                                <button
-                                    onClick={() => fetch('/api/moderatordeleteimage/' + imageId)}
-                                    className="btn">Delete
-                                </button>
-                            </div>
-                            : null}
-                    </div>
-                    {imageData.comments
-                        ? <CommentSection imageId={imageData.imageId} comments={imageData.comments} incrementComments={incrementComments} />
-                        : null}
-                </span>
-            }
-        </div >
-    )
+      <HorizontalAd />
+      {imageData.paymentRequired && imageData.payStatus === false ? (
+        <div className="container">
+          <h3 className="center-align">100 Sats</h3>
+          <QRCode
+            onLoad={() => checkForPayment()}
+            className="qr-code center"
+            value={imageData.paymentRequest}
+          />
+          <a href={"lightning:" + imageData.paymentRequest}>
+            <button className="btn center">Pay</button>
+          </a>
+          <p className="center-align">This image requires a deposit.</p>
+          <p className="center-align">
+            We use a small lightning network payment as a deterrent to people
+            abusing the service. After the image recevies 100 views the satoshis
+            are credited to the creator of the image for withdrawal.
+          </p>
+        </div>
+      ) : (
+        <span>
+          <div className="">
+            {imageData.imageId ? (
+              <ImageCard share={true} imageData={imageData} />
+            ) : null}
+            {console.log()}
+            {globalState.state.moderator ? (
+              <div className="center">
+                <button
+                  onClick={() =>
+                    fetch("/api/moderatorsuppressimage/" + imageId)
+                  }
+                  className="btn"
+                >
+                  Supress
+                </button>
+                <button
+                  onClick={() => fetch("/api/moderatordeleteimage/" + imageId)}
+                  className="btn"
+                >
+                  Delete
+                </button>
+              </div>
+            ) : null}
+          </div>
+          {imageData.comments ? (
+            <CommentSection
+              imageId={imageData.imageId}
+              comments={imageData.comments}
+              incrementComments={incrementComments}
+            />
+          ) : null}
+        </span>
+      )}
+    </div>
+  );
 }

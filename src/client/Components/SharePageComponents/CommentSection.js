@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import CommentBox from './CommentBox';
-import { store } from '../Context/Store';
+import { store } from '../../Context/Store';
 
 
 
