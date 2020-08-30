@@ -115,7 +115,7 @@ module.exports = function (app) {
     const imagesPerDayCap = 5;
 
     for await (image of req.user.images) {
-      if (new Date() - image.date <= 86400000) {
+      if (new Date() - image.date <= 86400000 && !image.paymentRequired) {
         imagesUploadeToday = imagesUploadeToday + 1;
       }
     }

@@ -1,28 +1,11 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { store } from "../../Context/Store";
 import { viewportContext } from "../../Context/GetWindowDimensions";
 import ImageCardMedia from "./ImageCardMedia";
 import ImageCardBottomBar from "./ImageCardBottomBar";
 
 export default function ImageCard(props) {
-  const globalState = useContext(store);
-  const { dispatch } = globalState;
-
-  const {
-    imageId,
-    fileType,
-    fileName,
-    caption,
-    title,
-    views,
-    numberOfComments,
-    orientation,
-    paymentRequired,
-    payStatus,
-    height,
-    width,
-  } = props.imageData;
+  const { imageId, caption, title, orientation } = props.imageData;
 
   const { screenWidth } = useContext(viewportContext);
 
