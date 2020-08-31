@@ -4,7 +4,7 @@ var passport = require("passport");
 const passportSetup = require("./config/passport-setup");
 const cookieSession = require("cookie-session");
 const keys = require("./config/keys");
-var logger = require("./log.js");
+// var logger = require("./log.js");
 const fallback = require("express-history-api-fallback");
 
 // setting up express

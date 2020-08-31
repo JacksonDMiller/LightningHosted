@@ -15,6 +15,7 @@ const logger = require("winston");
 // multer for image uploads
 var uploadImage = multer({
   dest: "src/server/uploads/compressed",
+  // file size limit for images
   limits: { fileSize: 1024 * 1024 * 1024 * 5 },
 
   // filter uploaded files based on MimeType
@@ -41,10 +42,13 @@ var uploadImage = multer({
     }
   },
 });
+
 // multer for avatar uploads
 var uploadAvatar = multer({
+  // max file size for avatar images
   limits: { fileSize: 1024 * 1024 * 1024 * 2 },
   dest: "src/server/uploads/avatars",
+
   // filter uploaded files using molter based on MimeType
   fileFilter: function fileFilter(req, file, cb) {
     const acceptedMimeTypes = ["image/jpeg", "image/png"];
@@ -70,7 +74,10 @@ module.exports = function (app) {
   app.post(
     "/api/uploadavatar",
     uploadAvatar.single("avatar", (err) => {
-      console.log(err);
+      logger.log({
+        level: "error",
+        message: "avatar upload error" + err,
+      });
     }),
     async function (req, res) {
       try {
@@ -80,7 +87,9 @@ module.exports = function (app) {
           .jpeg({ quality: 100, force: true })
           .rotate()
           .toFile("src/server/uploads/avatars/" + newAvatarFileName);
+        // delete the uploaded file after creating a compressed copy
         fsPromises.unlink(req.file.path);
+        // delete the old avatar image if there is one
         if (
           req.user.avatarFileName &&
           req.user.avatarFileName != "Default.jpg"
@@ -103,8 +112,8 @@ module.exports = function (app) {
     }
   );
 
-  // Upload a new image, process it, add it to the datbase, create an invoice to pay
-  // the deposit
+  // Upload a new image, process it, add it to the datbase.
+  // create an invoice for the deposit if required
   app.post("/api/upload", uploadImage.single("filepond"), async function (
     req,
     res
@@ -113,13 +122,13 @@ module.exports = function (app) {
     let paymentRequired = false;
     let imageInvoice = "";
     const imagesPerDayCap = 5;
-
+    // determine how many images have been uploaded in the last day
     for await (image of req.user.images) {
       if (new Date() - image.date <= 86400000 && !image.paymentRequired) {
         imagesUploadeToday = imagesUploadeToday + 1;
       }
     }
-
+    // if its over the cap then require a deposit
     if (imagesUploadeToday > imagesPerDayCap) {
       paymentRequired = true;
     }
@@ -139,6 +148,8 @@ module.exports = function (app) {
         // }
         const processedImage = new Promise(async (resolve, reject) => {
           try {
+            // if the image is a gif don't do any procesing
+            // converting gifs to mp4s on upload is on the to do list.
             if (req.file.mimetype === "image/gif") {
               await fsPromises.rename(
                 req.file.path,
@@ -202,6 +213,7 @@ module.exports = function (app) {
         const generateThumbnail = new Promise(async (resolve, reject) => {
           try {
             if (imageExtension === "mp4") {
+              console.log('here')
               const tg = new ThumbnailGenerator({
                 sourcePath:
                   "src/server/uploads/compressed/" + imageFileName + ".mp4",
@@ -218,8 +230,13 @@ module.exports = function (app) {
                     "." +
                     "jpeg"
                 )
-                .catch((err) => console.log(err));
-              // fsPromises.unlink('src/server/uploads/thumbnails/' + result)
+                .catch((err) =>
+                  logger.log({
+                    level: "error",
+                    message: `thumbnail generation err` + err,
+                  })
+                );
+               fsPromises.unlink('src/server/uploads/thumbnails/' + result)
               resolve(true);
             } else {
               sharp(
@@ -293,7 +310,6 @@ module.exports = function (app) {
 
         res.status(200).send(imageData);
       } catch (err) {
-        console.log("error was caught");
         logger.log({
           level: "error",
           message: err,
