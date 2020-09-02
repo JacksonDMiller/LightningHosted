@@ -3,13 +3,13 @@ var multer = require("multer");
 const sharp = require("sharp");
 const crypto = require("crypto");
 const imageSize = require("image-size");
-const ThumbnailGenerator = require("video-thumbnail-generator").default;
 const { createInvoice, authenticatedLndGrpc } = require("ln-service");
 const keys = require("../config/keys");
 const { lnd } = authenticatedLndGrpc(keys.lnd);
 const fsPromises = require("fs").promises;
 const getVideoDimensions = require("get-video-dimensions");
 const logger = require("winston");
+const genThumbnail = require("simple-thumbnail");
 
 //seting up multer
 // multer for image uploads
@@ -114,6 +114,7 @@ module.exports = function (app) {
 
   // Upload a new image, process it, add it to the datbase.
   // create an invoice for the deposit if required
+  // this function is a rats nest and should be refactored
   app.post("/api/upload", uploadImage.single("filepond"), async function (
     req,
     res
@@ -177,11 +178,12 @@ module.exports = function (app) {
               resolve("jpeg");
             }
             if (req.file.mimetype === "video/mp4") {
-              await fsPromises.rename(
-                req.file.path,
-                "src/server/uploads/compressed/" + imageFileName + ".mp4"
-              );
-              resolve("mp4");
+              await fsPromises
+                .rename(
+                  req.file.path,
+                  "src/server/uploads/compressed/" + imageFileName + ".mp4"
+                )
+                .then(resolve("mp4"));
             }
           } catch (error) {
             reject("error proessing the image" + error);
@@ -213,31 +215,19 @@ module.exports = function (app) {
         const generateThumbnail = new Promise(async (resolve, reject) => {
           try {
             if (imageExtension === "mp4") {
-              console.log('here')
-              const tg = new ThumbnailGenerator({
-                sourcePath:
-                  "src/server/uploads/compressed/" + imageFileName + ".mp4",
-                thumbnailPath: "src/server/uploads/thumbnails/",
-              });
-              let result = await tg.generateOneByPercent(1, {
-                size: dimensions.width + "x" + dimensions.height,
-              });
-              sharp("src/server/uploads/thumbnails/" + (await result))
-                .jpeg({ quality: 80, force: true })
-                .toFile(
-                  "src/server/uploads/thumbnails/" +
-                    imageFileName +
-                    "." +
-                    "jpeg"
-                )
-                .catch((err) =>
-                  logger.log({
-                    level: "error",
-                    message: `thumbnail generation err` + err,
-                  })
-                );
-               fsPromises.unlink('src/server/uploads/thumbnails/' + result)
-              resolve(true);
+              async function generateMp4Thumbnail() {
+                try {
+                  await genThumbnail(
+                    "src/server/uploads/compressed/" + imageFileName + ".mp4",
+                    "src/server/uploads/thumbnails/" + imageFileName + ".jpeg",
+                    dimensions.width + "x" + dimensions.height
+                  );
+                  resolve(true);
+                } catch (err) {
+                  resolve(false);
+                }
+              }
+              await generateMp4Thumbnail();
             } else {
               sharp(
                 "src/server/uploads/compressed/" +
@@ -262,7 +252,6 @@ module.exports = function (app) {
 
         await generateThumbnail;
 
-        // if (paymentRequired === true) {
         await imageInvoice
           .then((invoice) => {
             imageInvoice = invoice.request;
@@ -270,8 +259,6 @@ module.exports = function (app) {
           .catch((err) => {
             throw err[2].err.details + "its here";
           });
-        // }
-        // else { imageInvoice = null; }
 
         let imageOrientation = "horizontal";
         if (dimensions.height > dimensions.width) {
@@ -288,8 +275,8 @@ module.exports = function (app) {
           deleted: false,
           views: 0,
           reports: 0,
-          fileName: imageFileName + "." + imageExtension,
-          thumbNail: imageFileName + ".jpeg",
+          filename: imageFileName + "." + imageExtension,
+          thumbnail: imageFileName + ".jpeg",
           width: dimensions.width,
           height: dimensions.height,
           date: new Date(),
@@ -300,7 +287,7 @@ module.exports = function (app) {
           upvotes: 0,
           sats: 0,
           numberOfComments: 0,
-          fileType: imageExtension,
+          filetype: imageExtension,
           ogType: "ogType",
           twitterCard: "twitterCard",
           suppressed: false,
@@ -335,7 +322,7 @@ module.exports = function (app) {
     }
   });
 
-  // upvote an image and record that that the user has updated the image
+  // upvote an image and record that that the user has upvoted the image
   // or remove the upvote if it has previously been upvoted
   app.get("/api/upvote/:imageId", async (req, res) => {
     if (req.user) {
@@ -424,7 +411,6 @@ module.exports = function (app) {
       str = str.replace(/[^a-z0-9áéíóúñü \.?!""₿()$#@&,_-]/gim, "");
       return str.trim();
     }
-
     var { imageId, comment } = req.body;
     if (req.user) {
       try {
@@ -451,7 +437,7 @@ module.exports = function (app) {
         res.status(200).send({ newComment: newComment });
       } catch (error) {
         logger.log({
-          level: "error",
+          level: `error`,
           message: `Comment Error` + error,
         });
         res.status(404).send(`Oops something went wrong`);

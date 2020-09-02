@@ -7,8 +7,8 @@ export default function ProfileImageCard(props) {
     const [upvotes, setUpovotes] = useState(props.imageData.upvotes)
     const globalState = useContext(store);
     const { imageId,
-        fileType,
-        fileName,
+        filetype,
+        filename,
         caption,
         views,
         numberOfComments,
@@ -27,12 +27,12 @@ export default function ProfileImageCard(props) {
         <div className="imageCard card">
             <Link to={'/s/' + imageId}>
                 <div className="card-image">
-                    {fileType === 'mp4' ?
+                    {filetype === 'mp4' ?
                         <video autoPlay muted loop className='responsive-video'>
-                            <source src={"/api/i/" + fileName} type="video/mp4" />
+                            <source src={"/api/i/" + filename} type="video/mp4" />
                         </video>
-                        : fileType === 'gif' ? < img src={"/api/i/" + fileName} alt="image" />
-                            : <img src={"/api/t/" + fileName} alt="image" />}
+                        : filetype === 'gif' ? < img src={"/api/i/" + filename} alt="image" />
+                            : <img src={"/api/t/" + filename} alt="image" />}
 
                 </div>
             </Link>

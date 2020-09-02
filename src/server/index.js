@@ -1,11 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-var passport = require("passport");
+const passport = require("passport");
 const passportSetup = require("./config/passport-setup");
 const cookieSession = require("cookie-session");
 const keys = require("./config/keys");
-// var logger = require("./log.js");
+const logger = require("./log.js");
 const fallback = require("express-history-api-fallback");
+const mongoose = require("mongoose");
 
 // setting up express
 const app = express();
@@ -23,7 +24,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //setting up mongodb
-var mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost/LightningHosted", {
   useNewUrlParser: true,
   useUnifiedTopology: true,

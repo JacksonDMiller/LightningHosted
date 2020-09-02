@@ -13,8 +13,8 @@ module.exports = function (app) {
                 const index = await doc.images
                     .findIndex(image => image.imageId === req.params.imageId);
                 doc.images[index].deleted = true;
-                fsPromises.unlink('src/server/uploads/compressed/' + doc.images[index].fileName);
-                fsPromises.unlink('src/server/uploads/thumbnails/' + doc.images[index].thumbNail);
+                fsPromises.unlink('src/server/uploads/compressed/' + doc.images[index].filename);
+                fsPromises.unlink('src/server/uploads/thumbnails/' + doc.images[index].thumbnail);
 
                 doc.save();
                 res.status(200).send({ message: 'deleted' });

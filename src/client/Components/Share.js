@@ -74,7 +74,7 @@ export default function Share() {
     setImageData({ ...imageData, numberOfComments: incrementedComments });
   };
 
-  const { views, upvotes, title, fileName, height } = imageData;
+  const { views, upvotes, title, filename, height } = imageData;
 
   return (
     <div className="">
@@ -109,7 +109,7 @@ export default function Share() {
         <meta name="msapplication-TileColor" content="#800080" />
         <link
           rel="image_src"
-          href={"https://lightninghosted.com/i/" + fileName}
+          href={"https://lightninghosted.com/i/" + filename}
         />
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="og:title" content={title} />
@@ -133,11 +133,11 @@ export default function Share() {
         />
         <meta
           name="twitter:image"
-          content={"https://lightninghosted.com/i/" + fileName}
+          content={"https://lightninghosted.com/i/" + filename}
         />
         <meta
           property="og:image"
-          content={"https://lightninghosted.com/i/" + fileName}
+          content={"https://lightninghosted.com/i/" + filename}
         />
       </Helmet>
 

@@ -47,7 +47,7 @@ module.exports = function (app) {
     "/api/google/redirect",
     passport.authenticate("google"),
     (req, res) => {
-      res.redirect("/");
+      res.redirect("/profile");
     }
   );
 
