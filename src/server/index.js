@@ -7,6 +7,8 @@ const keys = require("./config/keys");
 const logger = require("./log.js");
 const fallback = require("express-history-api-fallback");
 const mongoose = require("mongoose");
+const https = require("https");
+const fs = require("fs");
 
 // setting up express
 const app = express();
@@ -43,6 +45,31 @@ require("./routes/moderator-routes")(app);
 
 app.use(fallback("index.html", { root: "./dist" }));
 
+app.use(function (req, res, next) {
+  if (req.secure) {
+    // request was via https, so do no special handling
+    next();
+  } else {
+    // request was via http, so redirect to https
+    res.redirect("https://" + req.headers.host + req.url);
+  }
+});
+
 app.listen(process.env.PORT || 8080, () =>
   console.log(`YipYip app is listening on port ${process.env.PORT || 8080}!`)
 );
+
+//  comment out for testing
+
+const options = {
+  key: fs.readFileSync(
+    "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
+    "utf8"
+  ),
+  cert: fs.readFileSync(
+    "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
+    "utf8"
+  ),
+};
+
+https.createServer(options, app).listen(8443);
