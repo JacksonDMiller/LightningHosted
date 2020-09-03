@@ -52,8 +52,6 @@ passport.use(
 passport.use(
   new LocalStrategy(function (username, password, done) {
     username = username.toLowerCase();
-    console.log(username);
-    console.log(password);
     Users.findOne(
       {
         $or: [
@@ -70,7 +68,6 @@ passport.use(
           return done(err);
         }
         if (!user) {
-          console.log("notfound");
           return done(null, false, { message: "Username not found" });
         }
         bcrypt.compare(password, user.password, (bcryptErr, res) => {
@@ -79,11 +76,7 @@ passport.use(
           }
           if (!res) {
             {
-              console.log(user.password, "up");
-              console.log(password, "p");
-              bcrypt.hash(password, 10).then((pa) => {
-                console.log(pa);
-              });
+              bcrypt.hash(password, 10).then((pa) => {});
               return done(null, false, { message: "Incorect Password" });
             }
           }

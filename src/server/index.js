@@ -8,10 +8,20 @@ const logger = require("./log.js");
 const fallback = require("express-history-api-fallback");
 const mongoose = require("mongoose");
 const https = require("https");
+const http = require("http");
 const fs = require("fs");
 
 // setting up express
 const app = express();
+app.use(function (req, res, next) {
+  if (req.secure) {
+    next();
+  } else {
+    // request was via http, so redirect to https
+    res.redirect("https://" + req.headers.host + req.url);
+  }
+});
+
 app.use(express.static("dist"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -45,16 +55,6 @@ require("./routes/moderator-routes")(app);
 
 app.use(fallback("index.html", { root: "./dist" }));
 
-app.use(function (req, res, next) {
-  if (req.secure) {
-    // request was via https, so do no special handling
-    next();
-  } else {
-    // request was via http, so redirect to https
-    res.redirect("https://" + req.headers.host + req.url);
-  }
-});
-
 app.listen(process.env.PORT || 8080, () =>
   console.log(`YipYip app is listening on port ${process.env.PORT || 8080}!`)
 );
@@ -72,4 +72,4 @@ const options = {
   ),
 };
 
-https.createServer(options, app).listen(8443);
+https.createServer(options, app).listen(443);
