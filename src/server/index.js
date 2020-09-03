@@ -62,15 +62,15 @@ app.listen(process.env.PORT || 8080, () =>
 
 //  comment out for testing
 
-// const options = {
-//   key: fs.readFileSync(
-//     "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
-//     "utf8"
-//   ),
-//   cert: fs.readFileSync(
-//     "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
-//     "utf8"
-//   ),
-// };
+const options = {
+  key: fs.readFileSync(
+    "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
+    "utf8"
+  ),
+  cert: fs.readFileSync(
+    "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
+    "utf8"
+  ),
+};
 
-// https.createServer(options, app).listen(443);
+https.createServer(options, app).listen(443);
