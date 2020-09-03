@@ -10,8 +10,9 @@ passport.use(
   new GoogleStrategy(
     {
       //options for the google strat
-      callbackURL: "http://192.168.0.33.xip.io:3000/api/google/redirect",
-      // callbackURL: 'http://localhost:3000/api/google/redirect',
+      callbackURL: "https://lightninghosted.com/api/google/redirect",
+      // callbackURL: 'http://192.168.0.33:3000/api/google/redirect',
+      //testing
       clientID: keys.google.clientID,
       clientSecret: keys.google.clientSecret,
     },
