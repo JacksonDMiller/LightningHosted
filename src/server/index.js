@@ -18,7 +18,8 @@ app.use(function (req, res, next) {
     next();
   } else {
     // request was via http, so redirect to https
-    res.redirect("https://" + req.headers.host + req.url);
+    res.redirect("https://lightninghosted.com");
+    // res.redirect("https://" + req.headers.host + req.url);
   }
 });
 
@@ -61,15 +62,15 @@ app.listen(process.env.PORT || 8080, () =>
 
 //  comment out for testing
 
-const options = {
-  key: fs.readFileSync(
-    "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
-    "utf8"
-  ),
-  cert: fs.readFileSync(
-    "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
-    "utf8"
-  ),
-};
+// const options = {
+//   key: fs.readFileSync(
+//     "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
+//     "utf8"
+//   ),
+//   cert: fs.readFileSync(
+//     "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
+//     "utf8"
+//   ),
+// };
 
-https.createServer(options, app).listen(443);
+// https.createServer(options, app).listen(443);
