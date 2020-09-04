@@ -98,7 +98,7 @@ export default function Share() {
         />
         <link
           rel="canonical"
-          href="https://LightningHosted.com/s/0690fafd456f2bd3"
+          href={"https://LightningHosted.com/s/" + filename}
         />
         <meta property="og:site_name" content="LightningHosted" />
         <meta name="twitter:site" content="@LightningHosted" />
@@ -109,7 +109,7 @@ export default function Share() {
         <meta name="msapplication-TileColor" content="#800080" />
         <link
           rel="image_src"
-          href={"https://lightninghosted.com/i/" + filename}
+          href={"https://lightninghosted.com/api/i/" + filename}
         />
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="og:title" content={title} />
@@ -133,11 +133,11 @@ export default function Share() {
         />
         <meta
           name="twitter:image"
-          content={"https://lightninghosted.com/i/" + filename}
+          content={"https://lightninghosted.com/api/i/" + filename}
         />
         <meta
           property="og:image"
-          content={"https://lightninghosted.com/i/" + filename}
+          content={"https://lightninghosted.com/api/i/" + filename}
         />
       </Helmet>
 
