@@ -83,7 +83,7 @@ export default function ImageCardBottomBar(props) {
                   <a
                     target="_blank"
                     href={
-                      "https://www.reddit.com/submit?url=lightninghosted.com/s/" +
+                      "https://www.reddit.com/submit?url=https://lightninghosted.com/s/" +
                       imageId +
                       "&title=" +
                       title
@@ -96,7 +96,7 @@ export default function ImageCardBottomBar(props) {
                   <a
                     target="_blank"
                     href={
-                      "https://www.facebook.com/sharer/sharer.php?u=lightninghosted.com/s/" +
+                      "https://www.facebook.com/sharer/sharer.php?u=https://lightninghosted.com/s/" +
                       imageId
                     }
                   >
@@ -109,7 +109,7 @@ export default function ImageCardBottomBar(props) {
                     href={
                       "http://twitter.com/share?text=" +
                       title +
-                      "&url=lightninghosted.com/s/" +
+                      "&url=https://lightninghosted.com/s/" +
                       imageId +
                       "&hashtags=LightningHosted"
                     }
