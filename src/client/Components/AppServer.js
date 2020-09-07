@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { ServerRouter, Switch, Route } from "react-router-dom";
 import Home from "./Home";
 // import "materialize-css/dist/css/materialize.min.css";
 import Profile from "./Profile";
@@ -12,7 +12,7 @@ import Login from "./Login";
 export default class App extends Component {
   render() {
     return (
-      <BrowserRouter>
+      <ServerRouter>
         <Navbar></Navbar>
         <Switch>
           <Route exact path="/" component={Home} />
@@ -22,7 +22,7 @@ export default class App extends Component {
           <Route path="/about" component={About} />
           <Route path="/contact" component={ContactUs} />
         </Switch>
-      </BrowserRouter>
+      </ServerRouter>
     );
   }
 }

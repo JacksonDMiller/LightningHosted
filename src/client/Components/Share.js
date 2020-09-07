@@ -84,12 +84,6 @@ export default function Share() {
         ) : (
           <title>LightningHosted</title>
         )}
-
-        <meta name="robots" content="follow, index" />
-        <meta
-          name="keywords"
-          content="images, photos, gif, gifs, memes, pictures, new pictures, reaction gifs, share photos, share images, latest images, funny, cute, visual storytelling, LightningHosted, LH"
-        />
         <meta
           name="description"
           content={
@@ -100,18 +94,11 @@ export default function Share() {
           rel="canonical"
           href={"https://LightningHosted.com/s/" + filename}
         />
-        <meta property="og:site_name" content="LightningHosted" />
-        <meta name="twitter:site" content="@LightningHosted" />
-        <meta name="twitter:domain" content="LightningHosted.com" />
         <meta name="twitter:title" content={title} />
-        <meta property="author" content="LightningHosted" />
-        <meta property="article:author" content="LightningHosted" />
-        <meta name="msapplication-TileColor" content="#800080" />
         <link
           rel="image_src"
           href={"https://lightninghosted.com/api/i/" + filename}
         />
-        <meta name="twitter:card" content="summary_large_image" />
         <meta property="og:title" content={title} />
         <meta
           property="og:url"

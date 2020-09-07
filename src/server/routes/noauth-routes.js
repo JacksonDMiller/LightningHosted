@@ -1,51 +1,54 @@
-const Users = require("../models/user-model");
-
-// a list of the top posts
-var topPostsList = [];
-// a list of ip's and the images they have viewed recently to avoid multiple views on an image
-var recentViewsList = [];
-
-//refreshing the top posts list periodically
-setInterval(function () {
-  updateTopTenList();
-}, 1000 * 60);
-
-// cleaning up the rcentviews list every hour I don't mind double counting views
-// I just dont want to count views multiple views in a short amount of time.
-setInterval(function () {
-  recentViewsList = [];
-}, 1000 * 60 * 60);
-
-updateTopTenList = async () => {
-  topPostsList = [];
-  const record = await Users.find({}).lean();
-  record.forEach((element) => {
-    //sort images
-    for (image in element.images) {
-      if (!element.images[image].deleted && !element.images[image].suppressed) {
-        // dont include images that require a deposti if the deposit has not been paid
-        if (
-          !element.images[image].paymentRequired ||
-          element.images[image].payStatus
-        ) {
-          let hoursSincePosting = Math.round(
-            (new Date() - element.images[image].date) / 1000 / 60 / 60
-          );
-          element.images[image].score =
-            element.images[image].views +
-            element.images[image].upvotes -
-            hoursSincePosting;
-          topPostsList.push(element.images[image]);
-        }
-      }
-    }
-    topPostsList.sort((a, b) => b.score - a.score);
-  });
-};
-// initail server start update
-updateTopTenList();
+import Users from "../models/user-model";
 
 module.exports = function (app) {
+  // a list of the top posts
+  var topPostsList = [];
+  // a list of ip's and the images they have viewed recently to avoid multiple views on an image
+  var recentViewsList = [];
+
+  //refreshing the top posts list periodically
+  setInterval(function () {
+    updateTopTenList();
+  }, 1000 * 60);
+
+  // cleaning up the rcentviews list every hour I don't mind double counting views
+  // I just dont want to count views multiple views in a short amount of time.
+  setInterval(function () {
+    recentViewsList = [];
+  }, 1000 * 60 * 60);
+
+  const updateTopTenList = async () => {
+    topPostsList = [];
+    const record = await Users.find({}).lean();
+    record.forEach((element) => {
+      //sort images
+      for (let image in element.images) {
+        if (
+          !element.images[image].deleted &&
+          !element.images[image].suppressed
+        ) {
+          // dont include images that require a deposti if the deposit has not been paid
+          if (
+            !element.images[image].paymentRequired ||
+            element.images[image].payStatus
+          ) {
+            let hoursSincePosting = Math.round(
+              (new Date() - element.images[image].date) / 1000 / 60 / 60
+            );
+            element.images[image].score =
+              element.images[image].views +
+              element.images[image].upvotes -
+              hoursSincePosting;
+            topPostsList.push(element.images[image]);
+          }
+        }
+      }
+      topPostsList.sort((a, b) => b.score - a.score);
+    });
+  };
+  // initail server start update
+  updateTopTenList();
+
   // get an image from the server  i = image
   app.get("/api/i/:filename", (req, res) => {
     res.sendFile("/src/server/uploads/compressed/" + req.params.filename, {
@@ -76,14 +79,14 @@ module.exports = function (app) {
           res.send("oops");
         }
         let imageData = {};
-        for (image in user.images) {
+        for (let image in user.images) {
           if (user.images[image].imageId === req.params.imageId) {
             imageData = user.images[image];
             break;
           }
         }
         // update the comments list with current usernames and avatars
-        for (comment in imageData.comments) {
+        for (let comment in imageData.comments) {
           let user = await Users.findOne({
             _id: imageData.comments[comment].comenterId,
           });

@@ -124,7 +124,7 @@ module.exports = function (app) {
     let imageInvoice = "";
     const imagesPerDayCap = 5;
     // determine how many images have been uploaded in the last day
-    for await (image of req.user.images) {
+    for await (let image of req.user.images) {
       if (new Date() - image.date <= 86400000 && !image.paymentRequired) {
         imagesUploadeToday = imagesUploadeToday + 1;
       }
@@ -193,12 +193,12 @@ module.exports = function (app) {
         const getDimensions = new Promise(async (resolve, reject) => {
           try {
             if (imageExtension === "mp4") {
-              result = await getVideoDimensions(
+              let result = await getVideoDimensions(
                 "src/server/uploads/compressed/" + imageFileName + ".mp4"
               );
               resolve(result);
             } else {
-              result = await imageSize(
+              let result = await imageSize(
                 "src/server/uploads/compressed/" +
                   imageFileName +
                   "." +
@@ -265,7 +265,7 @@ module.exports = function (app) {
           imageOrientation = "vertical";
         }
 
-        imageData = {
+        let imageData = {
           recentViews: [],
           posterId: req.user._id,
           orientation: imageOrientation,
@@ -310,7 +310,7 @@ module.exports = function (app) {
   app.get("/api/profileinfo/", async (req, res) => {
     if (req.user) {
       // remove previously deleted records
-      fillteredImages = req.user.images.filter((image) => {
+      let fillteredImages = req.user.images.filter((image) => {
         if (image.deleted === false) {
           return image;
         }
