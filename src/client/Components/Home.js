@@ -5,6 +5,7 @@ import HorizontalAd from "../Components/HorizontalAd";
 import { viewportContext } from "../Context/GetWindowDimensions";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Masonry from "react-masonry-css";
+import ReactGA from "react-ga";
 
 export default function Home() {
   const { screenWidth } = useContext(viewportContext);
@@ -37,6 +38,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    ReactGA.pageview(`/home`);
     getMoreImages();
   }, []);
 
