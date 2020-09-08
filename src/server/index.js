@@ -39,7 +39,6 @@ app.get("/s/:imageId", async (req, res, next) => {
       for (let image in user.images) {
         if (user.images[image].imageId === req.params.imageId) {
           imageData = user.images[image];
-          console.log(imageData);
           break;
         }
       }
