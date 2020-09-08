@@ -7,6 +7,7 @@ import ChangePasswordModal from "./ProfileComponents/ChangePasswordModal";
 import WithdrawModal from "./ProfileComponents/WithdrawModal";
 import ChangeUsernameModal from "./ProfileComponents/ChangeUsernameModal";
 import Masonry from "react-masonry-css";
+import ReactGA from "react-ga";
 
 export default function Profile() {
   const [images, setImages] = useState([]);
@@ -15,6 +16,7 @@ export default function Profile() {
   const [imageToDelete, setImageToDelete] = useState("");
 
   useEffect(() => {
+    ReactGA.pageview(`/profile`);
     const elems = document.querySelectorAll(".modal");
     const modelInstances = M.Modal.init(elems);
     var dropdownElems = document.querySelectorAll(".dropdown-trigger");

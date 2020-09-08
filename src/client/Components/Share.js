@@ -9,6 +9,7 @@ import { viewportContext } from "../Context/GetWindowDimensions";
 import { store } from "../Context/Store";
 const QRCode = require("qrcode.react");
 import Helmet from "react-helmet";
+import ReactGA from "react-ga";
 
 export default function Share() {
   const globalState = useContext(store);
@@ -35,6 +36,8 @@ export default function Share() {
   };
 
   useEffect(() => {
+    ReactGA.pageview(`/s/${imageId}`);
+
     // grab the image and image info
 
     getImageInfo();

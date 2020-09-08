@@ -19,14 +19,15 @@ const Users = require("./models/user-model");
 
 // setting up express
 const app = express();
-app.use(function (req, res, next) {
-  if (req.secure) {
-    next();
-  } else {
-    // request was via http, so redirect to https
-    res.redirect("https://lightninghosted.com");
-  }
-});
+
+// app.use(function (req, res, next) {
+//   if (req.secure) {
+//     next();
+//   } else {
+//     // request was via http, so redirect to https
+//     res.redirect("https://lightninghosted.com");
+//   }
+// });
 
 app.get("/s/:imageId", async (req, res, next) => {
   let title = "LightningHosted";
@@ -148,15 +149,15 @@ app.listen(process.env.PORT || 8080, () =>
 
 //  comment out for testing
 
-const options = {
-  key: fs.readFileSync(
-    "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
-    "utf8"
-  ),
-  cert: fs.readFileSync(
-    "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
-    "utf8"
-  ),
-};
+// const options = {
+//   key: fs.readFileSync(
+//     "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
+//     "utf8"
+//   ),
+//   cert: fs.readFileSync(
+//     "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
+//     "utf8"
+//   ),
+// };
 
-https.createServer(options, app).listen(443);
+// https.createServer(options, app).listen(443);

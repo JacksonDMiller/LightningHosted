@@ -9,8 +9,9 @@ import About from "./About";
 import ContactUs from "./ContactUs";
 import Login from "./Login";
 
+
 export default class App extends Component {
-  render() {
+  hydrate() {
     return (
       <ServerRouter>
         <Navbar></Navbar>

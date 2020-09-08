@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 var QRCode = require("qrcode.react");
+import ReactGA from "react-ga";
 
 // Import React FilePond
 import { FilePond, registerPlugin } from "react-filepond";
@@ -32,14 +33,19 @@ function Uploader({ addImage }) {
   const upload = () => {
     setIsUploading(true);
     pond.current.processFiles();
+    ReactGA.event({
+      category: "User",
+      action: "Image Uploaded",
+    });
   };
 
   return (
-    <div className='center filepond-container'>
+    <div className="center filepond-container">
       {file.length !== 0 ? (
         <div className="row">
           <div className="input-field col s10">
-            <textarea maxLength="40"
+            <textarea
+              maxLength="40"
               onChange={(e) => {
                 setTitle(e.target.value);
               }}
@@ -106,16 +112,14 @@ function Uploader({ addImage }) {
             ></textarea>
             <label htmlFor="icon_prefix4">Caption</label>
           </div>
-          {isUploading ?
-            <button className="btn">
-              Uploading...
-            </button>
-            : (
-              <button className="btn" onClick={upload}>
-                <i className="material-icons prefix col s2">arrow_upward</i>{" "}
+          {isUploading ? (
+            <button className="btn">Uploading...</button>
+          ) : (
+            <button className="btn" onClick={upload}>
+              <i className="material-icons prefix col s2">arrow_upward</i>{" "}
               Upload
-              </button>
-            )}
+            </button>
+          )}
         </div>
       ) : null}
     </div>

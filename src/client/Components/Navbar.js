@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import "../app.css";
 // import "materialize-css/dist/css/materialize.min.css";
 import { store } from "../Context/Store";
+import ReactGA from "react-ga";
+ReactGA.initialize("UA-133745471-2");
 
 const Navbar = () => {
   const globalState = useContext(store);
