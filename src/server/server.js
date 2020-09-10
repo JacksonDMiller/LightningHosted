@@ -47,8 +47,37 @@ app.use(function (req, res, next) {
 
 // end testing code
 
+app.get("/a/", (req, res) => {
+  res.send(
+    `  <div>
+      <iframe
+        data-aa="1259137"
+        src="//ad.a-ads.com/1259137?size=728x90"
+        scrolling="no"
+        style="width:728px; height:90px; border:0px; padding:0; overflow:hidden"
+        allowtransparency="true"
+      ></iframe>
+      <iframe
+        data-aa="1259139"
+        src="//ad.a-ads.com/1259139?size=468x60"
+        scrolling="no"
+        style="width:468px; height:60px; border:0px; padding:0; overflow:hidden"
+        allowtransparency="true"
+      ></iframe>
+      <iframe
+        data-aa="1443703"
+        src="//ad.a-ads.com/1443703?size=320x50"
+        scrolling="no"
+        style="width:320px; height:50px; border:0px; padding:0; overflow:hidden"
+        allowtransparency="true"
+      ></iframe>
+    </div>`
+  );
+});
+
 app.get("/s/:imageId", async (req, res, next) => {
   let title = "LightningHosted";
+  let twitterTitle = "";
   let imageData = "";
   Users.findOne({ "images.imageId": req.params.imageId })
     .then(async (user, err) => {
@@ -73,9 +102,7 @@ app.get("/s/:imageId", async (req, res, next) => {
         }
         data = data.replace(
           '<meta title="LightningHosted" />',
-          `
-     
-        <title>"${title}</title>
+          `<title>"${title}</title>
       <meta
         name="description"
         content=
@@ -85,7 +112,7 @@ app.get("/s/:imageId", async (req, res, next) => {
         rel="canonical"
         href="https://LightningHosted.com/s/${imageData.imageId}"
       />
-      <meta name="twitter:title" content="${imageData.title}" />
+      <meta name="twitter:title" content="${title}" />
       <link
         rel="image_src"
         href="https://lightninghosted.com/api/i/${imageData.filename}"
