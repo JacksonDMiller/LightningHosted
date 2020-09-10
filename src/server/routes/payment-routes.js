@@ -68,8 +68,9 @@ module.exports = function (app) {
           } else {
             res.status(402).send({ error: "Payment Required" });
           }
+        } else {
+          throw `No payment found for invoice: ${req.params.invoice}`;
         }
-        throw `No payment found for invoice: ${req.params.invoice}`;
       } catch (err) {
         logger.log({
           level: "error",
