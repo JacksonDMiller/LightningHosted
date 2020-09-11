@@ -1,10 +1,10 @@
 import Users from "../models/user-model";
 const fs = require("fs");
-import path from "path";
 import "ignore-styles";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 import AppServer from "../../client/Components/AppServer";
+import path from "path";
 
 module.exports = function (app) {
   // a list of the top posts
@@ -216,7 +216,7 @@ module.exports = function (app) {
         <meta name="twitter:title" content="${title}" />
         <link
           rel="image_src"
-          href="https://lightninghosted.com/api/i/${imageData.filename}"
+          href="https://lightninghosted.com/api/t/${imageData.filename}"
         />
         <meta property="og:title" content="${imageData.title}" />
         <meta
@@ -235,11 +235,11 @@ module.exports = function (app) {
         />
         <meta
           name="twitter:image"
-          content="https://lightninghosted.com/api/i/${imageData.filename}"
+          content="https://lightninghosted.com/api/t/${imageData.filename}"
         />
         <meta
           property="og:image"
-          content="https://lightninghosted.com/api/i/${imageData.filename}"
+          content="https://lightninghosted.com/api/t/${imageData.filename}"
         />`
           );
           return res.send(

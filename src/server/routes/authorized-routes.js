@@ -356,6 +356,9 @@ module.exports = function (app) {
             (image) => image.imageId === req.params.imageId
           );
           doc.images[index].upvotes = doc.images[index].upvotes - 1;
+          if (doc.images[index].upvotes < 0) {
+            doc.images[index].upvotes = 0;
+          }
           doc.save();
           let filtered = req.user.upvoted.filter(
             (id) => id !== req.params.imageId

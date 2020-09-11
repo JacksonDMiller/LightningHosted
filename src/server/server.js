@@ -13,11 +13,6 @@ const http = require("http");
 
 // setting up express
 const app = express();
-require("./routes/noauth-routes")(app);
-require("./routes/authentication-routes")(app);
-require("./routes/payment-routes")(app);
-require("./routes/authorized-routes")(app);
-require("./routes/moderator-routes")(app);
 
 //  comment out for testing
 // figure out how to do this programaticly
@@ -70,6 +65,12 @@ db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
   console.log("YipYip the datbase has connected!");
 });
+
+require("./routes/noauth-routes")(app);
+require("./routes/authentication-routes")(app);
+require("./routes/payment-routes")(app);
+require("./routes/authorized-routes")(app);
+require("./routes/moderator-routes")(app);
 
 app.use(fallback("index.html", { root: "./dist" }));
 
