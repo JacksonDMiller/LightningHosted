@@ -1,4 +1,10 @@
 import Users from "../models/user-model";
+const fs = require("fs");
+import path from "path";
+import "ignore-styles";
+import React from "react";
+import ReactDOMServer from "react-dom/server";
+import AppServer from "../../client/Components/AppServer";
 
 module.exports = function (app) {
   // a list of the top posts
@@ -140,5 +146,113 @@ module.exports = function (app) {
     } else {
       res.send(false);
     }
+  });
+
+  app.get("/a/", (req, res) => {
+    res.send(
+      `  <div>
+        <iframe
+          data-aa="1259137"
+          src="//ad.a-ads.com/1259137?size=728x90"
+          scrolling="no"
+          style="width:728px; height:90px; border:0px; padding:0; overflow:hidden"
+          allowtransparency="true"
+        ></iframe>
+        <iframe
+          data-aa="1259139"
+          src="//ad.a-ads.com/1259139?size=468x60"
+          scrolling="no"
+          style="width:468px; height:60px; border:0px; padding:0; overflow:hidden"
+          allowtransparency="true"
+        ></iframe>
+        <iframe
+          data-aa="1443703"
+          src="//ad.a-ads.com/1443703?size=320x50"
+          scrolling="no"
+          style="width:320px; height:50px; border:0px; padding:0; overflow:hidden"
+          allowtransparency="true"
+        ></iframe>
+      </div>`
+    );
+  });
+
+  app.get("/s/:imageId", async (req, res, next) => {
+    let title = "LightningHosted";
+    let twitterTitle = "";
+    let imageData = "";
+    Users.findOne({ "images.imageId": req.params.imageId })
+      .then(async (user, err) => {
+        if (err) {
+          res.send("oops");
+        }
+        for (let image in user.images) {
+          if (user.images[image].imageId === req.params.imageId) {
+            imageData = user.images[image];
+            break;
+          }
+        }
+
+        if (imageData.title) {
+          title = "LH - " + imageData.title;
+        }
+
+        fs.readFile(path.resolve("./dist/index.html"), "utf-8", (err, data) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).send("Some error happened");
+          }
+          data = data.replace(
+            '<meta title="LightningHosted" />',
+            `<title>"${title}</title>
+        <meta
+          name="description"
+          content=
+            "${imageData.views} views and ${imageData.upvotes} upvotes on LightningHosted.com"
+        />
+        <link
+          rel="canonical"
+          href="https://LightningHosted.com/s/${imageData.imageId}"
+        />
+        <meta name="twitter:title" content="${title}" />
+        <link
+          rel="image_src"
+          href="https://lightninghosted.com/api/i/${imageData.filename}"
+        />
+        <meta property="og:title" content="${imageData.title}" />
+        <meta
+          property="og:url"
+          content="https://LightningHosted.com/s/${imageData.imageId}"
+        />
+        <meta property="og:image:width" content="${imageData.width}" />
+        <meta property="og:image:height" content="${imageData.height}" />
+        <meta
+          property="og:description"
+          content="${imageData.views} views and ${imageData.upvotes} upvotes on LightningHosted.com"
+        />
+        <meta
+          name="twitter:description"
+          content="${imageData.views} views and ${imageData.upvotes} upvotes on LightningHosted.com"
+        />
+        <meta
+          name="twitter:image"
+          content="https://lightninghosted.com/api/i/${imageData.filename}"
+        />
+        <meta
+          property="og:image"
+          content="https://lightninghosted.com/api/i/${imageData.filename}"
+        />`
+          );
+          return res.send(
+            data.replace(
+              '<div id="root"></div>',
+              `<div id="root">${ReactDOMServer.renderToString(AppServer)}</div>`
+            )
+          );
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send("We couldn't find that image");
+      });
   });
 };
