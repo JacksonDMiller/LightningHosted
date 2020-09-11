@@ -9,6 +9,7 @@ const fallback = require("express-history-api-fallback");
 const mongoose = require("mongoose");
 const https = require("https");
 const http = require("http");
+const fs = require("fs");
 
 // setting up express
 const app = express();
