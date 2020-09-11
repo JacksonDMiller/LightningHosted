@@ -216,7 +216,7 @@ module.exports = function (app) {
         <meta name="twitter:title" content="${title}" />
         <link
           rel="image_src"
-          href="https://lightninghosted.com/api/t/${imageData.filename}"
+          href="https://lightninghosted.com/api/t/${imageData.thumbnail}"
         />
         <meta property="og:title" content="${imageData.title}" />
         <meta
@@ -235,11 +235,11 @@ module.exports = function (app) {
         />
         <meta
           name="twitter:image"
-          content="https://lightninghosted.com/api/t/${imageData.filename}"
+          content="https://lightninghosted.com/api/t/${imageData.thumbnail}"
         />
         <meta
           property="og:image"
-          content="https://lightninghosted.com/api/t/${imageData.filename}"
+          content="https://lightninghosted.com/api/t/${imageData.thumbnail}"
         />`
           );
           return res.send(
