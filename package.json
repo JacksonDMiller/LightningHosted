@@ -8,7 +8,8 @@
     "start": "npm run build && node src/server/index.js",
     "client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
     "server": "nodemon src/server/index.js",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "test": "jest"
   },
   "author": "Jackson Miller",
   "dependencies": {
@@ -33,6 +34,7 @@
     "fs": "0.0.1-security",
     "get-video-dimensions": "^1.0.0",
     "image-size": "^0.8.3",
+    "jest": "^26.4.2",
     "ln-service": "^48.4.3",
     "materialize-css": "^1.0.0-rc.2",
     "mongodb": "^3.5.8",
@@ -75,6 +77,7 @@
     "html-webpack-plugin": "^3.2.0",
     "ignore-styles": "^5.0.1",
     "nodemon": "^1.17.3",
+    "puppeteer": "^5.3.0",
     "style-loader": "^0.23.0",
     "url-loader": "^1.0.1",
     "webpack": "^4.5.0",

@@ -50,7 +50,7 @@ function Uploader({ addImage }) {
                 setTitle(e.target.value);
               }}
               id="icon_prefix5"
-              className="materialize-textarea"
+              className="materialize-textarea title-input"
             ></textarea>
             <label htmlFor="icon_prefix5">Title</label>
           </div>
@@ -115,7 +115,7 @@ function Uploader({ addImage }) {
           {isUploading ? (
             <button className="btn">Uploading...</button>
           ) : (
-            <button className="btn" onClick={upload}>
+            <button className="btn upload-btn" onClick={upload}>
               <i className="material-icons prefix col s2">arrow_upward</i>{" "}
               Upload
             </button>

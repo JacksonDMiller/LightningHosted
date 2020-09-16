@@ -14,32 +14,28 @@ const fs = require("fs");
 // setting up express
 const app = express();
 
-//  comment out for testing
-// figure out how to do this programaticly
-
-const options = {
-  key: fs.readFileSync(
-    "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
-    "utf8"
-  ),
-  cert: fs.readFileSync(
-    "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
-    "utf8"
-  ),
-};
-
-https.createServer(options, app).listen(443);
-
-app.use(function (req, res, next) {
-  if (req.secure) {
-    next();
-  } else {
-    // request was via http, so redirect to https
-    res.redirect("https://lightninghosted.com");
-  }
-});
-
-// end testing code
+// if the privkey is avalible use it to start a https server
+if (fs.existsSync("/etc/letsencrypt/live/lightninghosted.com/privkey.pem")) {
+  const options = {
+    key: fs.readFileSync(
+      "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
+      "utf8"
+    ),
+    cert: fs.readFileSync(
+      "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
+      "utf8"
+    ),
+  };
+  https.createServer(options, app).listen(443);
+  app.use(function (req, res, next) {
+    if (req.secure) {
+      next();
+    } else {
+      // request was via http, so redirect to https
+      res.redirect("https://lightninghosted.com");
+    }
+  });
+}
 
 app.use(express.static("dist"));
 app.use(bodyParser.urlencoded({ extended: true }));
