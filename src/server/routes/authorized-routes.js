@@ -257,7 +257,7 @@ module.exports = function (app) {
             imageInvoice = invoice.request;
           })
           .catch((err) => {
-            throw err[2].err.details + "its here";
+            throw err[2].err.details;
           });
 
         let imageOrientation = "horizontal";

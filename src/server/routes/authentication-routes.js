@@ -106,7 +106,7 @@ module.exports = function (app) {
         res.status(400).send({ error: `That username is already taken` });
       }
     } else {
-      res.send({ error: "Invalid Username" });
+      res.send({ error: "Invalid username" });
     }
   });
 };

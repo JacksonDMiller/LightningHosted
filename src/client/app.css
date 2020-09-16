@@ -392,6 +392,7 @@ body {
   color: black;
   margin: 0.5rem 10px 0rem 10px;
   text-align: center;
+  padding: 10px;
 }
 
 .image-stats span {

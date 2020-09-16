@@ -69,7 +69,7 @@ export default function Login() {
     };
     let res = await (await fetch("/api/register/", requestOptions)).json();
     if (res.error) {
-      M.toast({ html: `Oops something went wrong` });
+      M.toast({ html: res.error });
     } else {
       submitCredentialsLogin();
     }
