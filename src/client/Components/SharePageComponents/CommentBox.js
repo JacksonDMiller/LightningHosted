@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { store } from "../../Context/Store";
+import ReactGA from "react-ga";
 
 export default function CommentBox({
   imageId,
@@ -25,6 +26,10 @@ export default function CommentBox({
       if (res.error) {
         M.toast({ html: res.error });
       } else {
+        ReactGA.event({
+          category: "User",
+          action: "Commented",
+        });
         setComments([res.newComment, ...comments]);
         setnewComment("");
         incrementComments();

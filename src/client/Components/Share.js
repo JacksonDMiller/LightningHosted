@@ -132,57 +132,66 @@ export default function Share() {
       </Helmet>
 
       <HorizontalAd />
-      {imageData.paymentRequired && imageData.payStatus === false ? (
-        <div className="container">
-          <h3 className="center-align">100 Sats</h3>
-          <QRCode
-            onLoad={() => checkForPayment()}
-            className="qr-code center"
-            value={imageData.paymentRequest}
-          />
-          <a href={"lightning:" + imageData.paymentRequest}>
-            <button className="btn center">Pay</button>
-          </a>
-          <p className="center-align">This image requires a deposit.</p>
-          <p className="center-align">
-            We use a small lightning network payment as a deterrent to people
-            abusing the service. After the image recevies 100 views the satoshis
-            are credited to the creator of the image for withdrawal.
-          </p>
-        </div>
+      {imageData.deleted ? (
+        <p>This post has been deleted</p>
       ) : (
         <span>
-          <div className="">
-            {imageData.imageId ? (
-              <ImageCard share={true} imageData={imageData} />
-            ) : null}
-            {console.log()}
-            {globalState.state.moderator ? (
-              <div className="center">
-                <button
-                  onClick={() =>
-                    fetch("/api/moderatorsuppressimage/" + imageId)
-                  }
-                  className="btn"
-                >
-                  Supress
-                </button>
-                <button
-                  onClick={() => fetch("/api/moderatordeleteimage/" + imageId)}
-                  className="btn"
-                >
-                  Delete
-                </button>
+          {imageData.paymentRequired && imageData.payStatus === false ? (
+            <div className="container">
+              <h3 className="center-align">100 Sats</h3>
+              <QRCode
+                onLoad={() => checkForPayment()}
+                className="qr-code center"
+                value={imageData.paymentRequest}
+              />
+              <a href={"lightning:" + imageData.paymentRequest}>
+                <button className="btn center">Pay</button>
+              </a>
+              <p className="center-align">This image requires a deposit.</p>
+              <p className="center-align">
+                We use a small lightning network payment as a deterrent to
+                people abusing the service. After the image recevies 100 views
+                the satoshis are credited to the creator of the image for
+                withdrawal.
+              </p>
+            </div>
+          ) : (
+            <span>
+              <div className="">
+                {imageData.imageId ? (
+                  <ImageCard share={true} imageData={imageData} />
+                ) : null}
+                {console.log()}
+                {globalState.state.moderator ? (
+                  <div className="center">
+                    <button
+                      onClick={() =>
+                        fetch("/api/moderatorsuppressimage/" + imageId)
+                      }
+                      className="btn"
+                    >
+                      Supress
+                    </button>
+                    <button
+                      onClick={() =>
+                        fetch("/api/moderatordeleteimage/" + imageId)
+                      }
+                      className="btn"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ) : null}
               </div>
-            ) : null}
-          </div>
-          {imageData.comments ? (
-            <CommentSection
-              imageId={imageData.imageId}
-              comments={imageData.comments}
-              incrementComments={incrementComments}
-            />
-          ) : null}
+              {imageData.comments ? (
+                <CommentSection
+                  imageId={imageData.imageId}
+                  comments={imageData.comments}
+                  incrementComments={incrementComments}
+                />
+              ) : null}
+            </span>
+          )}{" "}
         </span>
       )}
     </div>

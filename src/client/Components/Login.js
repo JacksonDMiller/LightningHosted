@@ -71,6 +71,10 @@ export default function Login() {
     if (res.error) {
       M.toast({ html: res.error });
     } else {
+      ReactGA.event({
+        category: "User",
+        action: "New User Created",
+      });
       submitCredentialsLogin();
     }
   };
@@ -92,6 +96,10 @@ export default function Login() {
     if (res.status === 401) {
       M.toast({ html: "Incorect Username or Password Please Try Again" });
     } else {
+      ReactGA.event({
+        category: "User",
+        action: "Logged In",
+      });
       let data = await res.json();
       dispatch({ type: "LOGIN", payload: data.user });
     }

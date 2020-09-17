@@ -38,7 +38,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    ReactGA.pageview(`/home`);
+    ReactGA.pageview(`/`);
     getMoreImages();
   }, []);
 

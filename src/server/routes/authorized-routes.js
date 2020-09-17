@@ -123,15 +123,18 @@ module.exports = function (app) {
     let paymentRequired = false;
     let imageInvoice = "";
     const imagesPerDayCap = 5;
-    // determine how many images have been uploaded in the last day
-    for await (let image of req.user.images) {
-      if (new Date() - image.date <= 86400000 && !image.paymentRequired) {
-        imagesUploadeToday = imagesUploadeToday + 1;
+    //allow moderators to ignore the images per day cap
+    if (!req.user.moderator) {
+      // determine how many images have been uploaded in the last day
+      for await (let image of req.user.images) {
+        if (new Date() - image.date <= 86400000 && !image.paymentRequired) {
+          imagesUploadeToday = imagesUploadeToday + 1;
+        }
       }
-    }
-    // if its over the cap then require a deposit
-    if (imagesUploadeToday > imagesPerDayCap) {
-      paymentRequired = true;
+      // if its over the cap then require a deposit
+      if (imagesUploadeToday > imagesPerDayCap) {
+        paymentRequired = true;
+      }
     }
 
     if (Object.keys(req.file).length === 0) {
@@ -316,6 +319,7 @@ module.exports = function (app) {
         }
       });
       req.user.images = fillteredImages;
+      req.user.password = undefined;
       res.send(req.user);
     } else {
       res.status(401).send({ error: `Please log in` });

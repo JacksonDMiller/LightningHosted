@@ -5,10 +5,9 @@ import React from "react";
 import ReactDOMServer from "react-dom/server";
 import AppServer from "../../client/Components/AppServer";
 import path from "path";
+import { topPostsList, updateTopTenList } from "../topPosts";
 
 module.exports = function (app) {
-  // a list of the top posts
-  var topPostsList = [];
   // a list of ip's and the images they have viewed recently to avoid multiple views on an image
   var recentViewsList = [];
 
@@ -23,35 +22,6 @@ module.exports = function (app) {
     recentViewsList = [];
   }, 1000 * 60 * 60);
 
-  const updateTopTenList = async () => {
-    topPostsList = [];
-    const record = await Users.find({}).lean();
-    record.forEach((element) => {
-      //sort images
-      for (let image in element.images) {
-        if (
-          !element.images[image].deleted &&
-          !element.images[image].suppressed
-        ) {
-          // dont include images that require a deposti if the deposit has not been paid
-          if (
-            !element.images[image].paymentRequired ||
-            element.images[image].payStatus
-          ) {
-            let hoursSincePosting = Math.round(
-              (new Date() - element.images[image].date) / 1000 / 60 / 60
-            );
-            element.images[image].score =
-              element.images[image].views +
-              element.images[image].upvotes -
-              hoursSincePosting;
-            topPostsList.push(element.images[image]);
-          }
-        }
-      }
-      topPostsList.sort((a, b) => b.score - a.score);
-    });
-  };
   // initail server start update
   updateTopTenList();
 

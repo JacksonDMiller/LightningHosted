@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { store } from "../../Context/Store";
 import { Link } from "react-router-dom";
+import ReactGA from "react-ga";
 
 export default function ImageCardBottomBar(props) {
   const globalState = useContext(store);
@@ -28,6 +29,10 @@ export default function ImageCardBottomBar(props) {
       if (!globalState.state.upvoted.includes(imageId)) {
         setUpovotes(upvotes + 1);
         setUpvoted("upvoted");
+        ReactGA.event({
+          category: "User",
+          action: "Upvoted",
+        });
       } else {
         setUpovotes(upvotes - 1);
         setUpvoted("");
