@@ -36,6 +36,15 @@ export default function Share() {
   };
 
   useEffect(() => {
+    if (!localStorage.getItem("LightningHosted")) {
+      localStorage.setItem("LightningHosted", true);
+      M.toast({
+        displayLength: 8000,
+        html:
+          "Thanks for visting LightningHosted the site that pays you bitcoin for uploading images. Try it out!",
+      });
+    }
+
     ReactGA.pageview(`/s/${imageId}`);
 
     // grab the image and image info

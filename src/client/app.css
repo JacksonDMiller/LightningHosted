@@ -45,6 +45,10 @@ nav {
   color: black;
 }
 
+.card {
+  background-color: #f1f1f1;
+}
+
 .profile-info .withdraw-button {
   background-color: #800080;
 }
