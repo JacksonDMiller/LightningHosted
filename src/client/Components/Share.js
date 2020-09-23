@@ -14,6 +14,7 @@ import ReactGA from "react-ga";
 export default function Share() {
   const globalState = useContext(store);
   const [imageData, setImageData] = useState({});
+  const [satsToAdd, setSatsToAdd] = useState("");
   let { imageId } = useParams();
   const { screenWidth } = useContext(viewportContext);
   var checkPaymentInterval = null;
@@ -84,6 +85,14 @@ export default function Share() {
   const incrementComments = () => {
     let incrementedComments = imageData.numberOfComments + 1;
     setImageData({ ...imageData, numberOfComments: incrementedComments });
+  };
+
+  const addsats = async () => {
+    const res = await fetch(
+      `/api/moderatoraddsatoshis/${imageId}/${satsToAdd}`
+    );
+    let message = await res.json();
+    M.toast({ html: message.message });
   };
 
   const { views, upvotes, title, filename, height } = imageData;
@@ -188,6 +197,22 @@ export default function Share() {
                       className="btn"
                     >
                       Delete
+                    </button>
+
+                    <input
+                      value={satsToAdd}
+                      className="sats-input input-field"
+                      placeholder="add sats"
+                      style={{ width: "200px" }}
+                      id="add-sats"
+                      type="text"
+                      onChange={(e) => {
+                        setSatsToAdd(e.target.value);
+                      }}
+                    />
+                    <label htmlFor="add-sats">add-sats</label>
+                    <button onClick={addsats} className="btn">
+                      submit
                     </button>
                   </div>
                 ) : null}

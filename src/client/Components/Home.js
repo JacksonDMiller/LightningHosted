@@ -6,20 +6,31 @@ import { viewportContext } from "../Context/GetWindowDimensions";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Masonry from "react-masonry-css";
 import ReactGA from "react-ga";
+import { store } from "../Context/Store";
 
 export default function Home() {
+  const globalState = useContext(store);
+  const { dispatch } = globalState;
+
   const { screenWidth } = useContext(viewportContext);
   const [images, setImages] = useState([]);
-  const [page, setPage] = useState(0);
+  const page = globalState.state.pageNumber;
   const [hasMore, setHasMore] = useState(true);
+  let pageToGrab = page;
 
-  const getMoreImages = async (position) => {
-    const res = await fetch("/api/recomendedimages/" + page);
+  const getMoreImages = async (position, initial) => {
+    if (initial) {
+    } else {
+      dispatch({ type: "INCREMENTPAGE" });
+      pageToGrab = page + 1;
+    }
+
+    const res = await fetch("/api/recomendedimages/" + pageToGrab);
     const imageData = await res.json();
     if (imageData.length === 0) {
       setHasMore(false);
     }
-    setPage(page + 1);
+
     if (position === "top") {
       let arr = [...imageData, ...images];
       console.log(arr);
@@ -39,7 +50,7 @@ export default function Home() {
 
   useEffect(() => {
     ReactGA.pageview(`/`);
-    getMoreImages();
+    getMoreImages("bottom", true);
   }, []);
 
   return (

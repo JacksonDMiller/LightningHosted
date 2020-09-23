@@ -86,4 +86,33 @@ module.exports = function (app) {
       }
     }
   );
+
+  app.get("/api/moderatoraddsatoshis/:imageId/:sats", async (req, res) => {
+    if (req.user.moderator) {
+      try {
+        let doc = await Users.findOne({ "images.imageId": req.params.imageId });
+        const index = await doc.images.findIndex(
+          (image) => image.imageId === req.params.imageId
+        );
+        let satsToAdd = parseInt(req.params.sats);
+        if (!isNaN(satsToAdd)) {
+          doc.sats = doc.sats + satsToAdd;
+          doc.earnedSats = doc.earnedSats + satsToAdd;
+          doc.images[index].sats = doc.images[index].sats + satsToAdd;
+          doc.save();
+          res.status(200).send({ message: "added" });
+        } else {
+          throw "NAN";
+        }
+      } catch (error) {
+        logger.log({
+          level: "error",
+          message: `Moderator adding sats Error` + error,
+        });
+        res.status(404).send(`Oops something went wrong`);
+      }
+    } else {
+      res.status(401).send({ error: `cheeky bastard` });
+    }
+  });
 };
