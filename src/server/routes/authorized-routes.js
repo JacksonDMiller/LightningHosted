@@ -421,6 +421,9 @@ module.exports = function (app) {
     var { imageId, comment } = req.body;
     if (req.user) {
       try {
+        if (comment == false) {
+          throw "empty comment submited";
+        }
         const sanatizedComment = sanitizeString(comment);
         var newComment = {
           commentId: "CI" + crypto.randomBytes(8).toString("hex"),
@@ -447,7 +450,7 @@ module.exports = function (app) {
           level: `error`,
           message: `Comment Error` + error,
         });
-        res.status(404).send(`Oops something went wrong`);
+        res.status(404).send({ error: `Oops something went wrong` });
       }
     } else {
       res.status(401).send({ error: `Please log in` });

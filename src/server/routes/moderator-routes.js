@@ -72,6 +72,8 @@ module.exports = function (app) {
             (comment) => comment.commentId === req.params.commentId
           );
           doc.images[index].comments[commentIndex].suppressed = true;
+          doc.images[index].numberOfComments =
+            doc.images[index].numberOfComments - 1;
           doc.save();
           res.status(200).send({ message: "supressed" });
         } catch (error) {

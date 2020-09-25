@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { store } from "../../Context/Store";
 import { Link } from "react-router-dom";
 import ReactGA from "react-ga";
+import useClipboard from "react-use-clipboard";
 
 export default function ImageCardBottomBar(props) {
   const globalState = useContext(store);
@@ -9,6 +10,9 @@ export default function ImageCardBottomBar(props) {
 
   const { imageId, views, numberOfComments, title } = props.imageData;
   const { share, profile } = props;
+  const [isCopied, setCopied] = useClipboard(
+    `https://LightningHosted.com/s/${imageId}`
+  );
 
   const [upvoted, setUpvoted] = useState(() => {
     if (
@@ -120,6 +124,18 @@ export default function ImageCardBottomBar(props) {
                     }
                   >
                     <i className="fa fa-twitter"></i>Twitter
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="link-sytled-button"
+                    target="_blank"
+                    onClick={() => {
+                      setCopied();
+                      M.toast({ html: "Copied" });
+                    }}
+                  >
+                    <i className="fa fa-copy"></i>Copy
                   </a>
                 </li>
               </ul>

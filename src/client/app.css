@@ -445,3 +445,7 @@ body {
 .filepond-container {
   width: 80%;
 }
+
+.link-sytled-button {
+  cursor: pointer;
+}

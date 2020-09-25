@@ -13,28 +13,32 @@ export default function CommentBox({
     e.preventDefault();
     if (globalState.state.auth === false) {
       M.toast({ html: "<a href='/login'>Please Login First</a>" });
-    } else {
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imageId: imageId,
-          comment: newComment,
-        }),
-      };
-      let res = await (await fetch("/api/newcomment/", requestOptions)).json();
-      if (res.error) {
-        M.toast({ html: res.error });
-      } else {
-        ReactGA.event({
-          category: "User",
-          action: "Commented",
-        });
-        setComments([res.newComment, ...comments]);
-        setnewComment("");
-        incrementComments();
-      }
+      return;
     }
+    if (newComment == false) {
+      M.toast({ html: "Write a comment first" });
+      return;
+    }
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        imageId: imageId,
+        comment: newComment,
+      }),
+    };
+    let res = await (await fetch("/api/newcomment/", requestOptions)).json();
+    if (res.error) {
+      M.toast({ html: res.error });
+      return;
+    }
+    ReactGA.event({
+      category: "User",
+      action: "Commented",
+    });
+    setComments([res.newComment, ...comments]);
+    setnewComment("");
+    incrementComments();
   };
 
   const [newComment, setnewComment] = useState("");
