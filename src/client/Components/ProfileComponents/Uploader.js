@@ -45,7 +45,7 @@ function Uploader({ addImage }) {
         <div className="row">
           <div className="input-field col s10">
             <textarea
-              maxLength="40"
+              maxLength="60"
               onChange={(e) => {
                 setTitle(e.target.value);
               }}
