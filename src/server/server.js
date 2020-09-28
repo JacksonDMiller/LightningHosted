@@ -13,9 +13,11 @@ const fs = require("fs");
 
 // setting up express
 const app = express();
+let mongodbUri = "mongodb://localhost/LightningHosted";
 
-// if the privkey is avalible use it to start a https server
+// if the privkey is avalible use it to start a https server and use the servers mongodbURI
 if (fs.existsSync("/etc/letsencrypt/live/lightninghosted.com/privkey.pem")) {
+  mongodbUri = keys.mongodb.uri;
   const options = {
     key: fs.readFileSync(
       "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
@@ -51,7 +53,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //setting up mongodb
-mongoose.connect("mongodb://localhost/LightningHosted", {
+mongoose.connect(mongodbUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
