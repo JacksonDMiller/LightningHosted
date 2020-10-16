@@ -128,7 +128,7 @@ export default function ImageCardBottomBar(props) {
                 </li>
                 <li>
                   <a
-                    class="link-sytled-button"
+                    className="link-sytled-button"
                     target="_blank"
                     onClick={() => {
                       setCopied();

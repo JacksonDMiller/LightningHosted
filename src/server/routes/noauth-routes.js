@@ -183,7 +183,7 @@ module.exports = function (app) {
           rel="canonical"
           href="https://LightningHosted.com/s/${imageData.imageId}"
         />
-        <meta name="twitter:title" content="${title}" />
+        <meta name="twitter:title" content="${imageData.title}" />
         <link
           rel="image_src"
           href="https://lightninghosted.com/api/t/${imageData.thumbnail}"

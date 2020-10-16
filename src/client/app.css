@@ -270,8 +270,6 @@ input[type="range"]:focus::-ms-fill-upper {
 
 .qr-code {
   padding: 20px;
-  height: 228px !important;
-  width: 228px !important;
   background: white;
 }
 

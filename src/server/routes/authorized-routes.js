@@ -143,13 +143,20 @@ module.exports = function (app) {
       const imageFileName = crypto.randomBytes(8).toString("hex");
       let imageExtension = "";
       try {
-        // if (paymentRequired === true) {
-        imageInvoice = createInvoice({
-          lnd,
-          description: "LightningHosted deposit",
-          tokens: "100",
-        });
-        // }
+        if (paymentRequired === true) {
+          imageInvoice = createInvoice({
+            lnd,
+            description: "LightningHosted deposit",
+            tokens: "100",
+          }).catch((err) => {
+            logger.log({
+              level: "error",
+              message: `invoice creation error` + err,
+            });
+            imageInvoice = null;
+            paymentRequired = false;
+          });
+        }
         const processedImage = new Promise(async (resolve, reject) => {
           try {
             // if the image is a gif don't do any procesing
@@ -255,13 +262,10 @@ module.exports = function (app) {
 
         await generateThumbnail;
 
-        await imageInvoice
-          .then((invoice) => {
-            imageInvoice = invoice.request;
-          })
-          .catch((err) => {
-            throw err[2].err.details;
-          });
+        if (imageInvoice) {
+          let invoice = await imageInvoice;
+          imageInvoice = invoice.request;
+        }
 
         let imageOrientation = "horizontal";
         if (dimensions.height > dimensions.width) {

@@ -158,6 +158,7 @@ export default function Share() {
             <div className="container">
               <h3 className="center-align">100 Sats</h3>
               <QRCode
+                size={428}
                 onLoad={() => checkForPayment()}
                 className="qr-code center"
                 value={imageData.paymentRequest}

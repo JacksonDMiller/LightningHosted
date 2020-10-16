@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-var QRCode = require("qrcode.react");
 import ReactGA from "react-ga";
 
 // Import React FilePond
