@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { viewportContext } from "../../Context/GetWindowDimensions";
 import ImageCardMedia from "./ImageCardMedia";
 import ImageCardBottomBar from "./ImageCardBottomBar";
+import Linkify from "react-linkify";
 
 export default function ImageCard(props) {
   const { imageId, caption, title, orientation } = props.imageData;
@@ -76,7 +77,11 @@ export default function ImageCard(props) {
             imageData={props.imageData}
           />
         </div>
-        {caption ? <p className="caption-text">{imageCaption()}</p> : null}
+        {caption ? (
+          <Linkify>
+            <p className="caption-text">{imageCaption()}</p>{" "}
+          </Linkify>
+        ) : null}
       </ConditionalWrap>
 
       <ImageCardBottomBar

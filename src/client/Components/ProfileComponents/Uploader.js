@@ -45,6 +45,7 @@ function Uploader({ addImage }) {
           <div className="input-field col s10">
             <textarea
               maxLength="60"
+              value={title}
               onChange={(e) => {
                 setTitle(e.target.value);
               }}
@@ -84,6 +85,7 @@ function Uploader({ addImage }) {
               if (!res.errror) {
                 addImage(res);
                 setCaption("");
+                setTitle("");
                 setFile([]);
               }
             },
@@ -106,6 +108,7 @@ function Uploader({ addImage }) {
               onChange={(e) => {
                 setCaption(e.target.value);
               }}
+              value={caption}
               id="icon_prefix4"
               className="materialize-textarea"
             ></textarea>
