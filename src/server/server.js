@@ -16,27 +16,16 @@ const app = express();
 let mongodbUri = "mongodb://localhost/LightningHosted";
 var options = {};
 // if the privkey is avalible use it to start a https server and use the servers mongodbURI
-if (fs.existsSync("/etc/letsencrypt/live/lightninghosted.com/privkey.pem")) {
-  mongodbUri = keys.mongodb.uri;
-  options = {
-    key: fs.readFileSync(
-      "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
-      "utf8"
-    ),
-    cert: fs.readFileSync(
-      "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
-      "utf8"
-    ),
-  };
-}
+mongodbUri = keys.mongodb.uri;
 
-https.createServer(options, app).listen(443);
+// redirecting requests that come in on http
 app.use(function (req, res, next) {
   if (req.secure) {
+    // request was via https, so do no special handling
     next();
   } else {
     // request was via http, so redirect to https
-    res.redirect("https://lightninghosted.com");
+    res.redirect("https://" + req.headers.host + req.url);
   }
 });
 
@@ -73,6 +62,17 @@ require("./routes/moderator-routes")(app);
 
 app.use(fallback("index.html", { root: "./dist" }));
 
+options = {
+  key: fs.readFileSync(
+    "/etc/letsencrypt/live/lightninghosted.com/privkey.pem",
+    "utf8"
+  ),
+  cert: fs.readFileSync(
+    "/etc/letsencrypt/live/lightninghosted.com/fullchain.pem",
+    "utf8"
+  ),
+};
+https.createServer(options, app).listen(443);
 app.listen(process.env.PORT || 8080, () =>
   console.log(`YipYip app is listening on port ${process.env.PORT || 8080}!`)
 );
