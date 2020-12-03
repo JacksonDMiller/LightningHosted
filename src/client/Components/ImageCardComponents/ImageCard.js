@@ -77,12 +77,13 @@ export default function ImageCard(props) {
             imageData={props.imageData}
           />
         </div>
-        {caption ? (
+      
+      </ConditionalWrap>
+      {caption ? (
           <Linkify>
             <p className="caption-text">{imageCaption()}</p>{" "}
           </Linkify>
         ) : null}
-      </ConditionalWrap>
 
       <ImageCardBottomBar
         deleteImage={props.deleteImage}
