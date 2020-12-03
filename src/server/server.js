@@ -14,7 +14,7 @@ const fs = require("fs");
 // setting up express
 const app = express();
 let mongodbUri = "mongodb://localhost/LightningHosted";
-const options = {};
+var options = {};
 // if the privkey is avalible use it to start a https server and use the servers mongodbURI
 if (fs.existsSync("/etc/letsencrypt/live/lightninghosted.com/privkey.pem")) {
   mongodbUri = keys.mongodb.uri;
