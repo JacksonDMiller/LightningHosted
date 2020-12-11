@@ -27,23 +27,50 @@ module.exports = function (app) {
 
   // get an image from the server  i = image
   app.get("/api/i/:filename", (req, res) => {
-    res.sendFile("/src/server/uploads/compressed/" + req.params.filename, {
-      root: "./",
-    });
+    res.sendFile(
+      "/src/server/uploads/compressed/" + req.params.filename,
+      {
+        root: "./",
+      },
+      (err) => {
+        if (err) {
+          console.log(err);
+          res.send(`Oops we can't find that file`);
+        }
+      }
+    );
   });
 
   // get a thumbnail from the server  t = thumbnail
   app.get("/api/t/:filename", (req, res) => {
-    res.sendFile("/src/server/uploads/thumbnails/" + req.params.filename, {
-      root: "./",
-    });
+    res.sendFile(
+      "/src/server/uploads/thumbnails/" + req.params.filename,
+      {
+        root: "./",
+      },
+      (err) => {
+        if (err) {
+          console.log(err);
+          res.send(`Oops we can't find that file`);
+        }
+      }
+    );
   });
 
   // get an avatar from the server
   app.get("/api/avatar/:filename", (req, res) => {
-    res.sendFile("/src/server/uploads/avatars/" + req.params.filename, {
-      root: "./",
-    });
+    res.sendFile(
+      "/src/server/uploads/avatars/" + req.params.filename,
+      {
+        root: "./",
+      },
+      (err) => {
+        if (err) {
+          console.log(err);
+          res.send(`Oops we can't find that file`);
+        }
+      }
+    );
   });
 
   // get an image's record from the DB
@@ -51,9 +78,6 @@ module.exports = function (app) {
     // find the image data in the database
     Users.findOne({ "images.imageId": req.params.imageId })
       .then(async (user, err) => {
-        if (err) {
-          res.send("oops");
-        }
         let imageData = {};
         for (let image in user.images) {
           if (user.images[image].imageId === req.params.imageId) {
@@ -79,8 +103,7 @@ module.exports = function (app) {
         res.send(imageData);
       })
       .catch((err) => {
-        console.log(err);
-        res.send("We couldn't find that image");
+        res.send({ error: "We couldn't find that image" });
       });
   });
 
@@ -147,6 +170,7 @@ module.exports = function (app) {
   });
 
   app.get("/s/:imageId", async (req, res, next) => {
+    console.log("hello");
     let title = "LightningHosted";
     let twitterTitle = "";
     let imageData = "";
@@ -222,6 +246,7 @@ module.exports = function (app) {
       })
       .catch((err) => {
         console.log(err);
+        console.log("avadddddddddfaa");
         res.send("We couldn't find that image");
       });
   });
