@@ -107,7 +107,7 @@ export default function Login() {
 
   return (
     <div className="row container">
-      <div className="login-container col l6">
+      <div className="login-container">
         {globalState.state.auth ? <Redirect to="/profile" /> : null}
         <div className="">
           <ul className="tabs">
