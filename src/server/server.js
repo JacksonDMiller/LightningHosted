@@ -13,10 +13,9 @@ const fs = require("fs");
 
 // setting up express
 const app = express();
-let mongodbUri = "mongodb://localhost/LightningHosted";
 var options = {};
 // if the privkey is avalible use it to start a https server and use the servers mongodbURI
-mongodbUri = keys.mongodb.uri;
+let mongodbUri = keys.mongodb.uri;
 
 // redirecting requests that come in on http
 app.use(function (req, res, next) {
@@ -73,6 +72,6 @@ options = {
   ),
 };
 https.createServer(options, app).listen(443);
-app.listen(process.env.PORT || 8080, () =>
-  console.log(`YipYip app is listening on port ${process.env.PORT || 8080}!`)
+app.listen(process.env.PORT || 80, () =>
+  console.log(`YipYip app is listening on port ${80}!`)
 );

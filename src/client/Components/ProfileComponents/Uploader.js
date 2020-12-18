@@ -14,13 +14,15 @@ import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import FilePondPluginImageTransform from "filepond-plugin-image-transform";
 
 // Register the plugins
 registerPlugin(
   FilePondPluginFileValidateType,
   FilePondPluginImageExifOrientation,
   FilePondPluginImagePreview,
-  FilePondPluginFileValidateSize
+  FilePondPluginFileValidateSize,
+  FilePondPluginImageTransform
 );
 
 function Uploader({ addImage }) {
@@ -57,12 +59,7 @@ function Uploader({ addImage }) {
         </div>
       ) : null}
       <FilePond
-        acceptedFileTypes={[
-          "image/png",
-          "image/jpeg",
-          "image/gif",
-          "video/mp4",
-        ]}
+        acceptedFileTypes={["image/jpeg", "video/mp4"]}
         ref={pond}
         files={file}
         allowMultiple={false}
@@ -98,7 +95,8 @@ function Uploader({ addImage }) {
         allowProcess={false}
         allowRevert={false}
         instantUpload={false}
-        maxFileSize="5mb"
+        maxFileSize={"5mb"}
+        imageTransformOutputQuality={50}
       />
       {file.length !== 0 ? (
         <div className="row">

@@ -30,6 +30,7 @@
     "filepond-plugin-file-validate-type": "^1.2.5",
     "filepond-plugin-image-exif-orientation": "^1.0.9",
     "filepond-plugin-image-preview": "^4.6.4",
+    "filepond-plugin-image-transform": "^3.7.4",
     "fluent-ffmpeg": "^2.1.2",
     "fs": "0.0.1-security",
     "get-video-dimensions": "^1.0.0",

@@ -20,12 +20,7 @@ var uploadImage = multer({
 
   // filter uploaded files based on MimeType
   fileFilter: function fileFilter(req, file, cb) {
-    const acceptedMimeTypes = [
-      "image/jpeg",
-      "video/mp4",
-      "image/gif",
-      "image/png",
-    ];
+    const acceptedMimeTypes = ["image/jpeg", "video/mp4"];
     let error = null;
     if (!req.user) {
       error = "Please log in first";
@@ -115,203 +110,206 @@ module.exports = function (app) {
   // Upload a new image, process it, add it to the datbase.
   // create an invoice for the deposit if required
   // this function is a rats nest and should be refactored
-  app.post("/api/upload", uploadImage.single("filepond"), async function (
-    req,
-    res
-  ) {
-    let imagesUploadeToday = 0;
-    let paymentRequired = false;
-    let imageInvoice = "";
-    const imagesPerDayCap = 5;
-    //allow moderators to ignore the images per day cap
-    if (!req.user.moderator) {
-      // determine how many images have been uploaded in the last day
-      for await (let image of req.user.images) {
-        if (new Date() - image.date <= 86400000 && !image.paymentRequired) {
-          imagesUploadeToday = imagesUploadeToday + 1;
+  app.post(
+    "/api/upload",
+    uploadImage.single("filepond"),
+    async function (req, res) {
+      let imagesUploadeToday = 0;
+      let paymentRequired = false;
+      let imageInvoice = "";
+      const imagesPerDayCap = 5;
+      //allow moderators to ignore the images per day cap
+      if (!req.user.moderator) {
+        // determine how many images have been uploaded in the last day
+        for await (let image of req.user.images) {
+          if (new Date() - image.date <= 86400000 && !image.paymentRequired) {
+            imagesUploadeToday = imagesUploadeToday + 1;
+          }
+        }
+        // if its over the cap then require a deposit
+        if (imagesUploadeToday > imagesPerDayCap) {
+          paymentRequired = true;
         }
       }
-      // if its over the cap then require a deposit
-      if (imagesUploadeToday > imagesPerDayCap) {
-        paymentRequired = true;
-      }
-    }
 
-    if (Object.keys(req.file).length === 0) {
-      return res.status(400).send("No files were uploaded.");
-    } else {
-      const imageFileName = crypto.randomBytes(8).toString("hex");
-      let imageExtension = "";
-      try {
-        if (paymentRequired === true) {
-          imageInvoice = createInvoice({
-            lnd,
-            description: "LightningHosted deposit",
-            tokens: "100",
-          }).catch((err) => {
-            logger.log({
-              level: "error",
-              message: `invoice creation error` + err,
+      if (Object.keys(req.file).length === 0) {
+        return res.status(400).send("No files were uploaded.");
+      } else {
+        const imageFileName = crypto.randomBytes(8).toString("hex");
+        let imageExtension = "";
+        try {
+          if (paymentRequired === true) {
+            imageInvoice = createInvoice({
+              lnd,
+              description: "LightningHosted deposit",
+              tokens: "100",
+            }).catch((err) => {
+              logger.log({
+                level: "error",
+                message: `invoice creation error` + err,
+              });
+              imageInvoice = null;
+              paymentRequired = false;
             });
-            imageInvoice = null;
-            paymentRequired = false;
-          });
-        }
-        const processedImage = new Promise(async (resolve, reject) => {
-          try {
-            // if the image is a gif don't do any procesing
-            // converting gifs to mp4s on upload is on the to do list.
-            if (req.file.mimetype === "image/gif") {
-              await fsPromises.rename(
-                req.file.path,
-                "src/server/uploads/compressed/" + imageFileName + ".gif"
-              );
-              resolve("gif");
+          }
+          const processedImage = new Promise(async (resolve, reject) => {
+            try {
+              // if the image is a gif don't do any procesing
+              // converting gifs to mp4s on upload is on the to do list.
+              if (req.file.mimetype === "image/gif") {
+                await fsPromises.rename(
+                  req.file.path,
+                  "src/server/uploads/compressed/" + imageFileName + ".gif"
+                );
+                resolve("gif");
+              }
+              if (
+                req.file.mimetype === "image/jpeg" ||
+                req.file.mimetype === "image/png"
+              ) {
+                await sharp(req.file.path)
+                  .jpeg({ quality: 75, force: true })
+                  .rotate()
+                  .toFile(
+                    "src/server/uploads/compressed/" +
+                      imageFileName +
+                      "." +
+                      "jpeg"
+                  )
+                  .catch((err) => {
+                    return err;
+                  });
+                fsPromises.unlink(req.file.path);
+                resolve("jpeg");
+              }
+              if (req.file.mimetype === "video/mp4") {
+                await fsPromises
+                  .rename(
+                    req.file.path,
+                    "src/server/uploads/compressed/" + imageFileName + ".mp4"
+                  )
+                  .then(resolve("mp4"));
+              }
+            } catch (error) {
+              reject("error proessing the image" + error);
             }
-            if (
-              req.file.mimetype === "image/jpeg" ||
-              req.file.mimetype === "image/png"
-            ) {
-              await sharp(req.file.path)
-                .jpeg({ quality: 75, force: true })
-                .rotate()
-                .toFile(
+          });
+          await processedImage.then((ext) => (imageExtension = ext));
+          const getDimensions = new Promise(async (resolve, reject) => {
+            try {
+              if (imageExtension === "mp4") {
+                let result = await getVideoDimensions(
+                  "src/server/uploads/compressed/" + imageFileName + ".mp4"
+                );
+                resolve(result);
+              } else {
+                let result = await imageSize(
                   "src/server/uploads/compressed/" +
                     imageFileName +
                     "." +
-                    "jpeg"
-                )
-                .catch((err) => {
-                  return err;
-                });
-              fsPromises.unlink(req.file.path);
-              resolve("jpeg");
-            }
-            if (req.file.mimetype === "video/mp4") {
-              await fsPromises
-                .rename(
-                  req.file.path,
-                  "src/server/uploads/compressed/" + imageFileName + ".mp4"
-                )
-                .then(resolve("mp4"));
-            }
-          } catch (error) {
-            reject("error proessing the image" + error);
-          }
-        });
-        await processedImage.then((ext) => (imageExtension = ext));
-        const getDimensions = new Promise(async (resolve, reject) => {
-          try {
-            if (imageExtension === "mp4") {
-              let result = await getVideoDimensions(
-                "src/server/uploads/compressed/" + imageFileName + ".mp4"
-              );
-              resolve(result);
-            } else {
-              let result = await imageSize(
-                "src/server/uploads/compressed/" +
-                  imageFileName +
-                  "." +
-                  imageExtension
-              );
-              resolve(result);
-            }
-          } catch (error) {
-            reject("problems getting dimensions" + error);
-          }
-        });
-        var dimensions = await getDimensions.then((d) => (dimensions = d));
-
-        const generateThumbnail = new Promise(async (resolve, reject) => {
-          try {
-            if (imageExtension === "mp4") {
-              async function generateMp4Thumbnail() {
-                try {
-                  await genThumbnail(
-                    "src/server/uploads/compressed/" + imageFileName + ".mp4",
-                    "src/server/uploads/thumbnails/" + imageFileName + ".jpeg",
-                    dimensions.width + "x" + dimensions.height
-                  );
-                  resolve(true);
-                } catch (err) {
-                  resolve(false);
-                }
+                    imageExtension
+                );
+                resolve(result);
               }
-              await generateMp4Thumbnail();
-            } else {
-              sharp(
-                "src/server/uploads/compressed/" +
-                  imageFileName +
-                  "." +
-                  imageExtension
-              )
-                .jpeg({ quality: 20, force: true })
-                .rotate()
-                .toFile(
-                  "src/server/uploads/thumbnails/" +
+            } catch (error) {
+              reject("problems getting dimensions" + error);
+            }
+          });
+          var dimensions = await getDimensions.then((d) => (dimensions = d));
+
+          const generateThumbnail = new Promise(async (resolve, reject) => {
+            try {
+              if (imageExtension === "mp4") {
+                async function generateMp4Thumbnail() {
+                  try {
+                    await genThumbnail(
+                      "src/server/uploads/compressed/" + imageFileName + ".mp4",
+                      "src/server/uploads/thumbnails/" +
+                        imageFileName +
+                        ".jpeg",
+                      dimensions.width + "x" + dimensions.height
+                    );
+                    resolve(true);
+                  } catch (err) {
+                    resolve(false);
+                  }
+                }
+                await generateMp4Thumbnail();
+              } else {
+                sharp(
+                  "src/server/uploads/compressed/" +
                     imageFileName +
                     "." +
-                    "jpeg"
-                );
+                    imageExtension
+                )
+                  .jpeg({ quality: 20, force: true })
+                  .rotate()
+                  .toFile(
+                    "src/server/uploads/thumbnails/" +
+                      imageFileName +
+                      "." +
+                      "jpeg"
+                  );
+              }
+            } catch (err) {
+              reject("Thumbnail generation error" + err);
             }
-          } catch (err) {
-            reject("Thumbnail generation error" + err);
+            resolve(true);
+          });
+
+          await generateThumbnail;
+
+          if (imageInvoice) {
+            let invoice = await imageInvoice;
+            imageInvoice = invoice.request;
           }
-          resolve(true);
-        });
 
-        await generateThumbnail;
+          let imageOrientation = "horizontal";
+          if (dimensions.height > dimensions.width) {
+            imageOrientation = "vertical";
+          }
 
-        if (imageInvoice) {
-          let invoice = await imageInvoice;
-          imageInvoice = invoice.request;
+          let imageData = {
+            recentViews: [],
+            posterId: req.user._id,
+            orientation: imageOrientation,
+            imageId: imageFileName,
+            reviewStatus: false,
+            payStatus: false,
+            deleted: false,
+            views: 0,
+            reports: 0,
+            filename: imageFileName + "." + imageExtension,
+            thumbnail: imageFileName + ".jpeg",
+            width: dimensions.width,
+            height: dimensions.height,
+            date: new Date(),
+            caption: req.body.caption,
+            title: req.body.title.substring(0, 60),
+            paymentRequest: imageInvoice,
+            paymentRequired: paymentRequired,
+            upvotes: 0,
+            sats: 0,
+            numberOfComments: 0,
+            filetype: imageExtension,
+            ogType: "ogType",
+            twitterCard: "twitterCard",
+            suppressed: false,
+          };
+          await req.user.images.push(imageData);
+          req.user.save();
+
+          res.status(200).send(imageData);
+        } catch (err) {
+          logger.log({
+            level: "error",
+            message: err,
+          });
+          res.status(400).send({ error: err });
         }
-
-        let imageOrientation = "horizontal";
-        if (dimensions.height > dimensions.width) {
-          imageOrientation = "vertical";
-        }
-
-        let imageData = {
-          recentViews: [],
-          posterId: req.user._id,
-          orientation: imageOrientation,
-          imageId: imageFileName,
-          reviewStatus: false,
-          payStatus: false,
-          deleted: false,
-          views: 0,
-          reports: 0,
-          filename: imageFileName + "." + imageExtension,
-          thumbnail: imageFileName + ".jpeg",
-          width: dimensions.width,
-          height: dimensions.height,
-          date: new Date(),
-          caption: req.body.caption,
-          title: req.body.title.substring(0, 60),
-          paymentRequest: imageInvoice,
-          paymentRequired: paymentRequired,
-          upvotes: 0,
-          sats: 0,
-          numberOfComments: 0,
-          filetype: imageExtension,
-          ogType: "ogType",
-          twitterCard: "twitterCard",
-          suppressed: false,
-        };
-        await req.user.images.push(imageData);
-        req.user.save();
-
-        res.status(200).send(imageData);
-      } catch (err) {
-        logger.log({
-          level: "error",
-          message: err,
-        });
-        res.status(400).send({ error: err });
       }
     }
-  });
+  );
 
   // send profile info
   app.get("/api/profileinfo/", async (req, res) => {
