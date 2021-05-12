@@ -35,7 +35,6 @@ module.exports = function (app) {
       (err) => {
         if (err) {
           console.log(err);
-          res.send(`Oops we can't find that file`);
         }
       }
     );
@@ -169,8 +168,9 @@ module.exports = function (app) {
     );
   });
 
+  // this route is called when someone navigates directly to an image. It's done this way so that we can set
+  // html headers.
   app.get("/s/:imageId", async (req, res, next) => {
-    console.log("hello");
     let title = "LightningHosted";
     let twitterTitle = "";
     let imageData = "";
